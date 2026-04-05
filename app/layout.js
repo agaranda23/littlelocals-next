@@ -4,6 +4,10 @@ export const metadata = {
   title: 'LITTLElocals — Things to do with kids in Ealing',
   description: 'Quick ideas around Ealing for babies, toddlers and kids',
   themeColor: '#5C4B6B',
+  manifest: '/manifest.json',
+  icons: {
+    apple: '/bear-logo.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
