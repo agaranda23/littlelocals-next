@@ -3,8 +3,8 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/listing/sing-and-sign-ealing',
-        destination: '/listing/sing-and-sign-ealing-333',
+        source: '/listing/sing-and-sign-ealing-333',
+        destination: '/listing/sing-and-sign-ealing',
         permanent: true,
       },
     ]
