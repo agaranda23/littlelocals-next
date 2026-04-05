@@ -6,47 +6,6 @@ const DAY_NAMES = ['sun','mon','tue','wed','thu','fri','sat']
 
 export default function ListingDetailClient({ listing, images, relatedListings }) {
   const [saved, setSaved] = useState(false)
-  const [visited, setVisited] = useState(false)
-  const [plannedDates, setPlannedDates] = useState([])
-
-  useEffect(() => {
-    const v = localStorage.getItem('visited_' + listing.id)
-    if (v) setVisited(true)
-    const p = localStorage.getItem('plans_' + listing.id)
-    if (p) setPlannedDates(JSON.parse(p))
-  }, [listing.id])
-
-  const toggleVisited = () => {
-    if (visited) {
-      localStorage.removeItem('visited_' + listing.id)
-      setVisited(false)
-    } else {
-      localStorage.setItem('visited_' + listing.id, '1')
-      setVisited(true)
-    }
-  }
-
-  const togglePlan = (dateStr) => {
-    const next = plannedDates.includes(dateStr)
-      ? plannedDates.filter(d => d !== dateStr)
-      : [...plannedDates, dateStr]
-    setPlannedDates(next)
-    localStorage.setItem('plans_' + listing.id, JSON.stringify(next))
-  }
-
-  const getPlanDays = () => {
-    const days = []
-    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
-    const shortNames = ['Today','Tmrw']
-    for (let i = 0; i < 10; i++) {
-      const d = new Date()
-      d.setDate(d.getDate() + i)
-      const label = i < 2 ? shortNames[i] : dayNames[d.getDay()]
-      const dateStr = d.toISOString().split('T')[0]
-      days.push({ label, num: d.getDate(), dateStr })
-    }
-    return days
-  }
   const [imgIdx, setImgIdx] = useState(0)
 
   const isFree = listing.free || (listing.price || '').toLowerCase().includes('free')
@@ -229,34 +188,6 @@ export default function ListingDetailClient({ listing, images, relatedListings }
             ))}
           </div>
         )}
-
-        {/* Add to My Plans */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 10 }}>📅 Add to My Plans</div>
-          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
-            {getPlanDays().map(({ label, num, dateStr }) => {
-              const planned = plannedDates.includes(dateStr)
-              return (
-                <div key={dateStr} onClick={() => togglePlan(dateStr)}
-                  style={{ flexShrink: 0, textAlign: 'center', background: planned ? '#5B2D6E' : 'white', border: planned ? 'none' : '1px solid #E5E7EB', borderRadius: 12, padding: '8px 12px', cursor: 'pointer', minWidth: 52 }}>
-                  <div style={{ fontSize: 11, color: planned ? 'rgba(255,255,255,0.8)' : '#6B7280', marginBottom: 2 }}>{label}</div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: planned ? 'white' : '#111827' }}>{num}</div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Been here */}
-        <div onClick={toggleVisited} style={{ display: 'flex', alignItems: 'center', gap: 12, background: visited ? '#F0FDF4' : 'white', border: visited ? '1px solid #BBF7D0' : '1.5px dashed #E5E7EB', borderRadius: 14, padding: '14px 16px', marginBottom: 14, cursor: 'pointer' }}>
-          <div style={{ fontSize: 24 }}>{visited ? '✅' : '✅'}</div>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: visited ? '#15803D' : '#111827' }}>
-              {visited ? 'Been here!' : 'Been here? Tap to mark visited'}
-            </div>
-            <div style={{ fontSize: 12, color: '#6B7280' }}>Track activities your family has tried</div>
-          </div>
-        </div>
 
         {/* CTA buttons */}
         {listing.cta_url && (
