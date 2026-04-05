@@ -175,6 +175,39 @@ export default function HomeClient({ listings, recentListings = [] }) {
         <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 8 }}>👀 {exploringCount} parents exploring today</div>
       </div>
 
+
+      {/* Your week with the kids */}
+      {!hasActiveFilters && (
+        <div style={{ padding: '16px 0 4px' }}>
+          <div style={{ padding: '0 20px 10px', fontSize: 15, fontWeight: 800, color: '#111827' }}>📅 Your week with the kids</div>
+          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 4px', scrollbarWidth: 'none' }}>
+            {[
+              { key: 'mon', label: 'Mon', emoji: '🎨', pick: 'Arts & crafts' },
+              { key: 'tue', label: 'Tue', emoji: '🎵', pick: 'Music & singing' },
+              { key: 'wed', label: 'Wed', emoji: '🏊', pick: 'Swimming & sports' },
+              { key: 'thu', label: 'Thu', emoji: '📚', pick: 'Storytime & library' },
+              { key: 'fri', label: 'Fri', emoji: '🧸', pick: 'Soft play & sensory' },
+              { key: 'sat', label: 'Sat', emoji: '🌳', pick: 'Parks & outdoors' },
+              { key: 'sun', label: 'Sun', emoji: '🍳', pick: 'Family brunch & cafes' },
+            ].map(({ key, label, emoji, pick }) => {
+              const count = listings.filter(l =>
+                l.is_daily || !l.days_of_week || l.days_of_week.length === 0 || (l.days_of_week || []).includes(key)
+              ).length
+              const isToday = DAY_NAMES[new Date().getDay()] === key
+              return (
+                <div key={key} onClick={() => setDayFilter(key === DAY_NAMES[new Date().getDay()] ? 'today' : 'week')}
+                  style={{ flexShrink: 0, background: isToday ? '#5B2D6E' : 'white', borderRadius: 14, border: isToday ? 'none' : '1.5px solid #E5E7EB', padding: '12px 14px', minWidth: 110, cursor: 'pointer', textAlign: 'left' }}>
+                  <div style={{ fontSize: 20, marginBottom: 4 }}>{emoji}</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: isToday ? 'white' : '#111827', marginBottom: 2 }}>{isToday ? 'Today' : label}</div>
+                  <div style={{ fontSize: 11, color: isToday ? 'rgba(255,255,255,0.8)' : '#9CA3AF', marginBottom: 6, lineHeight: 1.3 }}>{pick}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: isToday ? 'rgba(255,255,255,0.9)' : '#D4732A' }}>{count} activities</div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Listings */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '0 16px' }}>
         {filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE).map(listing => (
