@@ -43,6 +43,8 @@ function getGreeting(weather) {
 
 export default function HomeClient({ listings, recentListings = [], localFav = null, viewCounts = {} }) {
   const [dayFilter, setDayFilter] = useState('week')
+  const [showFilters, setShowFilters] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
   const [search, setSearch] = useState('')
   const [ageFilter, setAgeFilter] = useState('all')
   const [freeOnly, setFreeOnly] = useState(false)
@@ -157,7 +159,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const dayChipStyle = (active) => ({
     flexShrink: 0, fontSize: 13, fontWeight: active ? 700 : 500,
     padding: '6px 14px', borderRadius: 20, cursor: 'pointer', whiteSpace: 'nowrap',
-    background: active ? '#111827' : 'white',
+    background: active ? '#D4732A' : 'white',
     color: active ? 'white' : '#6B7280',
     border: active ? 'none' : '1px solid #E5E7EB',
   })
@@ -177,10 +179,60 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
           <span style={{ color: '#9CA3AF' }}>🔍</span>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search activities..." style={{ border: 'none', outline: 'none', flex: 1, fontSize: 15, color: '#111827', background: 'transparent' }} />
         </div>
-        <button onClick={() => {}} style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 14, padding: '10px 16px', fontSize: 14, fontWeight: 700, color: '#111827', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
+        <button onClick={() => setShowFilters(f => !f)} style={{ background: showFilters ? '#5B2D6E' : 'white', border: showFilters ? 'none' : '1px solid #E5E7EB', borderRadius: 14, padding: '10px 16px', fontSize: 14, fontWeight: 700, color: showFilters ? 'white' : '#111827', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
           ≡ Filters
         </button>
       </div>
+
+      {/* Filter panel */}
+      {showFilters && (
+        <div style={{ margin: '0 16px 12px', background: 'white', borderRadius: 16, border: '1px solid #E5E7EB', padding: '16px' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#6B7280', marginBottom: 10 }}>AGE</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+            {[['baby','👶 Baby 0-12m'],['toddler','🧒 Toddler 1-3'],['preschool','🐣 Preschool 3-5'],['kids','🎒 Kids 5+']].map(([key, label]) => (
+              <span key={key} onClick={() => setAgeFilter(ageFilter === key ? 'all' : key)} style={{ fontSize: 13, fontWeight: ageFilter === key ? 700 : 500, padding: '6px 14px', borderRadius: 20, cursor: 'pointer', background: ageFilter === key ? '#5B2D6E' : '#F3F4F6', color: ageFilter === key ? 'white' : '#374151' }}>{label}</span>
+            ))}
+          </div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#6B7280', marginBottom: 10 }}>SETTING</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+            {[['sunny','Outdoor'],['rainy','Indoor']].map(([key, label]) => (
+              <span key={key} onClick={() => setWeatherMode(weatherMode === key ? 'all' : key)} style={{ fontSize: 13, fontWeight: weatherMode === key ? 700 : 500, padding: '6px 14px', borderRadius: 20, cursor: 'pointer', background: weatherMode === key ? '#D4732A' : '#F3F4F6', color: weatherMode === key ? 'white' : '#374151' }}>{label}</span>
+            ))}
+          </div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#6B7280', marginBottom: 10 }}>MORE</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+            {[['Free', freeOnly, () => setFreeOnly(!freeOnly)], ['Adventure', worthJourney, () => setWorthJourney(!worthJourney)], ['Nurseries', nurseryFilter, () => setNurseryFilter(!nurseryFilter)]].map(([label, active, action]) => (
+              <span key={label} onClick={action} style={{ fontSize: 13, fontWeight: active ? 700 : 500, padding: '6px 14px', borderRadius: 20, cursor: 'pointer', background: active ? '#D4732A' : '#F3F4F6', color: active ? 'white' : '#374151' }}>{label}</span>
+            ))}
+          </div>
+          <button onClick={() => { clearAll(); setShowFilters(false) }} style={{ width: '100%', background: '#F3F4F6', border: 'none', borderRadius: 12, padding: '10px', fontSize: 14, fontWeight: 700, color: '#374151', cursor: 'pointer' }}>Clear all filters</button>
+        </div>
+      )}
+
+      {/* Filter panel */}
+      {showFilters && (
+        <div style={{ margin: '0 16px 12px', background: 'white', borderRadius: 16, border: '1px solid #E5E7EB', padding: '16px' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#6B7280', marginBottom: 10 }}>AGE</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+            {[['baby','👶 Baby 0-12m'],['toddler','🧒 Toddler 1-3'],['preschool','🐣 Preschool 3-5'],['kids','🎒 Kids 5+']].map(([key, label]) => (
+              <span key={key} onClick={() => setAgeFilter(ageFilter === key ? 'all' : key)} style={{ fontSize: 13, fontWeight: ageFilter === key ? 700 : 500, padding: '6px 14px', borderRadius: 20, cursor: 'pointer', background: ageFilter === key ? '#5B2D6E' : '#F3F4F6', color: ageFilter === key ? 'white' : '#374151' }}>{label}</span>
+            ))}
+          </div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#6B7280', marginBottom: 10 }}>SETTING</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+            {[['sunny','Outdoor'],['rainy','Indoor']].map(([key, label]) => (
+              <span key={key} onClick={() => setWeatherMode(weatherMode === key ? 'all' : key)} style={{ fontSize: 13, fontWeight: weatherMode === key ? 700 : 500, padding: '6px 14px', borderRadius: 20, cursor: 'pointer', background: weatherMode === key ? '#D4732A' : '#F3F4F6', color: weatherMode === key ? 'white' : '#374151' }}>{label}</span>
+            ))}
+          </div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#6B7280', marginBottom: 10 }}>MORE</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+            {[['Free', freeOnly, () => setFreeOnly(!freeOnly)], ['Adventure', worthJourney, () => setWorthJourney(!worthJourney)], ['Nurseries', nurseryFilter, () => setNurseryFilter(!nurseryFilter)]].map(([label, active, action]) => (
+              <span key={label} onClick={action} style={{ fontSize: 13, fontWeight: active ? 700 : 500, padding: '6px 14px', borderRadius: 20, cursor: 'pointer', background: active ? '#D4732A' : '#F3F4F6', color: active ? 'white' : '#374151' }}>{label}</span>
+            ))}
+          </div>
+          <button onClick={() => { clearAll(); setShowFilters(false) }} style={{ width: '100%', background: '#F3F4F6', border: 'none', borderRadius: 12, padding: '10px', fontSize: 14, fontWeight: 700, color: '#374151', cursor: 'pointer' }}>Clear all filters</button>
+        </div>
+      )}
 
       {/* Age chips */}
       <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 16px 8px', scrollbarWidth: 'none' }}>
@@ -202,8 +254,8 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
           ['Outdoor', weatherMode === 'sunny', () => setWeatherMode(weatherMode === 'sunny' ? 'all' : 'sunny')],
           ['Indoor', weatherMode === 'rainy', () => setWeatherMode(weatherMode === 'rainy' ? 'all' : 'rainy')],
           ['Free', freeOnly, () => setFreeOnly(!freeOnly)],
-          ['🚗 Adventure', worthJourney, () => setWorthJourney(!worthJourney)],
-          ['🏫 Nurseries', nurseryFilter, () => setNurseryFilter(!nurseryFilter)],
+          ['Adventure', worthJourney, () => setWorthJourney(!worthJourney)],
+          ['Nurseries', nurseryFilter, () => setNurseryFilter(!nurseryFilter)],
         ].map(([label, active, action]) => (
           <span key={label} onClick={action} style={chipStyle(active)}>{label}</span>
         ))}
@@ -360,7 +412,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
             <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 2 }}>✨ Suggest an activity for Ealing parents</div>
             <div style={{ fontSize: 13, color: '#6B7280' }}>Help improve what families nearby can find</div>
           </div>
-          <button style={{ background: '#D4732A', color: 'white', border: 'none', borderRadius: 12, padding: '10px 16px', fontSize: 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>Add activity</button>
+          <a href='mailto:hello@littlelocals.uk?subject=Suggest an activity' style={{ background: '#D4732A', color: 'white', border: 'none', borderRadius: 12, padding: '10px 16px', fontSize: 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', textDecoration: 'none' }}>Add activity</a>
         </div>
       )}
 
@@ -439,7 +491,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 24 }}>✨</span>
-          <button style={{ background: '#D4732A', color: 'white', border: 'none', borderRadius: 12, padding: '10px 18px', fontSize: 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>Add activity</button>
+          <a href='mailto:hello@littlelocals.uk?subject=Suggest an activity' style={{ background: '#D4732A', color: 'white', border: 'none', borderRadius: 12, padding: '10px 18px', fontSize: 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', textDecoration: 'none' }}>Add activity</a>
         </div>
       </div>
 
@@ -452,8 +504,8 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         </div>
         <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 12 }}>Built by parents, for parents.</div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 12 }}>
-          {['Privacy Policy','Cookie Policy','Terms of Service','Contact'].map(link => (
-            <span key={link} style={{ fontSize: 11, color: '#9CA3AF', cursor: 'pointer', textDecoration: 'underline' }}>{link}</span>
+          {[['Privacy Policy','/privacy'],['Cookie Policy','/cookies'],['Terms of Service','/terms'],['Contact','mailto:hello@littlelocals.uk']].map(([label, href]) => (
+            <a key={label} href={href} style={{ fontSize: 11, color: '#9CA3AF', textDecoration: 'underline' }}>{label}</a>
           ))}
         </div>
         <div style={{ fontSize: 11, color: '#D1D5DB' }}>© 2026 LITTLElocals. All rights reserved.</div>
@@ -461,11 +513,11 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
 
       {/* Bottom nav */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '8px 0 20px', zIndex: 100 }}>
-        {[['🏠','Home'],['📅','Today'],['🔍','Explore'],['📋','My Plans']].map(([icon, label]) => (
-          <div key={label} style={{ flex: 1, textAlign: 'center', cursor: 'pointer' }}>
+        {[['🏠','Home','/'],['📅','Today','/?day=today'],['🔍','Explore','/'],['📋','My Plans','/']].map(([icon, label, href]) => (
+          <a key={label} href={href} style={{ flex: 1, textAlign: 'center', cursor: 'pointer', textDecoration: 'none' }}>
             <div style={{ fontSize: 20 }}>{icon}</div>
             <div style={{ fontSize: 10, fontWeight: 600, color: label === 'Home' ? '#5B2D6E' : '#9CA3AF', marginTop: 2 }}>{label}</div>
-          </div>
+          </a>
         ))}
       </div>
     </div>

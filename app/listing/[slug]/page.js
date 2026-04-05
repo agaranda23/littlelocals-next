@@ -25,15 +25,23 @@ export default async function ListingPage({ params }) {
     .order('sort_order', { ascending: true })
 
   // Fetch cross links
-  const { data: crossLinks } = await supabase
+  const { data: crossLinksA } = await supabase
     .from('cross_links')
     .select('listing_id_b')
     .eq('listing_id_a', listing.id)
     .limit(5)
 
+  const { data: crossLinksB } = await supabase
+    .from('cross_links')
+    .select('listing_id_a')
+    .eq('listing_id_b', listing.id)
+    .limit(5)
+
+  const crossLinks = [...(crossLinksA || []).map(c => ({ id: c.listing_id_b })), ...(crossLinksB || []).map(c => ({ id: c.listing_id_a }))]
+
   let relatedListings = []
   if (crossLinks && crossLinks.length > 0) {
-    const ids = crossLinks.map(c => c.listing_id_b)
+    const ids = crossLinks.map(c => c.id)
     const { data: related } = await supabase
       .from('listings')
       .select('id, name, slug, type, day, venue')

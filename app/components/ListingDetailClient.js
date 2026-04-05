@@ -7,6 +7,8 @@ const DAY_NAMES = ['sun','mon','tue','wed','thu','fri','sat']
 export default function ListingDetailClient({ listing, images, relatedListings }) {
   const [saved, setSaved] = useState(false)
   const [imgIdx, setImgIdx] = useState(0)
+  const [lightbox, setLightbox] = useState(false)
+  const [lightbox, setLightbox] = useState(false)
 
   const [visited, setVisited] = useState(false)
   const [plannedDates, setPlannedDates] = useState([])
@@ -179,13 +181,29 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           </div>
         )}
 
+        {/* Timetable image */}
+        {listing.timetable_image && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 10 }}>📅 Timetable</div>
+            <img src={listing.timetable_image} alt="Timetable" style={{ width: '100%', borderRadius: 12, cursor: 'pointer' }} onClick={() => setLightbox('timetable')} />
+          </div>
+        )}
+
+        {/* Timetable image */}
+        {listing.timetable_image && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 10 }}>📅 Timetable</div>
+            <img src={listing.timetable_image} alt="Timetable" style={{ width: '100%', borderRadius: 12, cursor: 'pointer' }} onClick={() => setLightbox('timetable')} />
+          </div>
+        )}
+
         {/* Photos gallery */}
         {images.length > 1 && (
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 10 }}>📸 Photos</div>
             <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
               {images.map((img, i) => (
-                <img key={i} src={img.url} alt="" onClick={() => setImgIdx(i)} style={{ flexShrink: 0, width: 120, height: 90, objectFit: 'cover', borderRadius: 10, cursor: 'pointer', border: i === imgIdx ? '2px solid #5B2D6E' : 'none' }} />
+                <img key={i} src={img.url} alt="" onClick={() => setLightbox(i)} style={{ flexShrink: 0, width: 120, height: 90, objectFit: 'cover', borderRadius: 10, cursor: 'pointer', border: i === imgIdx ? '2px solid #5B2D6E' : 'none' }} />
               ))}
             </div>
             <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 6 }}>{images.length} photos</div>
@@ -193,7 +211,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         )}
 
         {/* Video */}
-        {listing.video_url && (
+        {listing.video_url && listing.video_url.trim() !== '' && (
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 10 }}>🎥 Videos</div>
             <video src={listing.video_url} controls style={{ width: '100%', borderRadius: 12 }} />
@@ -212,8 +230,19 @@ export default function ListingDetailClient({ listing, images, relatedListings }
 
         {/* Related listings (cross links) */}
         {relatedListings.length > 0 && (
-          <div style={{ background: '#FFF0F9', border: '1px solid #FCE7F3', borderRadius: 14, padding: '14px 16px', marginBottom: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: '#9D174D', marginBottom: 10 }}>🌸 Also by {listing.suggested_by || 'this organiser'}:</div>
+          <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 14, padding: '14px 16px', marginBottom: 16 }}>
+            {(() => {
+              const t = (listing.type || '').toLowerCase()
+              const isSwim = t.includes('swim') || t.includes('aqua') || t.includes('water')
+              const isSport = t.includes('sport') || t.includes('football') || t.includes('fitness') || t.includes('gym')
+              const isMusic = t.includes('music') || t.includes('sing')
+              const isDance = t.includes('dance') || t.includes('ballet')
+              const isArt = t.includes('art') || t.includes('craft')
+              const emoji = isSwim ? '🏊' : isSport ? '⚽' : isMusic ? '🎵' : isDance ? '💉' : isArt ? '🎨' : '📍'
+              const bg = isSwim ? '#EFF6FF' : isSport ? '#F0FDF4' : isMusic ? '#FDF4FF' : isDance ? '#FFF7ED' : isArt ? '#FFF7ED' : '#FDF4FF'
+              const color = isSwim ? '#1E40AF' : isSport ? '#15803D' : isMusic ? '#7E22CE' : isDance ? '#9A3412' : isArt ? '#92400E' : '#9D174D'
+              return <div style={{ fontSize: 13, fontWeight: 800, color, marginBottom: 10 }}>{emoji} Also by {listing.suggested_by || 'this organiser'}:</div>
+            })()}
             {relatedListings.map((r, i) => (
               <Link key={r.id} href={`/listing/${r.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                 <div style={{ borderTop: i > 0 ? '1px solid #FCE7F3' : 'none', paddingTop: i > 0 ? 10 : 0, paddingBottom: i < relatedListings.length - 1 ? 10 : 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -260,7 +289,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         {!listing.cta_url && listing.website && (
           <a href={listing.website} target="_blank" rel="noopener noreferrer"
             style={{ display: 'block', background: '#5B2D6E', color: 'white', textAlign: 'center', padding: '16px 20px', borderRadius: 16, fontSize: 16, fontWeight: 800, marginBottom: 10, textDecoration: 'none' }}>
-            Visit Website
+            🌐 Visit Website
           </a>
         )}
         {listing.cta_url && (
@@ -276,12 +305,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
             🎁 Book a free trial
           </a>
         )}
-        {listing.website && (
-          <a href={listing.website} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'block', background: 'white', color: '#5B2D6E', textAlign: 'center', padding: '14px 20px', borderRadius: 16, fontSize: 15, fontWeight: 700, border: '2px solid #5B2D6E', marginBottom: 10, textDecoration: 'none' }}>
-            🌐 Visit Website
-          </a>
-        )}
+
 
         {/* Send to a parent */}
         <button onClick={() => navigator.share?.({ title: listing.name, url: window.location.href })}
@@ -316,6 +340,48 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         </div>
 
       </div>
+      {/* Lightbox */}
+      {lightbox && (
+        <div onClick={() => setLightbox(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <button onClick={() => setLightbox(false)} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 40, height: 40, color: 'white', fontSize: 20, cursor: 'pointer', zIndex: 1001 }}>✕</button>
+          {lightbox === 'timetable' ? (
+            <img src={listing.timetable_image} alt="Timetable" style={{ maxWidth: '95vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} onClick={e => e.stopPropagation()} />
+          ) : (
+            <div style={{ width: '100%', overflowX: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img src={images[typeof lightbox === 'number' ? lightbox : imgIdx]?.url} alt="" style={{ maxWidth: '95vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} onClick={e => e.stopPropagation()} />
+            </div>
+          )}
+          {typeof lightbox === 'number' && images.length > 1 && (
+            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+              {images.map((_, i) => (
+                <div key={i} onClick={e => { e.stopPropagation(); setLightbox(i) }} style={{ width: i === lightbox ? 16 : 8, height: 8, borderRadius: 4, background: i === lightbox ? 'white' : 'rgba(255,255,255,0.4)', cursor: 'pointer' }} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div onClick={() => setLightbox(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <button onClick={() => setLightbox(false)} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 40, height: 40, color: 'white', fontSize: 20, cursor: 'pointer', zIndex: 1001 }}>✕</button>
+          {lightbox === 'timetable' ? (
+            <img src={listing.timetable_image} alt="Timetable" style={{ maxWidth: '95vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} onClick={e => e.stopPropagation()} />
+          ) : (
+            <div style={{ width: '100%', overflowX: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img src={images[typeof lightbox === 'number' ? lightbox : imgIdx]?.url} alt="" style={{ maxWidth: '95vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} onClick={e => e.stopPropagation()} />
+            </div>
+          )}
+          {typeof lightbox === 'number' && images.length > 1 && (
+            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+              {images.map((_, i) => (
+                <div key={i} onClick={e => { e.stopPropagation(); setLightbox(i) }} style={{ width: i === lightbox ? 16 : 8, height: 8, borderRadius: 4, background: i === lightbox ? 'white' : 'rgba(255,255,255,0.4)', cursor: 'pointer' }} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
     </div>
   )
 }
