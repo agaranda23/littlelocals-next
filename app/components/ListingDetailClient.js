@@ -288,7 +288,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         {/* Send to a parent */}
         <button onClick={() => navigator.share?.({ title: listing.name, url: window.location.href })}
           style={{ display: 'block', width: '100%', background: 'white', color: '#111827', textAlign: 'center', padding: '12px 20px', borderRadius: 16, fontSize: 14, fontWeight: 700, border: '1px solid #E5E7EB', marginBottom: 10, cursor: 'pointer' }}>
-          📤 Send to a parent
+          🔗 Send to a parent
         </button>
 
         {/* WhatsApp */}
