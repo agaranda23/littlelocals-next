@@ -52,11 +52,45 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
 
   useEffect(() => { setCurrentPage(1) }, [dayFilter, search, ageFilter, freeOnly, weatherMode, worthJourney, nurseryFilter])
   const [userLocation, setUserLocation] = useState(null)
+  const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const [showInstall, setShowInstall] = useState(false)
+  const [isIOS, setIsIOS] = useState(false)
+  const [showIOSInstructions, setShowIOSInstructions] = useState(false)
   const [weather, setWeather] = useState(null)
   const [exploringCount, setExploringCount] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const PAGE_SIZE = 6
   useEffect(() => { setExploringCount(Math.floor(Math.random() * 18) + 8) }, [])
+
+  useEffect(() => {
+    const isIOSDevice = /iphone|ipad|ipod/i.test(navigator.userAgent)
+    const isInStandalone = window.matchMedia('(display-mode: standalone)').matches
+    setIsIOS(isIOSDevice)
+    if (!isInStandalone) {
+      if (isIOSDevice) {
+        setShowInstall(true)
+      } else {
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault()
+          setDeferredPrompt(e)
+          setShowInstall(true)
+        })
+      }
+    }
+  }, [])
+
+  const handleInstallClick = async () => {
+    if (isIOS) {
+      setShowIOSInstructions(true)
+      return
+    }
+    if (deferredPrompt) {
+      deferredPrompt.prompt()
+      const result = await deferredPrompt.userChoice
+      if (result.outcome === 'accepted') setShowInstall(false)
+      setDeferredPrompt(null)
+    }
+  }
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -331,14 +365,22 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       )}
 
       {/* Install banner */}
-      {!hasActiveFilters && currentPage === 1 && typeof window !== 'undefined' && !window.matchMedia('(display-mode: standalone)').matches && (
-        <div style={{ margin: '0 16px 16px', background: 'white', border: '1px solid #E5E7EB', borderRadius: 16, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 28 }}>🐻</span>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Add to home screen</div>
-            <div style={{ fontSize: 12, color: '#6B7280' }}>for quick access</div>
+      {!hasActiveFilters && currentPage === 1 && showInstall && (
+        <>
+          <div onClick={handleInstallClick} style={{ margin: '0 16px 16px', background: 'white', border: '1px solid #E5E7EB', borderRadius: 16, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+            <img src="/bear-logo.png" alt="LITTLElocals" style={{ width: 36, height: 36, borderRadius: 8 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Add to home screen</div>
+              <div style={{ fontSize: 12, color: '#6B7280' }}>for quick access</div>
+            </div>
+            <span style={{ fontSize: 18 }}>+</span>
           </div>
-        </div>
+          {showIOSInstructions && (
+            <div style={{ margin: '-8px 16px 16px', background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 12, padding: '12px 14px', fontSize: 13, color: '#0369A1', lineHeight: 1.5 }}>
+              Tap the <strong>Share</strong> button in Safari, then tap <strong>Add to Home Screen</strong>
+            </div>
+          )}
+        </>
       )}
 
       {/* Pagination */}
