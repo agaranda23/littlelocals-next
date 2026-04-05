@@ -218,7 +218,46 @@ export default function HomeClient({ listings, recentListings = [] }) {
         )
       })()}
 
-            {/* Listings */}
+      
+      {/* Local favourite */}
+      {!hasActiveFilters && (() => {
+        const fav = listings.find(l => l.is_local_favourite)
+        if (!fav) return null
+        const isFree = fav.free || (fav.price || '').toLowerCase().includes('free')
+        return (
+          <div style={{ padding: '20px 16px 4px' }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#D4732A', marginBottom: 4 }}>⭐ Local favourite this week</div>
+            {fav.local_favourite_subtitle && (
+              <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 10 }}>{fav.local_favourite_subtitle}</div>
+            )}
+            <a href={'/listing/' + fav.slug} style={{ textDecoration: 'none', display: 'block', background: 'white', borderRadius: 18, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', border: '1px solid #F3F4F6' }}>
+              <div style={{ position: 'relative' }}>
+                {fav.image && <img src={fav.image} alt={fav.name} style={{ width: '100%', height: 200, objectFit: 'cover', display: 'block' }} />}
+                <div style={{ position: 'absolute', top: 10, left: 10, background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 700, color: '#92400E' }}>⭐ Local favourite</div>
+                {fav.logo && (
+                  <div style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(255,255,255,0.92)', borderRadius: 8, padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <img src={fav.logo} alt="" style={{ height: 20, width: 'auto', borderRadius: 4 }} />
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#111827' }}>{fav.name}</span>
+                    {fav.verified && <img src="/verified-badge.svg" width={14} height={14} alt="" />}
+                  </div>
+                )}
+              </div>
+              <div style={{ padding: '14px 16px' }}>
+                <div style={{ fontSize: 17, fontWeight: 800, color: '#D4732A', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {fav.name}
+                  {fav.verified && <img src="/verified-badge.svg" width={16} height={16} alt="" />}
+                </div>
+                <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 6 }}>{fav.type}</div>
+                {fav.littlelocals_offer_text && (
+                  <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.5 }}>{fav.littlelocals_offer_text}</div>
+                )}
+              </div>
+            </a>
+          </div>
+        )
+      })()}
+
+      {/* Listings */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '0 16px' }}>
         {filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE).map(listing => (
           <ListingCard key={listing.id} listing={listing} />
