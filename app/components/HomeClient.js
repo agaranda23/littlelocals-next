@@ -5,6 +5,7 @@ import ListingCard from './ListingCard'
 const DAY_NAMES = ['sun','mon','tue','wed','thu','fri','sat']
 
 function isOnToday(l) {
+  if (!l.days_of_week || l.days_of_week.length === 0) return true
   if (l.is_daily) return true
   const today = DAY_NAMES[new Date().getDay()]
   return (l.days_of_week || []).includes(today)
@@ -15,10 +16,12 @@ function isOnTomorrow(l) {
   return (l.days_of_week || []).includes(tomorrow)
 }
 function isOnWeekend(l) {
+  if (!l.days_of_week || l.days_of_week.length === 0) return true
   if (l.is_daily) return true
   return (l.days_of_week || []).some(d => ['sat','sun'].includes(d))
 }
 function isOnThisWeek(l) {
+  if (!l.days_of_week || l.days_of_week.length === 0) return true
   if (l.is_daily) return true
   return (l.days_of_week || []).length > 0
 }
