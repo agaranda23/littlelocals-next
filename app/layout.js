@@ -3,6 +3,12 @@ import './globals.css'
 export const metadata = {
   title: 'LITTLElocals — Things to do with kids in Ealing',
   description: 'Quick ideas around Ealing for babies, toddlers and kids',
+  themeColor: '#5C4B6B',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'LITTLElocals',
+  },
 }
 
 export default function RootLayout({ children }) {
