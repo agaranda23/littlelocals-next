@@ -177,7 +177,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
 
 
       {/* Your week with the kids */}
-      {!hasActiveFilters && (() => {
+      {!hasActiveFilters && currentPage === 1 && (() => {
         const todayKey = DAY_NAMES[new Date().getDay()]
         const weekDays = ['mon','tue','wed','thu','fri','sat','sun']
         const todayIdx = weekDays.indexOf(todayKey)
@@ -230,7 +230,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
 
       
       {/* Local favourite */}
-      {!hasActiveFilters && (() => {
+      {!hasActiveFilters && currentPage === 1 && (() => {
         const fav = localFav
         if (!fav) return null
         const isFree = fav.free || (fav.price || '').toLowerCase().includes('free')
@@ -266,6 +266,38 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
           </div>
         )
       })()}
+
+      {/* Easy picks for right now */}
+      {!hasActiveFilters && currentPage === 1 && (() => {
+        const todayPicks = listings.filter(l => l.image && isOnToday(l)).slice(0, 6)
+        if (todayPicks.length === 0) return null
+        return (
+          <div style={{ padding: '20px 0 8px' }}>
+            <div style={{ padding: '0 20px 10px', fontSize: 15, fontWeight: 800, color: '#D4732A' }}>✨ Easy picks for right now</div>
+            <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 4px', scrollbarWidth: 'none' }}>
+              {todayPicks.map(l => (
+                <a key={l.id} href={'/listing/' + l.slug} style={{ flexShrink: 0, width: 130, textDecoration: 'none', display: 'block' }}>
+                  <div style={{ position: 'relative', height: 90, borderRadius: 12, overflow: 'hidden', marginBottom: 6 }}>
+                    <img src={l.image} alt={l.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    {l.logo && <img src={l.logo} alt="" style={{ position: 'absolute', bottom: 4, left: 4, height: 18, width: 'auto', borderRadius: 3, background: 'white', padding: 2 }} />}
+                    <div style={{ position: 'absolute', top: 4, right: 4, background: '#22C55E', color: 'white', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 5 }}>Today</div>
+                  </div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* Trusted by Ealing parents divider */}
+      {!hasActiveFilters && currentPage === 1 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px 16px' }}>
+          <div style={{ flex: 1, height: 1, background: '#E5E7EB' }} />
+          <span style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 600, whiteSpace: 'nowrap' }}>Trusted by Ealing parents</span>
+          <div style={{ flex: 1, height: 1, background: '#E5E7EB' }} />
+        </div>
+      )}
 
       {/* Listings */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '0 16px' }}>
