@@ -75,21 +75,20 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         </div>
       </div>
 
-      {/* Image carousel */}
+      {/* Cover photo only */}
       {images.length > 0 && (
-        <div style={{ position: 'relative', height: 280, overflow: 'hidden', background: '#F3F4F6' }}>
-          <img src={images[imgIdx]?.url} alt={listing.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'relative', height: 280, overflow: 'hidden', background: '#F3F4F6', cursor: 'pointer' }}
+          onClick={() => setLightbox(0)}>
+          <img src={images[0]?.url} alt={listing.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          {listing.logo && (
+            <div style={{ position: 'absolute', bottom: 12, left: 12, background: 'rgba(255,255,255,0.92)', borderRadius: 10, padding: '4px 10px' }}>
+              <img src={listing.logo} alt="" style={{ height: 24, width: 'auto', borderRadius: 4 }} />
+            </div>
+          )}
           {images.length > 1 && (
-            <>
-              <button onClick={() => setImgIdx(i => Math.max(0, i-1))} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 14 }}>‹</button>
-              <button onClick={() => setImgIdx(i => Math.min(images.length-1, i+1))} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 14 }}>›</button>
-              <div style={{ position: 'absolute', bottom: 10, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 }}>
-                {images.map((_, i) => (
-                  <div key={i} onClick={() => setImgIdx(i)} style={{ width: i === imgIdx ? 16 : 6, height: 6, borderRadius: 3, background: i === imgIdx ? 'white' : 'rgba(255,255,255,0.5)', cursor: 'pointer', transition: 'width 0.2s' }} />
-                ))}
-              </div>
-              <div style={{ position: 'absolute', bottom: 10, right: 12, background: 'rgba(0,0,0,0.5)', color: 'white', fontSize: 11, padding: '2px 7px', borderRadius: 10 }}>{imgIdx+1}/{images.length}</div>
-            </>
+            <div style={{ position: 'absolute', bottom: 12, right: 12, background: 'rgba(0,0,0,0.5)', color: 'white', fontSize: 11, padding: '2px 8px', borderRadius: 10 }}>
+              1/{images.length} 📷
+            </div>
           )}
         </div>
       )}
@@ -104,9 +103,8 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           {onToday && <span style={{ fontSize: 12, fontWeight: 700, background: '#D4732A', color: 'white', padding: '4px 12px', borderRadius: 20 }}>On Today! 🗓</span>}
         </div>
 
-        {/* Logo + name */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-          {listing.logo && <img src={listing.logo} alt="" style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'contain', background: 'white', border: '1px solid #F3F4F6', flexShrink: 0 }} />}
+        {/* Name */}
+        <div style={{ marginBottom: 4 }}>
           <h1 style={{ fontSize: 22, fontWeight: 900, color: '#111827', margin: 0, lineHeight: 1.2 }}>
             {listing.name}
           </h1>
@@ -197,15 +195,17 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         )}
 
         {/* Photos gallery */}
-        {images.length > 1 && (
+        {images.length > 0 && (
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 10 }}>📸 Photos</div>
-            <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
-              {images.map((img, i) => (
-                <img key={i} src={img.url} alt="" onClick={() => setLightbox(i)} style={{ flexShrink: 0, width: 120, height: 90, objectFit: 'cover', borderRadius: 10, cursor: 'pointer', border: i === imgIdx ? '2px solid #5B2D6E' : 'none' }} />
-              ))}
+            <div style={{ position: 'relative' }}>
+              <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                {images.map((img, i) => (
+                  <img key={i} src={img.url} alt="" onClick={() => setLightbox(i)} style={{ flexShrink: 0, width: 140, height: 105, objectFit: 'cover', borderRadius: 10, cursor: 'pointer' }} />
+                ))}
+              </div>
             </div>
-            <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 6 }}>{images.length} photos</div>
+            <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 6 }}>{images.length} photos · tap to enlarge</div>
           </div>
         )}
 
