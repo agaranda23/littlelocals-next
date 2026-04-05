@@ -208,31 +208,6 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         </div>
       )}
 
-      {/* Filter panel */}
-      {showFilters && (
-        <div style={{ margin: '0 16px 12px', background: 'white', borderRadius: 16, border: '1px solid #E5E7EB', padding: '16px' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#6B7280', marginBottom: 10 }}>AGE</div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-            {[['baby','👶 Baby 0-12m'],['toddler','🧒 Toddler 1-3'],['preschool','🐣 Preschool 3-5'],['kids','🎒 Kids 5+']].map(([key, label]) => (
-              <span key={key} onClick={() => setAgeFilter(ageFilter === key ? 'all' : key)} style={{ fontSize: 13, fontWeight: ageFilter === key ? 700 : 500, padding: '6px 14px', borderRadius: 20, cursor: 'pointer', background: ageFilter === key ? '#5B2D6E' : '#F3F4F6', color: ageFilter === key ? 'white' : '#374151' }}>{label}</span>
-            ))}
-          </div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#6B7280', marginBottom: 10 }}>SETTING</div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-            {[['sunny','Outdoor'],['rainy','Indoor']].map(([key, label]) => (
-              <span key={key} onClick={() => setWeatherMode(weatherMode === key ? 'all' : key)} style={{ fontSize: 13, fontWeight: weatherMode === key ? 700 : 500, padding: '6px 14px', borderRadius: 20, cursor: 'pointer', background: weatherMode === key ? '#D4732A' : '#F3F4F6', color: weatherMode === key ? 'white' : '#374151' }}>{label}</span>
-            ))}
-          </div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#6B7280', marginBottom: 10 }}>MORE</div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-            {[['Free', freeOnly, () => setFreeOnly(!freeOnly)], ['Adventure', worthJourney, () => setWorthJourney(!worthJourney)], ['Nurseries', nurseryFilter, () => setNurseryFilter(!nurseryFilter)]].map(([label, active, action]) => (
-              <span key={label} onClick={action} style={{ fontSize: 13, fontWeight: active ? 700 : 500, padding: '6px 14px', borderRadius: 20, cursor: 'pointer', background: active ? '#D4732A' : '#F3F4F6', color: active ? 'white' : '#374151' }}>{label}</span>
-            ))}
-          </div>
-          <button onClick={() => { clearAll(); setShowFilters(false) }} style={{ width: '100%', background: '#F3F4F6', border: 'none', borderRadius: 12, padding: '10px', fontSize: 14, fontWeight: 700, color: '#374151', cursor: 'pointer' }}>Clear all filters</button>
-        </div>
-      )}
-
       {/* Age chips */}
       <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 16px 8px', scrollbarWidth: 'none' }}>
         {[['baby','👶 Baby 0–12m'],['toddler','🧒 Toddler 1–3'],['preschool','🐣 Preschool 3–5'],['kids','🎒 Kids 5+']].map(([key, label]) => (
