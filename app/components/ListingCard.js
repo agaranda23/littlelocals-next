@@ -24,6 +24,61 @@ function formatDistance(km, mode) {
   return mins <= 1 ? 'Nearby' : `${mins} min ${mode}`
 }
 
+function isOnWeekend(l) {
+  const days = l.days_of_week || []
+  return days.includes('sat') || days.includes('sun') || l.is_daily
+}
+
+function isNewlyAdded(l) {
+  if (!l.created_at) return false
+  const daysSince = (Date.now() - new Date(l.created_at).getTime()) / (1000 * 60 * 60 * 24)
+  return daysSince < 14
+}
+
+function isMorningSessions(l) {
+  const t = (l.time || '').toLowerCase()
+  return t.includes('am') || t.includes('morning') || t.includes('9:') || t.includes('10:') || t.includes('11:')
+}
+
+function getDecisionBadge(listing, isFree, onToday, recentViews) {
+  const DAY = DAY_NAMES[new Date().getDay()]
+  const isWeekend = isOnWeekend(listing)
+  const isNew = isNewlyAdded(listing)
+  const ages = (listing.ages || '').toLowerCase()
+  const isBaby = ages.includes('0') || ages.includes('baby') || ages.includes('bab')
+  const isToddler = ages.includes('toddler') || ages.includes('1') || ages.includes('2')
+  const isIndoor = listing.indoor
+  const isOutdoor = !listing.indoor && listing.indoor !== null
+  const worthJourney = listing.worth_journey
+
+  // Priority order
+  if (onToday && isFree) return { label: 'Happening today', icon: '📅', bg: '#FFF7ED', color: '#9A3412' }
+  if (onToday) return { label: 'Happening today', icon: '📅', bg: '#FFF7ED', color: '#9A3412' }
+  if (isFree) return { label: 'Free', icon: '💰', bg: '#D1FAE5', color: '#065F46' }
+  if (isWeekend) return { label: 'This weekend', icon: '🎟', bg: '#EDE9FE', color: '#5B21B6' }
+  if (isIndoor) return { label: 'Indoor idea', icon: '🌧️', bg: '#EFF6FF', color: '#1E40AF' }
+  if (isOutdoor) return { label: 'Outdoor pick', icon: '🌳', bg: '#F0FDF4', color: '#15803D' }
+  if (isBaby) return { label: 'Baby-friendly', icon: '🚼', bg: '#FDF4FF', color: '#7E22CE' }
+  if (isToddler) return { label: 'Great for toddlers', icon: '🧒', bg: '#FFF7ED', color: '#C2410C' }
+  if (isNew) return { label: 'Just added', icon: '🆕', bg: '#F0FDF4', color: '#15803D' }
+  if (worthJourney) return { label: 'Worth the short trip', icon: '📍', bg: '#FFF7ED', color: '#9A3412' }
+  // Social proof fallback - rotate based on listing id to avoid repetition
+  const fallbacks = [
+    { label: 'Popular with parents', icon: '⭐', bg: '#FEF3C7', color: '#92400E' },
+    { label: 'Loved locally', icon: '✨', bg: '#FEF9C3', color: '#713F12' },
+    { label: 'Parents are saving this', icon: '📌', bg: '#FFF7ED', color: '#9A3412' },
+    { label: 'Parents viewed this today', icon: '👀', bg: '#F0F9FF', color: '#0369A1' },
+  ]
+  return fallbacks[(listing.id || 0) % fallbacks.length]
+}
+
+function getTrustBadge(listing) {
+  if (listing.is_local_favourite) return { label: 'Local favourite', icon: '💜' }
+  if (listing.is_featured) return { label: 'Featured this week', icon: '⭐' }
+  if (listing.verified) return { label: 'Verified provider', icon: '✔' }
+  return null
+}
+
 export default function ListingCard({ listing, userLocation, recentViews = 0 }) {
   const [saved, setSaved] = useState(false)
   const isFree = listing.free || (listing.price || '').toLowerCase().includes('free')
@@ -90,30 +145,35 @@ export default function ListingCard({ listing, userLocation, recentViews = 0 }) 
             {listing.description}
           </div>
         )}
-        {recentViews >= 3 && (
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: '#D4732A', background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 20, padding: '3px 10px', marginBottom: 6 }}>
-            📍 Parents nearby visited this recently
-          </div>
-        )}
-        {(listing.popular || listing.worth_journey || listing.free_trial) && (
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
-            {listing.popular && (
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#92400E', background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: 20, padding: '3px 10px' }}>
-                ⭐ Popular with Ealing parents this week
-              </span>
-            )}
-            {listing.worth_journey && (
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#1E40AF', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 20, padding: '3px 10px' }}>
-                🚗 Worth the journey
-              </span>
-            )}
-            {listing.free_trial && (
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#065F46', background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 20, padding: '3px 10px' }}>
-                🎁 Free trial
-              </span>
-            )}
-          </div>
-        )}
+        {(() => {
+          const trustBadge = getTrustBadge(listing)
+          const decisionBadge = getDecisionBadge(listing, isFree, onToday, recentViews)
+          const showThree = (listing.is_local_favourite || listing.is_featured) && onToday && isFree
+          return (
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
+              {trustBadge && (
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#5B2D6E', background: '#F3E8FF', border: '1px solid #D8B4FE', borderRadius: 20, padding: '3px 10px' }}>
+                  {trustBadge.icon} {trustBadge.label}
+                </span>
+              )}
+              {decisionBadge && (
+                <span style={{ fontSize: 12, fontWeight: 600, color: decisionBadge.color, background: decisionBadge.bg, borderRadius: 20, padding: '3px 10px' }}>
+                  {decisionBadge.icon} {decisionBadge.label}
+                </span>
+              )}
+              {showThree && !isFree && (
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#065F46', background: '#D1FAE5', borderRadius: 20, padding: '3px 10px' }}>
+                  💰 Free
+                </span>
+              )}
+              {listing.free_trial && (
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#065F46', background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 20, padding: '3px 10px' }}>
+                  🎁 Free trial
+                </span>
+              )}
+            </div>
+          )
+        })()}
         {distance && (
           <div style={{ fontSize: 12, color: '#6B7280' }}>📍 {distance}</div>
         )}
