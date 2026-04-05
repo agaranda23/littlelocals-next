@@ -189,6 +189,50 @@ export default function HomeClient({ listings }) {
         </div>
       )}
 
+
+      {/* Just added near you */}
+      {!hasActiveFilters && (
+        <div style={{ padding: '24px 0 8px' }}>
+          <div style={{ padding: '0 20px 10px', fontSize: 15, fontWeight: 800, color: '#D4732A' }}>✨ Just added near you</div>
+          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px', scrollbarWidth: 'none' }}>
+            {listings.slice(0, 8).map(l => (
+              <div key={l.id} style={{ flexShrink: 0, background: 'white', borderRadius: 14, border: '1.5px dashed #E5E7EB', padding: '10px 14px', minWidth: 140, maxWidth: 160 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
+                <div style={{ fontSize: 11, color: '#9CA3AF' }}>{l.type}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Suggest an activity CTA */}
+      <div style={{ margin: '24px 16px 0', background: '#FFF7ED', border: '2px dashed #D4732A', borderRadius: 18, padding: '20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#111827', marginBottom: 4 }}>✨ Suggest an activity for Ealing parents</div>
+          <div style={{ fontSize: 13, color: '#6B7280' }}>Help improve what families nearby can find</div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 24 }}>✨</span>
+          <button style={{ background: '#D4732A', color: 'white', border: 'none', borderRadius: 12, padding: '10px 18px', fontSize: 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>Add activity</button>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div style={{ marginTop: 40, padding: '0 20px 32px', textAlign: 'center' }}>
+        <div style={{ fontSize: 12, color: '#D1D5DB', marginBottom: 16 }}>community-powered kids activity discovery</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
+          <span style={{ fontSize: 28 }}>🐻</span>
+          <span style={{ fontSize: 20, fontWeight: 900, color: '#111827', letterSpacing: -0.5 }}>LITTLE<span style={{ color: '#D4732A' }}>locals</span></span>
+        </div>
+        <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 12 }}>Built by parents, for parents.</div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 12 }}>
+          {['Privacy Policy','Cookie Policy','Terms of Service','Contact'].map(link => (
+            <span key={link} style={{ fontSize: 11, color: '#9CA3AF', cursor: 'pointer', textDecoration: 'underline' }}>{link}</span>
+          ))}
+        </div>
+        <div style={{ fontSize: 11, color: '#D1D5DB' }}>© 2026 LITTLElocals. All rights reserved.</div>
+      </div>
+
       {/* Bottom nav */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '8px 0 20px', zIndex: 100 }}>
         {[['🏠','Home'],['📅','Today'],['🔍','Explore'],['📋','My Plans']].map(([icon, label]) => (
