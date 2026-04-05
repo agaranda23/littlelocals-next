@@ -70,8 +70,8 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           <button onClick={() => setSaved(s => !s)} style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: '50%', width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 16 }}>
             {saved ? '❤️' : '🤍'}
           </button>
-          {listing.whatsapp && (
-            <a href={`https://wa.me/${listing.whatsapp}`} target="_blank" rel="noopener noreferrer" style={{ background: '#25D366', border: 'none', borderRadius: '50%', width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, textDecoration: 'none' }}>💬</a>
+          {listing.whatsapp_group_url && (
+            <a href={`https://wa.me/${listing.whatsapp_group_url}`} target="_blank" rel="noopener noreferrer" style={{ background: '#25D366', border: 'none', borderRadius: '50%', width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, textDecoration: 'none' }}>💬</a>
           )}
         </div>
       </div>
@@ -259,6 +259,12 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         </div>
 
                 {/* CTA buttons */}
+        {!listing.cta_url && listing.website && (
+          <a href={listing.website} target="_blank" rel="noopener noreferrer"
+            style={{ display: 'block', background: '#5B2D6E', color: 'white', textAlign: 'center', padding: '16px 20px', borderRadius: 16, fontSize: 16, fontWeight: 800, marginBottom: 10, textDecoration: 'none' }}>
+            Visit Website
+          </a>
+        )}
         {listing.cta_url && (
           <a href={listing.cta_url} target="_blank" rel="noopener noreferrer"
             style={{ display: 'block', background: '#5B2D6E', color: 'white', textAlign: 'center', padding: '16px 20px', borderRadius: 16, fontSize: 16, fontWeight: 800, marginBottom: 10, textDecoration: 'none' }}>
@@ -266,6 +272,12 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           </a>
         )}
 
+        {listing.trial_link && (
+          <a href={listing.trial_link} target="_blank" rel="noopener noreferrer"
+            style={{ display: 'block', background: '#D1FAE5', color: '#065F46', textAlign: 'center', padding: '12px 20px', borderRadius: 16, fontSize: 14, fontWeight: 700, border: '1px solid #6EE7B7', marginBottom: 10, textDecoration: 'none' }}>
+            🎁 Book a free trial
+          </a>
+        )}
         {listing.website && (
           <a href={listing.website} target="_blank" rel="noopener noreferrer"
             style={{ display: 'block', background: 'white', color: '#5B2D6E', textAlign: 'center', padding: '14px 20px', borderRadius: 16, fontSize: 15, fontWeight: 700, border: '2px solid #5B2D6E', marginBottom: 10, textDecoration: 'none' }}>
@@ -280,8 +292,8 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         </button>
 
         {/* WhatsApp */}
-        {listing.whatsapp && (
-          <a href={`https://chat.whatsapp.com/${listing.whatsapp}`} target="_blank" rel="noopener noreferrer"
+        {listing.whatsapp_group_url && (
+          <a href={`https://chat.whatsapp.com/${listing.whatsapp_group_url}`} target="_blank" rel="noopener noreferrer"
             style={{ display: 'block', background: '#F0FDF4', color: '#15803D', textAlign: 'center', padding: '12px 20px', borderRadius: 16, fontSize: 14, fontWeight: 700, border: '1px solid #BBF7D0', marginBottom: 10, textDecoration: 'none' }}>
             💬 Join WhatsApp Group
           </a>
@@ -289,7 +301,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
 
         {/* Instagram */}
         {listing.instagram && (
-          <a href={`https://instagram.com/${listing.instagram.replace('@','')}`} target="_blank" rel="noopener noreferrer"
+          <a href={listing.instagram.startsWith('http') ? listing.instagram : `https://instagram.com/${listing.instagram.replace('@','')}`} target="_blank" rel="noopener noreferrer"
             style={{ display: 'block', background: '#FDF4FF', color: '#7E22CE', textAlign: 'center', padding: '12px 20px', borderRadius: 16, fontSize: 14, fontWeight: 700, border: '1px solid #E9D5FF', marginBottom: 10, textDecoration: 'none' }}>
             📸 View on Instagram
           </a>
