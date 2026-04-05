@@ -70,9 +70,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           <button onClick={() => { setSaved(s => !s); navigator.vibrate && navigator.vibrate(50) }} style={{ background: saved ? '#5B2D6E' : 'white', border: saved ? 'none' : '1px solid #E5E7EB', borderRadius: '50%', width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 16, transition: 'background 0.2s' }}>
             <span style={{ color: 'white', fontSize: saved ? 18 : 16 }}>{saved ? '♥' : '🤍'}</span>
           </button>
-          {listing.whatsapp_group_url && (
-            <a href={listing.whatsapp_group_url} target="_blank" rel="noopener noreferrer" style={{ background: '#25D366', border: 'none', borderRadius: '50%', width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, textDecoration: 'none' }}>💬</a>
-          )}
+
         </div>
       </div>
 
