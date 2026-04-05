@@ -12,7 +12,7 @@ const EALING_BOROUGH = ['Ealing','Hanwell','West Ealing','North Ealing','South E
 export default async function HomePage() {
   const { data: listings } = await supabase
     .from('listings')
-    .select('id, name, slug, location, type, emoji, ages, age_min, age_max, price, free, indoor, verified, popular, logo, days_of_week, is_daily, day, worth_journey, category, homepage_score, is_local_favourite, local_favourite_subtitle, littlelocals_offer_text')
+    .select('id, name, slug, location, type, emoji, ages, age_min, age_max, price, free, indoor, verified, popular, logo, days_of_week, is_daily, day, worth_journey, category, homepage_score, is_local_favourite, local_favourite_subtitle, littlelocals_offer_text, description, free_trial, lat, lng, whatsapp_group_url, instagram')
     .order('homepage_score', { ascending: false })
     .limit(200)
 

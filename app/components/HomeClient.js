@@ -51,11 +51,21 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const [nurseryFilter, setNurseryFilter] = useState(false)
 
   useEffect(() => { setCurrentPage(1) }, [dayFilter, search, ageFilter, freeOnly, weatherMode, worthJourney, nurseryFilter])
+  const [userLocation, setUserLocation] = useState(null)
   const [weather, setWeather] = useState(null)
   const [exploringCount, setExploringCount] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const PAGE_SIZE = 6
   useEffect(() => { setExploringCount(Math.floor(Math.random() * 18) + 8) }, [])
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {}
+      )
+    }
+  }, [])
 
   useEffect(() => {
     fetch('https://api.open-meteo.com/v1/forecast?latitude=51.5139&longitude=-0.3048&current_weather=true&timezone=Europe/London')
@@ -128,11 +138,14 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       </div>
 
       {/* Search */}
-      <div style={{ padding: '0 16px 10px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', padding: '10px 14px', gap: 8 }}>
+      <div style={{ padding: '0 16px 10px', display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', padding: '10px 14px', gap: 8, flex: 1 }}>
           <span style={{ color: '#9CA3AF' }}>🔍</span>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search activities..." style={{ border: 'none', outline: 'none', flex: 1, fontSize: 15, color: '#111827', background: 'transparent' }} />
         </div>
+        <button onClick={() => {}} style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 14, padding: '10px 16px', fontSize: 14, fontWeight: 700, color: '#111827', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
+          ≡ Filters
+        </button>
       </div>
 
       {/* Age chips */}
@@ -302,9 +315,20 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       {/* Listings */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '0 16px' }}>
         {filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE).map(listing => (
-          <ListingCard key={listing.id} listing={listing} />
+          <ListingCard key={listing.id} listing={listing} userLocation={userLocation} />
         ))}
       </div>
+
+      {/* Install banner */}
+      {!hasActiveFilters && currentPage === 1 && typeof window !== 'undefined' && !window.matchMedia('(display-mode: standalone)').matches && (
+        <div style={{ margin: '0 16px 16px', background: 'white', border: '1px solid #E5E7EB', borderRadius: 16, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: 28 }}>🐻</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Add to home screen</div>
+            <div style={{ fontSize: 12, color: '#6B7280' }}>for quick access</div>
+          </div>
+        </div>
+      )}
 
       {/* Pagination */}
       {filtered.length > PAGE_SIZE && (() => {
