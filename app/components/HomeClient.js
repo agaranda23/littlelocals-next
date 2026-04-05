@@ -49,8 +49,11 @@ export default function HomeClient({ listings }) {
   const [weatherMode, setWeatherMode] = useState('all')
   const [worthJourney, setWorthJourney] = useState(false)
   const [nurseryFilter, setNurseryFilter] = useState(false)
+
+  useEffect(() => { setVisibleCount(6) }, [dayFilter, search, ageFilter, freeOnly, weatherMode, worthJourney, nurseryFilter])
   const [weather, setWeather] = useState(null)
   const [exploringCount, setExploringCount] = useState(0)
+  const [visibleCount, setVisibleCount] = useState(6)
   useEffect(() => { setExploringCount(Math.floor(Math.random() * 18) + 8) }, [])
 
   useEffect(() => {
@@ -93,6 +96,7 @@ export default function HomeClient({ listings }) {
   const hasActiveFilters = freeOnly || weatherMode !== 'all' || worthJourney || nurseryFilter || ageFilter !== 'all' || search
 
   const clearAll = () => {
+    setVisibleCount(6)
     setFreeOnly(false); setWeatherMode('all'); setWorthJourney(false)
     setNurseryFilter(false); setAgeFilter('all'); setSearch(''); setDayFilter('week')
   }
@@ -172,10 +176,18 @@ export default function HomeClient({ listings }) {
 
       {/* Listings */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '0 16px' }}>
-        {filtered.map(listing => (
+        {filtered.slice(0, visibleCount).map(listing => (
           <ListingCard key={listing.id} listing={listing} />
         ))}
       </div>
+
+      {filtered.length > visibleCount && (
+        <div style={{ padding: '20px 16px', textAlign: 'center' }}>
+          <button onClick={() => setVisibleCount(v => v + 6)} style={{ background: '#5B2D6E', color: 'white', border: 'none', borderRadius: 14, padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+            Load more ({filtered.length - visibleCount} more)
+          </button>
+        </div>
+      )}
 
       {/* Bottom nav */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '8px 0 20px', zIndex: 100 }}>
