@@ -8,7 +8,6 @@ export default function ListingDetailClient({ listing, images, relatedListings }
   const [saved, setSaved] = useState(false)
   const [imgIdx, setImgIdx] = useState(0)
   const [lightbox, setLightbox] = useState(false)
-  const [lightbox, setLightbox] = useState(false)
 
   const [visited, setVisited] = useState(false)
   const [plannedDates, setPlannedDates] = useState([])
@@ -361,26 +360,6 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         </div>
       )}
 
-      {/* Lightbox */}
-      {lightbox && (
-        <div onClick={() => setLightbox(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <button onClick={() => setLightbox(false)} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 40, height: 40, color: 'white', fontSize: 20, cursor: 'pointer', zIndex: 1001 }}>✕</button>
-          {lightbox === 'timetable' ? (
-            <img src={listing.timetable_image} alt="Timetable" style={{ maxWidth: '95vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} onClick={e => e.stopPropagation()} />
-          ) : (
-            <div style={{ width: '100%', overflowX: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <img src={images[typeof lightbox === 'number' ? lightbox : imgIdx]?.url} alt="" style={{ maxWidth: '95vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} onClick={e => e.stopPropagation()} />
-            </div>
-          )}
-          {typeof lightbox === 'number' && images.length > 1 && (
-            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-              {images.map((_, i) => (
-                <div key={i} onClick={e => { e.stopPropagation(); setLightbox(i) }} style={{ width: i === lightbox ? 16 : 8, height: 8, borderRadius: 4, background: i === lightbox ? 'white' : 'rgba(255,255,255,0.4)', cursor: 'pointer' }} />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
 
     </div>
   )
