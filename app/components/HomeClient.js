@@ -287,7 +287,10 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
                 if (!pick) return null
                 const isFree = pick.free || (pick.price || '').toLowerCase().includes('free')
                 return (
-                  <a key={dayKey} href={'/listing/' + pick.slug} style={{ flexShrink: 0, width: 155, borderRadius: 14, overflow: 'hidden', background: 'white', boxShadow: '0 2px 10px rgba(0,0,0,0.08)', border: '1px solid #F3F4F6', textDecoration: 'none', display: 'block' }}>
+                  {(() => {
+                    const isPickSaved = savedIds.has(pick.id)
+                    return (
+                  <a key={dayKey} href={'/listing/' + pick.slug} style={{ flexShrink: 0, width: 155, borderRadius: 14, overflow: 'hidden', background: 'white', boxShadow: isPickSaved ? '0 2px 10px rgba(91,45,110,0.2)' : '0 2px 10px rgba(0,0,0,0.08)', border: isPickSaved ? '2px solid #5B2D6E' : '1px solid #F3F4F6', textDecoration: 'none', display: 'block' }}>
                     <div style={{ position: 'relative', height: 95, overflow: 'hidden' }}>
                       <img src={pick.image} alt={pick.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       <div style={{ position: 'absolute', top: 6, left: 6, background: isToday ? '#5B2D6E' : 'rgba(0,0,0,0.55)', color: 'white', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6 }}>

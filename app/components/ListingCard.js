@@ -80,7 +80,12 @@ function getTrustBadge(listing) {
 }
 
 export default function ListingCard({ listing, userLocation, recentViews = 0, isSaved = false }) {
-  const [saved, setSaved] = useState(false)
+  const [saved, setSaved] = useState(() => {
+    try {
+      const favs = JSON.parse(localStorage.getItem('ll_favs') || '[]')
+      return favs.includes(listing.id)
+    } catch(e) { return false }
+  })
   const isFree = listing.free || (listing.price || '').toLowerCase().includes('free')
   const onToday = isOnToday(listing)
 
@@ -108,7 +113,16 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
               <span>📅</span><span>Today</span>
             </div>
           )}
-          <button onClick={e => { e.preventDefault(); e.stopPropagation(); setSaved(s => !s); navigator.vibrate && navigator.vibrate(50) }}
+          <button onClick={e => {
+              e.preventDefault(); e.stopPropagation(); navigator.vibrate && navigator.vibrate(50)
+              const next = !saved
+              setSaved(next)
+              try {
+                const existing = JSON.parse(localStorage.getItem('ll_favs') || '[]')
+                const updated = next ? [...new Set([...existing, listing.id])] : existing.filter(id => id !== listing.id)
+                localStorage.setItem('ll_favs', JSON.stringify(updated))
+              } catch(e) {}
+            }}
             style={{ position: 'absolute', top: 10, right: 10, background: saved ? '#5B2D6E' : 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 16, boxShadow: '0 1px 6px rgba(0,0,0,0.12)', transition: 'background 0.2s' }}>
             <span style={{ color: saved ? 'white' : 'inherit' }}>{saved ? '♥' : '🤍'}</span>
           </button>
