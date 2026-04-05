@@ -41,7 +41,7 @@ function getGreeting(weather) {
   return '🌙 Planning ahead with the kids?'
 }
 
-export default function HomeClient({ listings, recentListings = [] }) {
+export default function HomeClient({ listings, recentListings = [], localFav = null }) {
   const [dayFilter, setDayFilter] = useState('week')
   const [search, setSearch] = useState('')
   const [ageFilter, setAgeFilter] = useState('all')
@@ -221,7 +221,7 @@ export default function HomeClient({ listings, recentListings = [] }) {
       
       {/* Local favourite */}
       {!hasActiveFilters && (() => {
-        const fav = listings.find(l => l.is_local_favourite)
+        const fav = localFav
         if (!fav) return null
         const isFree = fav.free || (fav.price || '').toLowerCase().includes('free')
         return (

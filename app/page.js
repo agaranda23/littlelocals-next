@@ -16,6 +16,12 @@ export default async function HomePage() {
     .order('homepage_score', { ascending: false })
     .limit(200)
 
+  const { data: localFavData } = await supabase
+    .from('listings')
+    .select('id, name, slug, type, price, free, verified, logo, is_local_favourite, local_favourite_subtitle, littlelocals_offer_text')
+    .eq('is_local_favourite', true)
+    .limit(1)
+
   const { data: recentListings } = await supabase
     .from('listings')
     .select('id, name, slug, type')
@@ -27,6 +33,17 @@ export default async function HomePage() {
     .select('listing_id, url')
     .order('sort_order', { ascending: true })
     .in('listing_id', (listings || []).map(l => l.id))
+
+  const localFav = localFavData?.[0] || null
+  if (localFav) {
+    const { data: favImg } = await supabase
+      .from('listing_images')
+      .select('url')
+      .eq('listing_id', localFav.id)
+      .order('sort_order', { ascending: true })
+      .limit(1)
+    if (favImg?.[0]) localFav.image = favImg[0].url
+  }
 
   const imageMap = {}
   ;(images || []).forEach(img => {
@@ -41,7 +58,7 @@ export default async function HomePage() {
   return (
     <>
       <Header />
-      <HomeClient listings={ealingListings} recentListings={recentListings || []} />
+      <HomeClient listings={ealingListings} recentListings={recentListings || []} localFav={localFav} />
     </>
   )
 }
