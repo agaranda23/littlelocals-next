@@ -41,7 +41,7 @@ function getGreeting(weather) {
   return '🌙 Planning ahead with the kids?'
 }
 
-export default function HomeClient({ listings }) {
+export default function HomeClient({ listings, recentListings = [] }) {
   const [dayFilter, setDayFilter] = useState('week')
   const [search, setSearch] = useState('')
   const [ageFilter, setAgeFilter] = useState('all')
@@ -50,10 +50,11 @@ export default function HomeClient({ listings }) {
   const [worthJourney, setWorthJourney] = useState(false)
   const [nurseryFilter, setNurseryFilter] = useState(false)
 
-  useEffect(() => { setVisibleCount(6) }, [dayFilter, search, ageFilter, freeOnly, weatherMode, worthJourney, nurseryFilter])
+  useEffect(() => { setCurrentPage(1) }, [dayFilter, search, ageFilter, freeOnly, weatherMode, worthJourney, nurseryFilter])
   const [weather, setWeather] = useState(null)
   const [exploringCount, setExploringCount] = useState(0)
-  const [visibleCount, setVisibleCount] = useState(6)
+  const [currentPage, setCurrentPage] = useState(1)
+  const PAGE_SIZE = 6
   useEffect(() => { setExploringCount(Math.floor(Math.random() * 18) + 8) }, [])
 
   useEffect(() => {
@@ -96,7 +97,7 @@ export default function HomeClient({ listings }) {
   const hasActiveFilters = freeOnly || weatherMode !== 'all' || worthJourney || nurseryFilter || ageFilter !== 'all' || search
 
   const clearAll = () => {
-    setVisibleCount(6)
+    setCurrentPage(1)
     setFreeOnly(false); setWeatherMode('all'); setWorthJourney(false)
     setNurseryFilter(false); setAgeFilter('all'); setSearch(''); setDayFilter('week')
   }
@@ -176,30 +177,54 @@ export default function HomeClient({ listings }) {
 
       {/* Listings */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '0 16px' }}>
-        {filtered.slice(0, visibleCount).map(listing => (
+        {filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE).map(listing => (
           <ListingCard key={listing.id} listing={listing} />
         ))}
       </div>
 
-      {filtered.length > visibleCount && (
-        <div style={{ padding: '20px 16px', textAlign: 'center' }}>
-          <button onClick={() => setVisibleCount(v => v + 6)} style={{ background: '#5B2D6E', color: 'white', border: 'none', borderRadius: 14, padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
-            Load more ({filtered.length - visibleCount} more)
-          </button>
-        </div>
-      )}
+      {/* Pagination */}
+      {filtered.length > PAGE_SIZE && (() => {
+        const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+        const pages = []
+        if (currentPage > 1) pages.push({ label: '← Prev', page: currentPage - 1, prev: true })
+        pages.push({ label: '1', page: 1 })
+        if (totalPages > 1) pages.push({ label: '2', page: 2 })
+        if (currentPage > 3) pages.push({ label: '...', page: null })
+        if (currentPage > 2 && currentPage < totalPages - 1) pages.push({ label: String(currentPage), page: currentPage })
+        if (totalPages > 3 && currentPage < totalPages - 1) pages.push({ label: '...', page: null })
+        pages.push({ label: String(totalPages), page: totalPages })
+        if (currentPage < totalPages) pages.push({ label: 'Next →', page: currentPage + 1, next: true })
+        const seen = new Set()
+        const deduped = pages.filter(p => {
+          if (p.label === '...') return true
+          if (seen.has(p.label)) return false
+          seen.add(p.label); return true
+        })
+        return (
+          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', padding: '20px 16px', flexWrap: 'wrap' }}>
+            {deduped.map((p, i) => (
+              <button key={i} onClick={() => p.page && setCurrentPage(p.page)} disabled={!p.page} style={{
+                padding: '8px 14px', borderRadius: 10, border: '1px solid #E5E7EB', fontSize: 14, fontWeight: p.page === currentPage ? 700 : 500,
+                background: p.page === currentPage ? '#D4732A' : 'white',
+                color: p.page === currentPage ? 'white' : p.prev || p.next ? '#111827' : '#6B7280',
+                cursor: p.page ? 'pointer' : 'default', minWidth: 38
+              }}>{p.label}</button>
+            ))}
+          </div>
+        )
+      })()}
 
 
       {/* Just added near you */}
-      {!hasActiveFilters && (
+      {!hasActiveFilters && recentListings.length > 0 && (
         <div style={{ padding: '24px 0 8px' }}>
           <div style={{ padding: '0 20px 10px', fontSize: 15, fontWeight: 800, color: '#D4732A' }}>✨ Just added near you</div>
           <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px', scrollbarWidth: 'none' }}>
-            {listings.slice(0, 8).map(l => (
-              <div key={l.id} style={{ flexShrink: 0, background: 'white', borderRadius: 14, border: '1.5px dashed #E5E7EB', padding: '10px 14px', minWidth: 140, maxWidth: 160 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
+            {recentListings.map(l => (
+              <a key={l.id} href={`/listing/${l.slug}`} style={{ flexShrink: 0, background: 'white', borderRadius: 14, border: '1.5px dashed #E5E7EB', padding: '10px 14px', minWidth: 140, maxWidth: 160, textDecoration: 'none', display: 'block' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#D4732A', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
                 <div style={{ fontSize: 11, color: '#9CA3AF' }}>{l.type}</div>
-              </div>
+              </a>
             ))}
           </div>
         </div>
@@ -221,7 +246,7 @@ export default function HomeClient({ listings }) {
       <div style={{ marginTop: 40, padding: '0 20px 32px', textAlign: 'center' }}>
         <div style={{ fontSize: 12, color: '#D1D5DB', marginBottom: 16 }}>community-powered kids activity discovery</div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
-          <span style={{ fontSize: 28 }}>🐻</span>
+          <img src="/bear-logo.png" alt="LITTLElocals" style={{ width: 36, height: 36, borderRadius: 8 }} />
           <span style={{ fontSize: 20, fontWeight: 900, color: '#111827', letterSpacing: -0.5 }}>LITTLE<span style={{ color: '#D4732A' }}>locals</span></span>
         </div>
         <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 12 }}>Built by parents, for parents.</div>

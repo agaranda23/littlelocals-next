@@ -16,6 +16,12 @@ export default async function HomePage() {
     .order('homepage_score', { ascending: false })
     .limit(200)
 
+  const { data: recentListings } = await supabase
+    .from('listings')
+    .select('id, name, slug, type')
+    .order('created_at', { ascending: false })
+    .limit(12)
+
   const { data: images } = await supabase
     .from('listing_images')
     .select('listing_id, url')
@@ -35,7 +41,7 @@ export default async function HomePage() {
   return (
     <>
       <Header />
-      <HomeClient listings={ealingListings} />
+      <HomeClient listings={ealingListings} recentListings={recentListings || []} />
     </>
   )
 }
