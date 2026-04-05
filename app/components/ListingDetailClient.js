@@ -34,6 +34,8 @@ export default function ListingDetailClient({ listing, images, relatedListings }
     localStorage.setItem('plans_' + listing.id, JSON.stringify(next))
   }
 
+  const [imgIdx, setImgIdx] = useState(0)
+
   const getPlanDays = () => {
     const days = []
     const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
@@ -47,7 +49,6 @@ export default function ListingDetailClient({ listing, images, relatedListings }
     }
     return days
   }
-  const [imgIdx, setImgIdx] = useState(0)
 
   const isFree = listing.free || (listing.price || '').toLowerCase().includes('free')
   const isOnToday = () => {
