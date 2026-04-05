@@ -24,7 +24,7 @@ export default function ListingCard({ listing }) {
   })()
 
   const card = (
-    <div style={{ background: 'white', borderRadius: 18, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', border: '1px solid #F3F4F6', cursor: listing.slug ? 'pointer' : 'default' }}>
+    <div style={{ background: 'white', borderRadius: 18, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', border: '1px solid #F3F4F6', cursor: listing.slug ? 'pointer' : 'default' }}>
 
       {/* Image with overlays */}
       {listing.image && (
@@ -98,12 +98,7 @@ export default function ListingCard({ listing }) {
           </div>
         )}
 
-        {/* Worth journey distance note */}
-        {listing.worth_journey && (
-          <div style={{ fontSize: 12, color: '#6B7280' }}>
-            🚗 Worth the journey &nbsp;{listing.popular && <>⭐ Popular with Ealing parents this week</>}
-          </div>
-        )}
+
       </div>
     </div>
   )
