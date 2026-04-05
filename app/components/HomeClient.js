@@ -64,6 +64,14 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   useEffect(() => { setExploringCount(Math.floor(Math.random() * 18) + 8) }, [])
 
   useEffect(() => {
+    try {
+      const favs = JSON.parse(localStorage.getItem('ll_favs') || '[]')
+      const cal = JSON.parse(localStorage.getItem('ll_calendar_v2') || '[]')
+      setSavedIds(new Set([...favs, ...cal]))
+    } catch(e) {}
+  }, [])
+
+  useEffect(() => {
     const isIOSDevice = /iphone|ipad|ipod/i.test(navigator.userAgent)
     const isInStandalone = window.matchMedia('(display-mode: standalone)').matches
     setIsIOS(isIOSDevice)
@@ -254,7 +262,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         const todayKey = DAY_NAMES[new Date().getDay()]
         const weekDays = ['mon','tue','wed','thu','fri','sat','sun']
         const todayIdx = weekDays.indexOf(todayKey)
-        const orderedDays = [...weekDays.slice(todayIdx), ...weekDays.slice(0, todayIdx)]
+        const orderedDays = [...weekDays.slice(todayIdx), ...weekDays.slice(0, todayIdx)].slice(0, 5)
         return (
           <div style={{ padding: '16px 0 4px' }}>
             <div style={{ padding: '0 20px 4px', fontSize: 15, fontWeight: 800, color: '#111827' }}>📅 Your week with the kids</div>
@@ -279,7 +287,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
                 if (!pick) return null
                 const isFree = pick.free || (pick.price || '').toLowerCase().includes('free')
                 return (
-                  <a key={dayKey} href={'/listing/' + pick.slug} style={{ flexShrink: 0, width: 155, borderRadius: 14, overflow: 'hidden', background: 'white', boxShadow: '0 2px 10px rgba(0,0,0,0.08)', border: isToday ? '2px solid #5B2D6E' : '1px solid #F3F4F6', textDecoration: 'none', display: 'block' }}>
+                  <a key={dayKey} href={'/listing/' + pick.slug} style={{ flexShrink: 0, width: 155, borderRadius: 14, overflow: 'hidden', background: 'white', boxShadow: '0 2px 10px rgba(0,0,0,0.08)', border: '1px solid #F3F4F6', textDecoration: 'none', display: 'block' }}>
                     <div style={{ position: 'relative', height: 95, overflow: 'hidden' }}>
                       <img src={pick.image} alt={pick.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       <div style={{ position: 'absolute', top: 6, left: 6, background: isToday ? '#5B2D6E' : 'rgba(0,0,0,0.55)', color: 'white', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6 }}>
@@ -342,7 +350,14 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
 
       {/* Easy picks for right now */}
       {!hasActiveFilters && currentPage === 1 && (() => {
-        const todayPicks = listings.filter(l => l.image && isOnToday(l)).slice(0, 6)
+        const savedIds = (() => { try { return JSON.parse(localStorage.getItem('ll_favs') || '[]') } catch(e) { return [] } })()
+        const calendarIds = (() => { try { return JSON.parse(localStorage.getItem('ll_calendar_v2') || '[]') } catch(e) { return [] } })()
+        const savedSet = new Set([...savedIds, ...calendarIds])
+        const todayAll = listings.filter(l => l.image && isOnToday(l))
+        const todayPicks = [
+          ...todayAll.filter(l => savedSet.has(l.id)),
+          ...todayAll.filter(l => !savedSet.has(l.id))
+        ].slice(0, 4)
         if (todayPicks.length === 0) return null
         return (
           <div style={{ padding: '20px 0 8px' }}>
@@ -375,7 +390,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       {/* Listings */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '0 16px' }}>
         {filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE).map(listing => (
-          <ListingCard key={listing.id} listing={listing} userLocation={userLocation} recentViews={listing.recentViews || 0} />
+          <ListingCard key={listing.id} listing={listing} userLocation={userLocation} recentViews={listing.recentViews || 0} isSaved={savedIds.has(listing.id)} />
         ))}
       </div>
 

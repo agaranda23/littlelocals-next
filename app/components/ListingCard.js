@@ -79,7 +79,7 @@ function getTrustBadge(listing) {
   return null
 }
 
-export default function ListingCard({ listing, userLocation, recentViews = 0 }) {
+export default function ListingCard({ listing, userLocation, recentViews = 0, isSaved = false }) {
   const [saved, setSaved] = useState(false)
   const isFree = listing.free || (listing.price || '').toLowerCase().includes('free')
   const onToday = isOnToday(listing)
@@ -146,6 +146,13 @@ export default function ListingCard({ listing, userLocation, recentViews = 0 }) 
           </div>
         )}
         {(() => {
+          if (isSaved) return (
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#5B2D6E', background: '#F3E8FF', border: '1px solid #D8B4FE', borderRadius: 20, padding: '3px 10px' }}>
+                💜 Saved by you
+              </span>
+            </div>
+          )
           const trustBadge = getTrustBadge(listing)
           const decisionBadge = getDecisionBadge(listing, isFree, onToday, recentViews)
           const showThree = (listing.is_local_favourite || listing.is_featured) && onToday && isFree
