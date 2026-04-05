@@ -177,38 +177,48 @@ export default function HomeClient({ listings, recentListings = [] }) {
 
 
       {/* Your week with the kids */}
-      {!hasActiveFilters && (
-        <div style={{ padding: '16px 0 4px' }}>
-          <div style={{ padding: '0 20px 10px', fontSize: 15, fontWeight: 800, color: '#111827' }}>📅 Your week with the kids</div>
-          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 4px', scrollbarWidth: 'none' }}>
-            {[
-              { key: 'mon', label: 'Mon', emoji: '🎨', pick: 'Arts & crafts' },
-              { key: 'tue', label: 'Tue', emoji: '🎵', pick: 'Music & singing' },
-              { key: 'wed', label: 'Wed', emoji: '🏊', pick: 'Swimming & sports' },
-              { key: 'thu', label: 'Thu', emoji: '📚', pick: 'Storytime & library' },
-              { key: 'fri', label: 'Fri', emoji: '🧸', pick: 'Soft play & sensory' },
-              { key: 'sat', label: 'Sat', emoji: '🌳', pick: 'Parks & outdoors' },
-              { key: 'sun', label: 'Sun', emoji: '🍳', pick: 'Family brunch & cafes' },
-            ].map(({ key, label, emoji, pick }) => {
-              const count = listings.filter(l =>
-                l.is_daily || !l.days_of_week || l.days_of_week.length === 0 || (l.days_of_week || []).includes(key)
-              ).length
-              const isToday = DAY_NAMES[new Date().getDay()] === key
-              return (
-                <div key={key} onClick={() => setDayFilter(key === DAY_NAMES[new Date().getDay()] ? 'today' : 'week')}
-                  style={{ flexShrink: 0, background: isToday ? '#5B2D6E' : 'white', borderRadius: 14, border: isToday ? 'none' : '1.5px solid #E5E7EB', padding: '12px 14px', minWidth: 110, cursor: 'pointer', textAlign: 'left' }}>
-                  <div style={{ fontSize: 20, marginBottom: 4 }}>{emoji}</div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: isToday ? 'white' : '#111827', marginBottom: 2 }}>{isToday ? 'Today' : label}</div>
-                  <div style={{ fontSize: 11, color: isToday ? 'rgba(255,255,255,0.8)' : '#9CA3AF', marginBottom: 6, lineHeight: 1.3 }}>{pick}</div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: isToday ? 'rgba(255,255,255,0.9)' : '#D4732A' }}>{count} activities</div>
-                </div>
-              )
-            })}
+      {!hasActiveFilters && (() => {
+        const todayKey = DAY_NAMES[new Date().getDay()]
+        const weekDays = ['mon','tue','wed','thu','fri','sat','sun']
+        const todayIdx = weekDays.indexOf(todayKey)
+        const orderedDays = [...weekDays.slice(todayIdx), ...weekDays.slice(0, todayIdx)]
+        return (
+          <div style={{ padding: '16px 0 4px' }}>
+            <div style={{ padding: '0 20px 4px', fontSize: 15, fontWeight: 800, color: '#111827' }}>📅 Your week with the kids</div>
+            <div style={{ padding: '0 20px 10px', fontSize: 12, color: '#9CA3AF' }}>Ideas nearby based on what's happening this week</div>
+            <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 4px', scrollbarWidth: 'none' }}>
+              {orderedDays.map(dayKey => {
+                const dayMap = { mon:'Mon', tue:'Tue', wed:'Wed', thu:'Thu', fri:'Fri', sat:'Sat', sun:'Sun' }
+                const isToday = dayKey === todayKey
+                const pick = listings.filter(l =>
+                  l.image && (l.is_daily || !l.days_of_week || l.days_of_week.length === 0 || (l.days_of_week || []).includes(dayKey))
+                )[0]
+                if (!pick) return null
+                const isFree = pick.free || (pick.price || '').toLowerCase().includes('free')
+                return (
+                  <a key={dayKey} href={'/listing/' + pick.slug} style={{ flexShrink: 0, width: 155, borderRadius: 14, overflow: 'hidden', background: 'white', boxShadow: '0 2px 10px rgba(0,0,0,0.08)', border: isToday ? '2px solid #5B2D6E' : '1px solid #F3F4F6', textDecoration: 'none', display: 'block' }}>
+                    <div style={{ position: 'relative', height: 95, overflow: 'hidden' }}>
+                      <img src={pick.image} alt={pick.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <div style={{ position: 'absolute', top: 6, left: 6, background: isToday ? '#5B2D6E' : 'rgba(0,0,0,0.55)', color: 'white', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6 }}>
+                        {isToday ? 'Today' : dayMap[dayKey]}
+                      </div>
+                    </div>
+                    <div style={{ padding: '8px 10px' }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#111827', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pick.name}</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: 11, color: '#9CA3AF' }}>📍 Nearby</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: isFree ? '#065F46' : '#D4732A' }}>{isFree ? 'Free' : pick.price}</span>
+                      </div>
+                    </div>
+                  </a>
+                )
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
-      {/* Listings */}
+            {/* Listings */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '0 16px' }}>
         {filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE).map(listing => (
           <ListingCard key={listing.id} listing={listing} />
