@@ -41,7 +41,7 @@ function getGreeting(weather) {
   return '🌙 Planning ahead with the kids?'
 }
 
-export default function HomeClient({ listings, recentListings = [], localFav = null }) {
+export default function HomeClient({ listings, recentListings = [], localFav = null, viewCounts = {} }) {
   const [dayFilter, setDayFilter] = useState('week')
   const [search, setSearch] = useState('')
   const [ageFilter, setAgeFilter] = useState('all')
@@ -315,9 +315,20 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       {/* Listings */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '0 16px' }}>
         {filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE).map(listing => (
-          <ListingCard key={listing.id} listing={listing} userLocation={userLocation} />
+          <ListingCard key={listing.id} listing={listing} userLocation={userLocation} recentViews={listing.recentViews || 0} />
         ))}
       </div>
+
+      {/* Mid-feed suggest CTA - shown after listings on page 1 */}
+      {!hasActiveFilters && currentPage === 1 && filtered.length > 3 && (
+        <div style={{ margin: '4px 16px 4px', background: '#FFF7ED', border: '2px dashed #D4732A', borderRadius: 18, padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 2 }}>✨ Suggest an activity for Ealing parents</div>
+            <div style={{ fontSize: 13, color: '#6B7280' }}>Help improve what families nearby can find</div>
+          </div>
+          <button style={{ background: '#D4732A', color: 'white', border: 'none', borderRadius: 12, padding: '10px 16px', fontSize: 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>Add activity</button>
+        </div>
+      )}
 
       {/* Install banner */}
       {!hasActiveFilters && currentPage === 1 && typeof window !== 'undefined' && !window.matchMedia('(display-mode: standalone)').matches && (

@@ -22,6 +22,18 @@ export default async function HomePage() {
     .eq('is_local_favourite', true)
     .limit(1)
 
+  // Get recently viewed listing IDs (last 7 days)
+  const { data: recentViews } = await supabase
+    .from('listing_views')
+    .select('listing_id')
+    .gte('viewed_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+    .limit(500)
+
+  const viewCounts = {}
+  ;(recentViews || []).forEach(v => {
+    viewCounts[v.listing_id] = (viewCounts[v.listing_id] || 0) + 1
+  })
+
   const { data: recentListings } = await supabase
     .from('listings')
     .select('id, name, slug, type')
@@ -53,12 +65,12 @@ export default async function HomePage() {
   // Filter to Ealing borough only, keep worth_journey listings too
   const ealingListings = (listings || [])
     .filter(l => l.worth_journey || EALING_BOROUGH.some(a => (l.location || '').includes(a)))
-    .map(l => ({ ...l, image: imageMap[l.id] || null }))
+    .map(l => ({ ...l, image: imageMap[l.id] || null, recentViews: viewCounts[l.id] || 0 }))
 
   return (
     <>
       <Header />
-      <HomeClient listings={ealingListings} recentListings={recentListings || []} localFav={localFav} />
+      <HomeClient listings={ealingListings} recentListings={recentListings || []} localFav={localFav} viewCounts={viewCounts} />
     </>
   )
 }
