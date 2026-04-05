@@ -71,7 +71,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
             {saved ? '❤️' : '🤍'}
           </button>
           {listing.whatsapp_group_url && (
-            <a href={`https://wa.me/${listing.whatsapp_group_url}`} target="_blank" rel="noopener noreferrer" style={{ background: '#25D366', border: 'none', borderRadius: '50%', width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, textDecoration: 'none' }}>💬</a>
+            <a href={listing.whatsapp_group_url} target="_blank" rel="noopener noreferrer" style={{ background: '#25D366', border: 'none', borderRadius: '50%', width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, textDecoration: 'none' }}>💬</a>
           )}
         </div>
       </div>
@@ -293,7 +293,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
 
         {/* WhatsApp */}
         {listing.whatsapp_group_url && (
-          <a href={`https://chat.whatsapp.com/${listing.whatsapp_group_url}`} target="_blank" rel="noopener noreferrer"
+          <a href={listing.whatsapp_group_url} target="_blank" rel="noopener noreferrer"
             style={{ display: 'block', background: '#F0FDF4', color: '#15803D', textAlign: 'center', padding: '12px 20px', borderRadius: 16, fontSize: 14, fontWeight: 700, border: '1px solid #BBF7D0', marginBottom: 10, textDecoration: 'none' }}>
             💬 Join WhatsApp Group
           </a>
