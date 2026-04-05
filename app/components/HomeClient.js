@@ -137,8 +137,8 @@ export default function HomeClient({ listings, recentListings = [] }) {
 
       {/* Age chips */}
       <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 16px 8px', scrollbarWidth: 'none' }}>
-        {[['all','All ages'],['baby','👶 Baby 0–12m'],['toddler','🧒 Toddler 1–3'],['preschool','🐣 Preschool 3–5'],['kids','🎒 Kids 5+']].map(([key, label]) => (
-          <span key={key} onClick={() => setAgeFilter(key)} style={chipStyle(ageFilter === key, '#5B2D6E')}>{label}</span>
+        {[['baby','👶 Baby 0–12m'],['toddler','🧒 Toddler 1–3'],['preschool','🐣 Preschool 3–5'],['kids','🎒 Kids 5+']].map(([key, label]) => (
+          <span key={key} onClick={() => setAgeFilter(ageFilter === key ? 'all' : key)} style={chipStyle(ageFilter === key, '#5B2D6E')}>{label}</span>
         ))}
       </div>
 
