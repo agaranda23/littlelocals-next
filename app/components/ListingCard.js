@@ -80,12 +80,7 @@ function getTrustBadge(listing) {
 }
 
 export default function ListingCard({ listing, userLocation, recentViews = 0, isSaved = false }) {
-  const [saved, setSaved] = useState(() => {
-    try {
-      const favs = JSON.parse(localStorage.getItem('ll_favs') || '[]')
-      return favs.includes(listing.id)
-    } catch(e) { return false }
-  })
+  const [saved, setSaved] = useState(isSaved)
   const isFree = listing.free || (listing.price || '').toLowerCase().includes('free')
   const onToday = isOnToday(listing)
 
