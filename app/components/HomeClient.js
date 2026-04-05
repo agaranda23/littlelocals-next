@@ -190,8 +190,18 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
               {orderedDays.map(dayKey => {
                 const dayMap = { mon:'Mon', tue:'Tue', wed:'Wed', thu:'Thu', fri:'Fri', sat:'Sat', sun:'Sun' }
                 const isToday = dayKey === todayKey
+                const usedSlugs = orderedDays.slice(0, orderedDays.indexOf(dayKey)).map(dk => {
+                  const p = listings.filter(l =>
+                    l.image && (l.days_of_week || []).includes(dk)
+                  )[0]
+                  return p?.slug
+                }).filter(Boolean)
                 const pick = listings.filter(l =>
-                  l.image && (l.is_daily || !l.days_of_week || l.days_of_week.length === 0 || (l.days_of_week || []).includes(dayKey))
+                  l.image &&
+                  !usedSlugs.includes(l.slug) &&
+                  ((l.days_of_week || []).includes(dayKey) || l.is_daily)
+                )[0] || listings.filter(l =>
+                  l.image && !usedSlugs.includes(l.slug)
                 )[0]
                 if (!pick) return null
                 const isFree = pick.free || (pick.price || '').toLowerCase().includes('free')
