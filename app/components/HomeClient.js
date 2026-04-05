@@ -47,7 +47,8 @@ export default function HomeClient({ listings }) {
   const [worthJourney, setWorthJourney] = useState(false)
   const [nurseryFilter, setNurseryFilter] = useState(false)
   const [weather, setWeather] = useState(null)
-  const [exploringCount] = useState(() => Math.floor(Math.random() * 18) + 8)
+  const [exploringCount, setExploringCount] = useState(0)
+  useEffect(() => { setExploringCount(Math.floor(Math.random() * 18) + 8) }, [])
 
   useEffect(() => {
     fetch('https://api.open-meteo.com/v1/forecast?latitude=51.5139&longitude=-0.3048&current_weather=true&timezone=Europe/London')
