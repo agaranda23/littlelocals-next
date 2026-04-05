@@ -24,7 +24,7 @@ function formatDistance(km, mode) {
   return mins <= 1 ? 'Nearby' : `${mins} min ${mode}`
 }
 
-export default function ListingCard({ listing, userLocation }) {
+export default function ListingCard({ listing, userLocation, recentViews = 0 }) {
   const [saved, setSaved] = useState(false)
   const isFree = listing.free || (listing.price || '').toLowerCase().includes('free')
   const onToday = isOnToday(listing)
@@ -57,6 +57,11 @@ export default function ListingCard({ listing, userLocation }) {
             style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 16, boxShadow: '0 1px 6px rgba(0,0,0,0.12)' }}>
             {saved ? '❤️' : '🤍'}
           </button>
+          <div style={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 }}>
+            <div style={{ width: 16, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.9)' }} />
+            <div style={{ width: 6, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.5)' }} />
+            <div style={{ width: 6, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.5)' }} />
+          </div>
           {listing.logo && (
             <div style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(255,255,255,0.92)', borderRadius: 8, padding: '4px 8px' }}>
               <img src={listing.logo} alt="" style={{ height: 22, width: 'auto', borderRadius: 4 }} />
@@ -83,6 +88,11 @@ export default function ListingCard({ listing, userLocation }) {
         {listing.description && (
           <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 6, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
             {listing.description}
+          </div>
+        )}
+        {recentViews >= 3 && (
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: '#D4732A', background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 20, padding: '3px 10px', marginBottom: 6 }}>
+            📍 Parents nearby visited this recently
           </div>
         )}
         {(listing.popular || listing.worth_journey || listing.free_trial) && (
