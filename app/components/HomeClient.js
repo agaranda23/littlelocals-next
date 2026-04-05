@@ -44,7 +44,6 @@ function getGreeting(weather) {
 export default function HomeClient({ listings, recentListings = [], localFav = null, viewCounts = {} }) {
   const [dayFilter, setDayFilter] = useState('week')
   const [showFilters, setShowFilters] = useState(false)
-  const [showFilters, setShowFilters] = useState(false)
   const [search, setSearch] = useState('')
   const [ageFilter, setAgeFilter] = useState('all')
   const [freeOnly, setFreeOnly] = useState(false)
