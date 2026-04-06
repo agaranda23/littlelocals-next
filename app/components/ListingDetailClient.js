@@ -25,26 +25,56 @@ export default function ListingDetailClient({ listing, images, relatedListings }
   // Load from localStorage on mount
   useEffect(() => {
     try {
-      if (localStorage.getItem('visited_' + listing.id)) setVisited(true)
-      const p = localStorage.getItem('plans_' + listing.id)
-      if (p) setPlannedDates(JSON.parse(p))
+      const passport = JSON.parse(localStorage.getItem('ll_passport') || '[]')
+      if (passport.includes(listing.id)) setVisited(true)
+      const calData = localStorage.getItem('ll_calendar_v2')
+      if (calData) {
+        const cal = JSON.parse(calData)
+        const dates = Object.keys(cal).filter(d => (cal[d] || []).includes(listing.id))
+        setPlannedDates(dates)
+      }
     } catch(e) {}
   }, [listing.id])
 
   const toggleVisited = () => {
     try {
-      if (visited) { localStorage.removeItem('visited_' + listing.id); setVisited(false) }
-      else { localStorage.setItem('visited_' + listing.id, '1'); setVisited(true) }
+      const passport = JSON.parse(localStorage.getItem('ll_passport') || '[]')
+      if (visited) {
+        localStorage.setItem('ll_passport', JSON.stringify(passport.filter(id => id !== listing.id)))
+        setVisited(false)
+      } else {
+        localStorage.setItem('ll_passport', JSON.stringify([...new Set([...passport, listing.id])]))
+        setVisited(true)
+      }
+    } catch(e) {}
+  }
+
+  const addToPlans = () => {
+    try {
+      const today = new Date().toISOString().split('T')[0]
+      const cal = JSON.parse(localStorage.getItem('ll_calendar_v2') || '{}')
+      const arr = cal[today] || []
+      if (!arr.includes(listing.id)) {
+        cal[today] = [...arr, listing.id]
+        localStorage.setItem('ll_calendar_v2', JSON.stringify(cal))
+        setPlannedDates(prev => [...new Set([...prev, today])])
+      }
     } catch(e) {}
   }
 
   const togglePlan = (dateStr) => {
     try {
-      const next = plannedDates.includes(dateStr)
-        ? plannedDates.filter(d => d !== dateStr)
-        : [...plannedDates, dateStr]
-      setPlannedDates(next)
-      localStorage.setItem('plans_' + listing.id, JSON.stringify(next))
+      const cal = JSON.parse(localStorage.getItem('ll_calendar_v2') || '{}')
+      const arr = cal[dateStr] || []
+      if (arr.includes(listing.id)) {
+        cal[dateStr] = arr.filter(id => id !== listing.id)
+        if (cal[dateStr].length === 0) delete cal[dateStr]
+        setPlannedDates(prev => prev.filter(d => d !== dateStr))
+      } else {
+        cal[dateStr] = [...arr, listing.id]
+        setPlannedDates(prev => [...new Set([...prev, dateStr])])
+      }
+      localStorage.setItem('ll_calendar_v2', JSON.stringify(cal))
     } catch(e) {}
   }
 

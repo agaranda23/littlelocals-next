@@ -137,7 +137,7 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
           <div style={{ fontSize: 16, fontWeight: 800, color: '#111827', lineHeight: 1.3, display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
             {listing.name}
-            {listing.verified && <img src="/verified-badge.svg" width={16} height={16} style={{ verticalAlign: 'middle', flexShrink: 0 }} alt="Verified" />}
+            {listing.verified && listing.image && <img src="/verified-badge.svg" width={16} height={16} style={{ verticalAlign: 'middle', flexShrink: 0 }} alt="Verified" />}
           </div>
           {(listing.price || isFree) && (
             <div style={{ flexShrink: 0, fontSize: 12, fontWeight: 700, padding: '3px 9px', borderRadius: 8, background: isFree ? '#D1FAE5' : '#FFF7ED', color: isFree ? '#065F46' : '#9A3412', whiteSpace: 'nowrap' }}>
@@ -190,6 +190,9 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
             </div>
           )
         })()}
+        {recentViews >= 3 && (
+          <div style={{ fontSize: 12, color: '#D4732A', fontWeight: 600, marginBottom: 3 }}>📍 {recentViews} parents nearby visited this recently</div>
+        )}
         {distance && (
           <div style={{ fontSize: 12, color: '#6B7280' }}>📍 {distance}</div>
         )}
