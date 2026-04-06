@@ -43,6 +43,7 @@ function getGreeting(weather) {
 
 export default function HomeClient({ listings, recentListings = [], localFav = null, viewCounts = {} }) {
   const [savedIds, setSavedIds] = useState(new Set())
+  const [activeNav, setActiveNav] = useState('home')
   const [showCalendar, setShowCalendar] = useState(false)
   const [recentlyViewed, setRecentlyViewed] = useState([])
   const [passport, setPassport] = useState([])
@@ -367,15 +368,18 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         {/* Bottom nav */}
         <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '6px 0 16px', zIndex: 100 }}>
           {[
-            { img: '/nav-home.png', label: 'Home', action: closeCalendar },
-            { img: '/nav-today.png', label: 'Today', action: () => { closeCalendar(); setDayFilter('today') } },
-            { img: '/nav-explore.png', label: 'Explore', action: () => { closeCalendar(); setDayFilter('week'); setSearch(''); setAgeFilter('all'); setFreeOnly(false); setWeatherMode('all'); setWorthJourney(false); setNurseryFilter(false) } },
-            { img: '/nav-plans.png', label: 'My Plans', action: () => {} },
-          ].map(tab => (
-            <div key={tab.label} onClick={tab.action} style={{ flex: 1, textAlign: 'center', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <img src={tab.img} alt={tab.label} style={{ width: 66, height: 66, objectFit: 'contain' }} />
-            </div>
-          ))}
+            { id: 'home', sel: '/home-nav-selected.png', unsel: '/home-nav-unselected.png', label: 'Home', action: () => { setActiveNav('home'); closeCalendar() } },
+            { id: 'today', sel: '/today-nav-selected.png', unsel: '/today-nav-unselected.png', label: 'Today', action: () => { setActiveNav('today'); closeCalendar(); setDayFilter('today') } },
+            { id: 'explore', sel: '/explore-nav-selected.png', unsel: '/explore-nav-unselected.png', label: 'Explore', action: () => { setActiveNav('explore'); closeCalendar(); setDayFilter('week'); setSearch(''); setAgeFilter('all'); setFreeOnly(false); setWeatherMode('all'); setWorthJourney(false); setNurseryFilter(false) } },
+            { id: 'plans', sel: '/myplans-nav-selected.png', unsel: '/myplans-nav-unselected.png', label: 'My Plans', action: () => {} },
+          ].map(tab => {
+            const isActive = tab.id === 'plans' || activeNav === tab.id
+            return (
+              <div key={tab.id} onClick={tab.action} style={{ flex: 1, textAlign: 'center', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <img src={isActive ? tab.sel : tab.unsel} alt={tab.label} style={{ width: isActive ? 72 : 62, height: isActive ? 72 : 62, objectFit: 'contain', transition: 'width 0.15s, height 0.15s' }} />
+              </div>
+            )
+          })}
         </div>
       </div>
     )
