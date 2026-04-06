@@ -12,6 +12,16 @@ export default function ListingDetailClient({ listing, images, relatedListings }
   const [visited, setVisited] = useState(false)
   const [plannedDates, setPlannedDates] = useState([])
 
+  // Track recently viewed
+  useEffect(() => {
+    try {
+      const rv = JSON.parse(localStorage.getItem('ll_recentlyViewed') || '[]')
+      const filtered = rv.filter(r => r.id !== listing.id)
+      const updated = [{ id: listing.id, name: listing.name, image: images?.[0]?.url || null }, ...filtered].slice(0, 20)
+      localStorage.setItem('ll_recentlyViewed', JSON.stringify(updated))
+    } catch(e) {}
+  }, [listing.id])
+
   // Load from localStorage on mount
   useEffect(() => {
     try {
