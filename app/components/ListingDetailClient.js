@@ -237,15 +237,8 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         {listing.timetable_image && (
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 10 }}>📅 Timetable</div>
-            <img src={listing.timetable_image} alt="Timetable" style={{ width: '100%', borderRadius: 12, cursor: 'pointer' }} onClick={() => setLightbox('timetable')} />
-          </div>
-        )}
-
-        {/* Timetable image */}
-        {listing.timetable_image && (
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 10 }}>📅 Timetable</div>
-            <img src={listing.timetable_image} alt="Timetable" style={{ width: '100%', borderRadius: 12, cursor: 'pointer' }} onClick={() => setLightbox('timetable')} />
+            <img src={listing.timetable_image} alt="Timetable" style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 12, cursor: 'pointer' }} onClick={() => setLightbox('timetable')} />
+            <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>Tap to enlarge</div>
           </div>
         )}
 
@@ -268,9 +261,17 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         {images.filter(img => img.url?.endsWith('.mp4')).length > 0 && (
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 10 }}>🎥 Videos</div>
-            {images.filter(img => img.url?.endsWith('.mp4')).map((img, i) => (
-              <video key={i} src={img.url} controls playsInline style={{ width: '100%', borderRadius: 12, marginBottom: 8, background: '#000' }} />
-            ))}
+            <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
+              {images.filter(img => img.url?.endsWith('.mp4')).map((img, i) => (
+                <div key={i} onClick={() => setLightbox(images.indexOf(img))} style={{ flexShrink: 0, width: 140, height: 105, borderRadius: 10, overflow: 'hidden', background: '#000', cursor: 'pointer', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <video src={img.url} muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <div style={{ position: 'absolute', background: 'rgba(0,0,0,0.5)', borderRadius: '50%', width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ color: 'white', fontSize: 16, marginLeft: 3 }}>▶</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>Tap to play</div>
           </div>
         )}
 
