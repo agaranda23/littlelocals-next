@@ -7,6 +7,24 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 )
 
+export async function generateMetadata({ params }) {
+  const { slug } = await params
+  const { data: listing } = await supabase
+    .from('listings')
+    .select('name, description, type, location, ages')
+    .eq('slug', slug)
+    .single()
+  if (!listing) return { title: 'LITTLElocals' }
+  const title = `${listing.name} — Kids Activities in ${listing.location || 'Ealing'} | LITTLElocals`
+  const description = listing.description || `${listing.name} is a ${listing.type} activity in ${listing.location || 'Ealing'}${listing.ages ? ' for ' + listing.ages : ''}. Find kids activities near you on LITTLElocals.`
+  return {
+    title,
+    description,
+    openGraph: { title, description, siteName: 'LITTLElocals' },
+    twitter: { card: 'summary', title, description },
+  }
+}
+
 export default async function ListingPage({ params }) {
   const { slug } = await params
 
