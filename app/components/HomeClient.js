@@ -416,42 +416,62 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         const weekDays = ['mon','tue','wed','thu','fri','sat','sun']
         const todayIdx = weekDays.indexOf(todayKey)
         const orderedDays = [...weekDays.slice(todayIdx), ...weekDays.slice(0, todayIdx)].slice(0, 5)
+        const weekPicks = orderedDays.map(dayKey => {
+          const usedSlugs = orderedDays.slice(0, orderedDays.indexOf(dayKey)).map(dk => {
+            const p = listings.filter(l => l.image && (l.days_of_week || []).includes(dk))[0]
+            return p?.slug
+          }).filter(Boolean)
+          return listings.filter(l =>
+            l.image && !usedSlugs.includes(l.slug) && ((l.days_of_week || []).includes(dayKey) || l.is_daily)
+          )[0] || listings.filter(l => l.image && !usedSlugs.includes(l.slug))[0] || null
+        }).filter(Boolean)
+        const savedCount = weekPicks.filter(p => savedIds.has(p.id)).length
+        const sortedPicks = [
+          ...weekPicks.filter(p => savedIds.has(p.id)),
+          ...weekPicks.filter(p => !savedIds.has(p.id))
+        ]
+        const getWeekDayKey = (pick) => orderedDays[weekPicks.indexOf(pick)] || orderedDays[0]
         return (
           <div style={{ padding: '16px 0 4px' }}>
-            <div style={{ padding: '0 20px 4px', fontSize: 15, fontWeight: 800, color: '#111827' }}>📅 Your week with the kids</div>
-            <div style={{ padding: '0 20px 10px', fontSize: 12, color: '#9CA3AF' }}>Ideas nearby based on what's happening this week</div>
+            <div style={{ padding: '0 20px 2px', fontSize: 15, fontWeight: 800, color: '#111827' }}>📅 Your week with the kids</div>
+            <div style={{ padding: '0 20px 6px', fontSize: 12, color: '#9CA3AF' }}>Ideas nearby based on what's happening this week</div>
+            {savedCount > 0 && (
+              <div style={{ padding: '0 20px 8px', fontSize: 13, fontWeight: 700, color: '#5B2D6E' }}>✅ {savedCount} saved {savedCount === 1 ? 'activity' : 'activities'} this week</div>
+            )}
             <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 4px', scrollbarWidth: 'none' }}>
-              {orderedDays.map(dayKey => {
+              {sortedPicks.map(pick => {
+                const dayKey = getWeekDayKey(pick)
                 const dayMap = { mon:'Mon', tue:'Tue', wed:'Wed', thu:'Thu', fri:'Fri', sat:'Sat', sun:'Sun' }
                 const isToday = dayKey === todayKey
-                const usedSlugs = orderedDays.slice(0, orderedDays.indexOf(dayKey)).map(dk => {
-                  const p = listings.filter(l =>
-                    l.image && (l.days_of_week || []).includes(dk)
-                  )[0]
-                  return p?.slug
-                }).filter(Boolean)
-                const pick = listings.filter(l =>
-                  l.image &&
-                  !usedSlugs.includes(l.slug) &&
-                  ((l.days_of_week || []).includes(dayKey) || l.is_daily)
-                )[0] || listings.filter(l =>
-                  l.image && !usedSlugs.includes(l.slug)
-                )[0]
-                if (!pick) return null
                 const isFree = pick.free || (pick.price || '').toLowerCase().includes('free')
                 const isPickSaved = savedIds.has(pick.id)
+                const dist = (() => {
+                  if (!userLocation || !pick.lat || !pick.lng) return null
+                  const R = 6371
+                  const dLat = (pick.lat - userLocation.lat) * Math.PI / 180
+                  const dLng = (pick.lng - userLocation.lng) * Math.PI / 180
+                  const a = Math.sin(dLat/2)**2 + Math.cos(userLocation.lat*Math.PI/180) * Math.cos(pick.lat*Math.PI/180) * Math.sin(dLng/2)**2
+                  const km = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+                  const mode = km < 1.5 ? 'walk' : 'drive'
+                  const mins = Math.round(km / (mode === 'walk' ? 0.08 : 0.5))
+                  return mins <= 1 ? 'Nearby' : mins + ' min'
+                })()
                 return (
-                  <a key={dayKey} href={'/listing/' + pick.slug} style={{ flexShrink: 0, width: 155, borderRadius: 14, overflow: 'hidden', background: 'white', boxShadow: isPickSaved ? '0 2px 10px rgba(91,45,110,0.2)' : '0 2px 10px rgba(0,0,0,0.08)', border: isPickSaved ? '2px solid #5B2D6E' : '1px solid #F3F4F6', textDecoration: 'none', display: 'block' }}>
+                  <a key={pick.id} href={'/listing/' + pick.slug} style={{ flexShrink: 0, width: 155, borderRadius: 14, overflow: 'hidden', background: 'white', boxShadow: isPickSaved ? '0 2px 10px rgba(91,45,110,0.2)' : '0 2px 10px rgba(0,0,0,0.08)', border: isPickSaved ? '2px solid #5B2D6E' : '1px solid #F3F4F6', textDecoration: 'none', display: 'block', position: 'relative' }}>
                     <div style={{ position: 'relative', height: 95, overflow: 'hidden' }}>
                       <img src={pick.image} alt={pick.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       <div style={{ position: 'absolute', top: 6, left: 6, background: isToday ? '#5B2D6E' : 'rgba(0,0,0,0.55)', color: 'white', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6 }}>
                         {isToday ? 'Today' : dayMap[dayKey]}
                       </div>
+                      <div style={{ position: 'absolute', top: 6, right: 6, background: isPickSaved ? '#5B2D6E' : 'rgba(255,255,255,0.9)', borderRadius: '50%', width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, cursor: 'pointer' }}
+                        onClick={e => { e.preventDefault(); e.stopPropagation(); try { const favs = JSON.parse(localStorage.getItem('ll_favs') || '[]'); const next = isPickSaved ? favs.filter(id => id !== pick.id) : [...new Set([...favs, pick.id])]; localStorage.setItem('ll_favs', JSON.stringify(next)); setSavedIds(new Set([...next, ...JSON.parse(localStorage.getItem('ll_calendar_v2') ? Object.values(JSON.parse(localStorage.getItem('ll_calendar_v2'))).flat() : '[]')])) } catch(e) {} }}>
+                        <span style={{ color: isPickSaved ? 'white' : '#9CA3AF' }}>{isPickSaved ? '♥' : '🤍'}</span>
+                      </div>
                     </div>
                     <div style={{ padding: '8px 10px' }}>
                       <div style={{ fontSize: 12, fontWeight: 700, color: '#111827', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pick.name}</div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: 11, color: '#9CA3AF' }}>📍 Nearby</span>
+                        <span style={{ fontSize: 11, color: '#9CA3AF' }}>📍 {dist || 'Nearby'}</span>
                         <span style={{ fontSize: 11, fontWeight: 700, color: isFree ? '#065F46' : '#D4732A' }}>{isFree ? 'Free' : pick.price}</span>
                       </div>
                     </div>
