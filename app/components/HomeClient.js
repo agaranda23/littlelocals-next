@@ -656,17 +656,17 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       </div>
 
       {/* Bottom nav */}
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '8px 0 20px', zIndex: 100 }}>
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '6px 0 16px', zIndex: 100 }}>
         {[
-          { icon: '🏠', label: 'Home', action: () => { window.scrollTo({ top: 0, behavior: 'smooth' }) } },
-          { icon: '📅', label: 'Today', action: () => { window.location.href = '/?day=today' } },
-          { icon: '🔍', label: 'Explore', action: () => { window.scrollTo({ top: 0, behavior: 'smooth' }) } },
-          { icon: '🗓️', label: 'My Plans', action: openCalendar, badge: calendarTotal },
+          { img: '/nav-home.png', label: 'Home', action: () => { window.scrollTo({ top: 0, behavior: 'smooth' }) } },
+          { img: '/nav-today.png', label: 'Today', action: () => { window.location.href = '/?day=today' } },
+          { img: '/nav-explore.png', label: 'Explore', action: () => { window.scrollTo({ top: 0, behavior: 'smooth' }) } },
+          { img: '/nav-plans.png', label: 'My Plans', action: openCalendar, badge: calendarTotal },
         ].map(tab => (
-          <div key={tab.label} onClick={tab.action} style={{ flex: 1, textAlign: 'center', cursor: 'pointer', position: 'relative' }}>
-            <div style={{ fontSize: 22 }}>{tab.icon}</div>
-            <div style={{ fontSize: 10, fontWeight: 600, color: tab.label === 'Home' ? '#5B2D6E' : '#9CA3AF', marginTop: 2 }}>{tab.label}</div>
-            {tab.badge > 0 && <div style={{ position: 'absolute', top: 0, right: 'calc(50% - 20px)', background: '#5B2D6E', color: 'white', fontSize: 9, fontWeight: 800, borderRadius: 10, minWidth: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{tab.badge}</div>}
+          <div key={tab.label} onClick={tab.action} style={{ flex: 1, textAlign: 'center', cursor: 'pointer', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <img src={tab.img} alt={tab.label} style={{ width: 44, height: 44, objectFit: 'contain' }} />
+            <div style={{ fontSize: 10, fontWeight: 600, color: '#5B2D6E', marginTop: 2 }}>{tab.label}</div>
+            {tab.badge > 0 && <div style={{ position: 'absolute', top: 0, right: 'calc(50% - 22px)', background: '#D4732A', color: 'white', fontSize: 9, fontWeight: 800, borderRadius: 10, minWidth: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{tab.badge}</div>}
           </div>
         ))}
       </div>
