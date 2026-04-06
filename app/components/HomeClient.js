@@ -671,7 +671,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         {[
           { img: '/nav-home.png', label: 'Home', action: () => { window.scrollTo({ top: 0, behavior: 'smooth' }) } },
           { img: '/nav-today.png', label: 'Today', action: () => { setDayFilter('today'); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
-          { img: '/nav-explore.png', label: 'Explore', action: () => { window.scrollTo({ top: 0, behavior: 'smooth' }) } },
+          { img: '/nav-explore.png', label: 'Explore', action: () => { setDayFilter('week'); setSearch(''); setAgeFilter('all'); setFreeOnly(false); setWeatherMode('all'); setWorthJourney(false); setNurseryFilter(false); setCurrentPage(1); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
           { img: '/nav-plans.png', label: 'My Plans', action: openCalendar, badge: calendarTotal },
         ].map(tab => (
           <div key={tab.label} onClick={tab.action} style={{ flex: 1, textAlign: 'center', cursor: 'pointer', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

@@ -99,6 +99,21 @@ export default function ListingDetailClient({ listing, images, relatedListings }
   }
   const onToday = isOnToday()
 
+  const BottomNav = () => (
+    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '6px 0 16px', zIndex: 100 }}>
+      {[
+        { img: '/nav-home.png', label: 'Home', href: '/' },
+        { img: '/nav-today.png', label: 'Today', href: '/?day=today' },
+        { img: '/nav-explore.png', label: 'Explore', href: '/' },
+        { img: '/nav-plans.png', label: 'My Plans', href: '/?plans=1' },
+      ].map(tab => (
+        <a key={tab.label} href={tab.href} style={{ flex: 1, textAlign: 'center', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <img src={tab.img} alt={tab.label} style={{ width: 66, height: 66, objectFit: 'contain' }} />
+        </a>
+      ))}
+    </div>
+  )
+
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', paddingBottom: 100, fontFamily: 'system-ui, sans-serif' }}>
 
@@ -401,6 +416,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
       )}
 
 
+      <BottomNav />
     </div>
   )
 }
