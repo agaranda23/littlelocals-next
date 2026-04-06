@@ -42,6 +42,7 @@ function getGreeting(weather) {
 }
 
 export default function HomeClient({ listings, recentListings = [], localFav = null, viewCounts = {} }) {
+  const [savedIds, setSavedIds] = useState(new Set())
   const [dayFilter, setDayFilter] = useState('week')
   const [showFilters, setShowFilters] = useState(false)
   const [search, setSearch] = useState('')
@@ -286,10 +287,8 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
                 )[0]
                 if (!pick) return null
                 const isFree = pick.free || (pick.price || '').toLowerCase().includes('free')
+                const isPickSaved = savedIds.has(pick.id)
                 return (
-                  {(() => {
-                    const isPickSaved = savedIds.has(pick.id)
-                    return (
                   <a key={dayKey} href={'/listing/' + pick.slug} style={{ flexShrink: 0, width: 155, borderRadius: 14, overflow: 'hidden', background: 'white', boxShadow: isPickSaved ? '0 2px 10px rgba(91,45,110,0.2)' : '0 2px 10px rgba(0,0,0,0.08)', border: isPickSaved ? '2px solid #5B2D6E' : '1px solid #F3F4F6', textDecoration: 'none', display: 'block' }}>
                     <div style={{ position: 'relative', height: 95, overflow: 'hidden' }}>
                       <img src={pick.image} alt={pick.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
