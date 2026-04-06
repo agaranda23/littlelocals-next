@@ -738,17 +738,21 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       {/* Bottom nav */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '6px 0 16px', zIndex: 100 }}>
         {[
-          { img: '/nav-home.png', label: 'Home', action: () => { window.scrollTo({ top: 0, behavior: 'smooth' }) } },
-          { img: '/nav-today.png', label: 'Today', action: () => { setDayFilter('today'); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
-          { img: '/nav-explore.png', label: 'Explore', action: () => { setDayFilter('week'); setSearch(''); setAgeFilter('all'); setFreeOnly(false); setWeatherMode('all'); setWorthJourney(false); setNurseryFilter(false); setCurrentPage(1); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
-          { img: '/nav-plans.png', label: 'My Plans', action: openCalendar, badge: calendarTotal },
-        ].map(tab => (
-          <div key={tab.label} onClick={tab.action} style={{ flex: 1, textAlign: 'center', cursor: 'pointer', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <img src={tab.img} alt={tab.label} style={{ width: 66, height: 66, objectFit: 'contain' }} />
+          { id: 'home', sel: '/home-nav-selected.png', unsel: '/home-nav-unselected.png', label: 'Home', action: () => { setActiveNav('home'); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
+          { id: 'today', sel: '/today-nav-selected.png', unsel: '/today-nav-unselected.png', label: 'Today', action: () => { setActiveNav('today'); setDayFilter('today'); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
+          { id: 'explore', sel: '/explore-nav-selected.png', unsel: '/explore-nav-unselected.png', label: 'Explore', action: () => { setActiveNav('explore'); setDayFilter('week'); setSearch(''); setAgeFilter('all'); setFreeOnly(false); setWeatherMode('all'); setWorthJourney(false); setNurseryFilter(false); setCurrentPage(1); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
+          { id: 'plans', sel: '/myplans-nav-selected.png', unsel: '/myplans-nav-unselected.png', label: 'My Plans', action: () => { setActiveNav('plans'); openCalendar() }, badge: calendarTotal },
+        ].map(tab => {
+          const isActive = activeNav === tab.id
+          return (
+          <div key={tab.id} onClick={tab.action} style={{ flex: 1, textAlign: 'center', cursor: 'pointer', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <img src={isActive ? tab.sel : tab.unsel} alt={tab.label} style={{ width: isActive ? 72 : 62, height: isActive ? 72 : 62, objectFit: 'contain', transition: 'width 0.15s, height 0.15s' }} />
             {tab.badge > 0 && <div style={{ position: 'absolute', top: 0, right: 'calc(50% - 22px)', background: '#D4732A', color: 'white', fontSize: 9, fontWeight: 800, borderRadius: 10, minWidth: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{tab.badge}</div>}
           </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
 }
+
