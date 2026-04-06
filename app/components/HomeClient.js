@@ -664,8 +664,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
           { img: '/nav-plans.png', label: 'My Plans', action: openCalendar, badge: calendarTotal },
         ].map(tab => (
           <div key={tab.label} onClick={tab.action} style={{ flex: 1, textAlign: 'center', cursor: 'pointer', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <img src={tab.img} alt={tab.label} style={{ width: 44, height: 44, objectFit: 'contain' }} />
-            <div style={{ fontSize: 10, fontWeight: 600, color: '#5B2D6E', marginTop: 2 }}>{tab.label}</div>
+            <img src={tab.img} alt={tab.label} style={{ width: 66, height: 66, objectFit: 'contain' }} />
             {tab.badge > 0 && <div style={{ position: 'absolute', top: 0, right: 'calc(50% - 22px)', background: '#D4732A', color: 'white', fontSize: 9, fontWeight: 800, borderRadius: 10, minWidth: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{tab.badge}</div>}
           </div>
         ))}
