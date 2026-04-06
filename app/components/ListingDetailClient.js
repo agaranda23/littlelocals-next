@@ -134,7 +134,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
       {images.length > 0 && (
         <div style={{ position: 'relative', height: 280, overflow: 'hidden', background: '#F3F4F6', cursor: 'pointer' }}
           onClick={() => setLightbox(0)}>
-          <img src={images[0]?.url} alt={listing.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          {images[0]?.url?.endsWith('.mp4') ? <video src={images[0].url} autoPlay muted loop playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <img src={images[0]?.url} alt={listing.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
           {listing.logo && (
             <div style={{ position: 'absolute', bottom: 12, left: 12, background: 'rgba(255,255,255,0.92)', borderRadius: 10, padding: '4px 10px' }}>
               <img src={listing.logo} alt="" style={{ height: 24, width: 'auto', borderRadius: 4 }} />
@@ -256,7 +256,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
             <div style={{ position: 'relative' }}>
               <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
                 {images.map((img, i) => (
-                  <img key={i} src={img.url} alt="" onClick={() => setLightbox(i)} style={{ flexShrink: 0, width: 140, height: 105, objectFit: 'cover', borderRadius: 10, cursor: 'pointer' }} />
+                  {img.url?.endsWith('.mp4') ? <video key={i} src={img.url} muted loop playsInline onClick={() => setLightbox(i)} style={{ flexShrink: 0, width: 140, height: 105, objectFit: 'cover', borderRadius: 10, cursor: 'pointer' }} /> : <img key={i} src={img.url} alt="" onClick={() => setLightbox(i)} style={{ flexShrink: 0, width: 140, height: 105, objectFit: 'cover', borderRadius: 10, cursor: 'pointer' }} />}
                 ))}
               </div>
             </div>
@@ -402,7 +402,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
             <img src={listing.timetable_image} alt="Timetable" style={{ maxWidth: '95vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} onClick={e => e.stopPropagation()} />
           ) : (
             <div style={{ width: '100%', overflowX: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <img src={images[typeof lightbox === 'number' ? lightbox : imgIdx]?.url} alt="" style={{ maxWidth: '95vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} onClick={e => e.stopPropagation()} />
+              {images[typeof lightbox === 'number' ? lightbox : imgIdx]?.url?.endsWith('.mp4') ? <video src={images[typeof lightbox === 'number' ? lightbox : imgIdx]?.url} controls autoPlay style={{ maxWidth: '95vw', maxHeight: '90vh', borderRadius: 8 }} onClick={e => e.stopPropagation()} /> : <img src={images[typeof lightbox === 'number' ? lightbox : imgIdx]?.url} alt="" style={{ maxWidth: '95vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} onClick={e => e.stopPropagation()} />}
             </div>
           )}
           {typeof lightbox === 'number' && images.length > 1 && (
