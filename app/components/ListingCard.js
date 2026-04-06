@@ -81,8 +81,23 @@ function getTrustBadge(listing) {
 
 export default function ListingCard({ listing, userLocation, recentViews = 0, isSaved = false }) {
   const [saved, setSaved] = useState(isSaved)
+  const [imgIdx, setImgIdx] = useState(0)
+  const [touchStartX, setTouchStartX] = useState(null)
+  const allImages = listing.images && listing.images.length > 0 ? listing.images : (listing.image ? [listing.image] : [])
+  const currentImage = allImages[imgIdx] || listing.image
   const isFree = listing.free || (listing.price || '').toLowerCase().includes('free')
   const onToday = isOnToday(listing)
+
+  const handleTouchStart = (e) => setTouchStartX(e.touches[0].clientX)
+  const handleTouchEnd = (e) => {
+    if (touchStartX === null) return
+    const diff = touchStartX - e.changedTouches[0].clientX
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) setImgIdx(i => Math.min(i + 1, allImages.length - 1))
+      else setImgIdx(i => Math.max(i - 1, 0))
+    }
+    setTouchStartX(null)
+  }
 
   const dayLabel = (() => {
     if (listing.is_daily) return 'Daily'
@@ -102,7 +117,7 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
     <div style={{ background: 'white', borderRadius: 18, overflow: 'hidden', boxShadow: isSaved ? '0 2px 16px rgba(91,45,110,0.18)' : '0 2px 16px rgba(0,0,0,0.08)', border: isSaved ? '2px solid #5B2D6E' : '1px solid #F3F4F6', cursor: listing.slug ? 'pointer' : 'default' }}>
       {listing.image && (
         <div style={{ position: 'relative', height: 200, overflow: 'hidden' }}>
-          <img src={listing.image} alt={listing.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          <img src={currentImage} alt={listing.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} />
           {onToday && (
             <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(255,255,255,0.95)', borderRadius: 10, padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, fontWeight: 700, color: '#111827', boxShadow: '0 1px 6px rgba(0,0,0,0.12)' }}>
               <span>📅</span><span>Today</span>
@@ -121,11 +136,13 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
             style={{ position: 'absolute', top: 10, right: 10, background: saved ? '#5B2D6E' : 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 16, boxShadow: '0 1px 6px rgba(0,0,0,0.12)', transition: 'background 0.2s' }}>
             <span style={{ color: saved ? 'white' : 'inherit' }}>{saved ? '♥' : '🤍'}</span>
           </button>
-          <div style={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 }}>
-            <div style={{ width: 16, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.9)' }} />
-            <div style={{ width: 6, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.5)' }} />
-            <div style={{ width: 6, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.5)' }} />
-          </div>
+          {allImages.length > 1 && (
+            <div style={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 }}>
+              {allImages.map((_, i) => (
+                <div key={i} style={{ width: i === imgIdx ? 16 : 6, height: 4, borderRadius: 2, background: i === imgIdx ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.5)', transition: 'width 0.2s' }} />
+              ))}
+            </div>
+          )}
           {listing.logo && (
             <div style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(255,255,255,0.92)', borderRadius: 8, padding: '4px 8px' }}>
               <img src={listing.logo} alt="" style={{ height: 22, width: 'auto', borderRadius: 4 }} />

@@ -59,13 +59,14 @@ export default async function HomePage() {
 
   const imageMap = {}
   ;(images || []).forEach(img => {
-    if (!imageMap[img.listing_id]) imageMap[img.listing_id] = img.url
+    if (!imageMap[img.listing_id]) imageMap[img.listing_id] = []
+    imageMap[img.listing_id].push(img.url)
   })
 
   // Filter to Ealing borough only, keep worth_journey listings too
   const ealingListings = (listings || [])
     .filter(l => l.worth_journey || EALING_BOROUGH.some(a => (l.location || '').includes(a)))
-    .map(l => ({ ...l, image: imageMap[l.id] || null, recentViews: viewCounts[l.id] || 0 }))
+    .map(l => ({ ...l, image: (imageMap[l.id] || [])[0] || null, images: imageMap[l.id] || [], recentViews: viewCounts[l.id] || 0 }))
 
   return (
     <>
