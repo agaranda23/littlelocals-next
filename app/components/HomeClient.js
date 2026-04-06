@@ -94,6 +94,13 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
 
   const calendarTotal = Object.values(calendarPlan).reduce((sum, arr) => sum + arr.length, 0)
   const openCalendar = () => { const now = new Date(); setCalMonth(now.getMonth()); setCalYear(now.getFullYear()); setSelectedDate(now.toISOString().split('T')[0]); setShowCalendar(true) }
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.search.includes('plans=1')) {
+      openCalendar()
+      window.history.replaceState({}, '', '/')
+    }
+  }, [])
   const closeCalendar = () => setShowCalendar(false)
   const removeFromCalendar = (id, date) => { setCalendarPlan(prev => { const arr = (prev[date] || []).filter(x => x !== id); const next = {...prev}; if (arr.length === 0) delete next[date]; else next[date] = arr; return next }) }
 
