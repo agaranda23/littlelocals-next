@@ -114,7 +114,7 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
   })()
 
   const card = (
-    <div style={{ background: 'white', borderRadius: 18, overflow: 'hidden', boxShadow: isSaved ? '0 2px 16px rgba(91,45,110,0.18)' : '0 2px 16px rgba(0,0,0,0.08)', border: isSaved ? '2px solid #5B2D6E' : '1px solid #F3F4F6', cursor: listing.slug ? 'pointer' : 'default' }}>
+    <div style={{ background: 'white', borderRadius: 18, overflow: 'hidden', boxShadow: saved ? '0 2px 16px rgba(91,45,110,0.18)' : '0 2px 16px rgba(0,0,0,0.08)', border: saved ? '2px solid #5B2D6E' : '1px solid #F3F4F6', cursor: listing.slug ? 'pointer' : 'default' }}>
       {listing.image && (
         <div style={{ position: 'relative', height: 200, overflow: 'hidden' }}>
           <img src={currentImage} alt={listing.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} />
@@ -172,7 +172,7 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
           </div>
         )}
         {(() => {
-          if (isSaved) return (
+          if (saved) return (
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: '#5B2D6E', background: '#F3E8FF', border: '1px solid #D8B4FE', borderRadius: 20, padding: '3px 10px' }}>
                 💜 Saved by you
