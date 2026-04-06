@@ -60,7 +60,6 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const [nurseryFilter, setNurseryFilter] = useState(false)
 
   useEffect(() => { setCurrentPage(1) }, [dayFilter, search, ageFilter, freeOnly, weatherMode, worthJourney, nurseryFilter])
-  useEffect(() => { if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' }) }, [currentPage])
   const [userLocation, setUserLocation] = useState(null)
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [showInstall, setShowInstall] = useState(false)
@@ -601,7 +600,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         return (
           <div style={{ display: 'flex', gap: 6, justifyContent: 'center', padding: '20px 16px', flexWrap: 'wrap' }}>
             {deduped.map((p, i) => (
-              <button key={i} onClick={() => p.page && setCurrentPage(p.page)} disabled={!p.page} style={{
+              <button key={i} onClick={() => { if (p.page) { setCurrentPage(p.page); window.scrollTo({ top: 0, behavior: 'smooth' }) } }} disabled={!p.page} style={{
                 padding: '8px 14px', borderRadius: 10, border: '1px solid #E5E7EB', fontSize: 14, fontWeight: p.page === currentPage ? 700 : 500,
                 background: p.page === currentPage ? '#D4732A' : 'white',
                 color: p.page === currentPage ? 'white' : p.prev || p.next ? '#111827' : '#6B7280',
