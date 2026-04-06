@@ -464,7 +464,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
                         {isToday ? 'Today' : dayMap[dayKey]}
                       </div>
                       <div style={{ position: 'absolute', top: 6, right: 6, background: isPickSaved ? '#5B2D6E' : 'rgba(255,255,255,0.9)', borderRadius: '50%', width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, cursor: 'pointer' }}
-                        onClick={e => { e.preventDefault(); e.stopPropagation(); try { const favs = JSON.parse(localStorage.getItem('ll_favs') || '[]'); const next = isPickSaved ? favs.filter(id => id !== pick.id) : [...new Set([...favs, pick.id])]; localStorage.setItem('ll_favs', JSON.stringify(next)); setSavedIds(new Set([...next, ...JSON.parse(localStorage.getItem('ll_calendar_v2') ? Object.values(JSON.parse(localStorage.getItem('ll_calendar_v2'))).flat() : '[]')])) } catch(e) {} }}>
+                        onClick={e => { e.preventDefault(); e.stopPropagation(); navigator.vibrate && navigator.vibrate(50); try { const favs = JSON.parse(localStorage.getItem('ll_favs') || '[]'); const next = isPickSaved ? favs.filter(id => id !== pick.id) : [...new Set([...favs, pick.id])]; localStorage.setItem('ll_favs', JSON.stringify(next)); const cal = JSON.parse(localStorage.getItem('ll_calendar_v2') || '{}'); const calIds = Object.values(cal).flat(); setSavedIds(new Set([...next, ...calIds])) } catch(e) {} }}>
                         <span style={{ color: isPickSaved ? 'white' : '#9CA3AF' }}>{isPickSaved ? '♥' : '🤍'}</span>
                       </div>
                     </div>
