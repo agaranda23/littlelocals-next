@@ -43,6 +43,11 @@ function getGreeting(weather) {
 
 export default function HomeClient({ listings, recentListings = [], localFav = null, viewCounts = {} }) {
   const [savedIds, setSavedIds] = useState(new Set())
+  const [showCalendar, setShowCalendar] = useState(false)
+  const [calMonth, setCalMonth] = useState(new Date().getMonth())
+  const [calYear, setCalYear] = useState(new Date().getFullYear())
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
+  const [calendarPlan, setCalendarPlan] = useState({})
   const [dayFilter, setDayFilter] = useState('week')
   const [showFilters, setShowFilters] = useState(false)
   const [search, setSearch] = useState('')
@@ -68,9 +73,23 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
     try {
       const favs = JSON.parse(localStorage.getItem('ll_favs') || '[]')
       const cal = JSON.parse(localStorage.getItem('ll_calendar_v2') || '[]')
-      setSavedIds(new Set([...favs, ...cal]))
+      setSavedIds(new Set([...favs, ...Object.values(JSON.parse(localStorage.getItem('ll_calendar_v2') || '{}')).flat()]))
+      const planData = localStorage.getItem('ll_calendar_v2')
+      if (planData) {
+        const parsed = JSON.parse(planData)
+        if (typeof parsed === 'object' && !Array.isArray(parsed)) setCalendarPlan(parsed)
+      }
     } catch(e) {}
   }, [])
+
+  useEffect(() => {
+    try { localStorage.setItem('ll_calendar_v2', JSON.stringify(calendarPlan)) } catch(e) {}
+  }, [calendarPlan])
+
+  const calendarTotal = Object.values(calendarPlan).reduce((sum, arr) => sum + arr.length, 0)
+  const openCalendar = () => { const now = new Date(); setCalMonth(now.getMonth()); setCalYear(now.getFullYear()); setSelectedDate(now.toISOString().split('T')[0]); setShowCalendar(true) }
+  const closeCalendar = () => setShowCalendar(false)
+  const removeFromCalendar = (id, date) => { setCalendarPlan(prev => { const arr = (prev[date] || []).filter(x => x !== id); const next = {...prev}; if (arr.length === 0) delete next[date]; else next[date] = arr; return next }) }
 
   useEffect(() => {
     const isIOSDevice = /iphone|ipad|ipod/i.test(navigator.userAgent)
@@ -505,11 +524,17 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
 
       {/* Bottom nav */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '8px 0 20px', zIndex: 100 }}>
-        {[['🏠','Home','/'],['📅','Today','/?day=today'],['🔍','Explore','/'],['📋','My Plans','/']].map(([icon, label, href]) => (
-          <a key={label} href={href} style={{ flex: 1, textAlign: 'center', cursor: 'pointer', textDecoration: 'none' }}>
-            <div style={{ fontSize: 20 }}>{icon}</div>
-            <div style={{ fontSize: 10, fontWeight: 600, color: label === 'Home' ? '#5B2D6E' : '#9CA3AF', marginTop: 2 }}>{label}</div>
-          </a>
+        {[
+          { icon: '🏠', label: 'Home', action: () => { window.scrollTo({ top: 0, behavior: 'smooth' }) } },
+          { icon: '📅', label: 'Today', action: () => { window.location.href = '/?day=today' } },
+          { icon: '🔍', label: 'Explore', action: () => { window.scrollTo({ top: 0, behavior: 'smooth' }) } },
+          { icon: '🗓️', label: 'My Plans', action: openCalendar, badge: calendarTotal },
+        ].map(tab => (
+          <div key={tab.label} onClick={tab.action} style={{ flex: 1, textAlign: 'center', cursor: 'pointer', position: 'relative' }}>
+            <div style={{ fontSize: 22 }}>{tab.icon}</div>
+            <div style={{ fontSize: 10, fontWeight: 600, color: tab.label === 'Home' ? '#5B2D6E' : '#9CA3AF', marginTop: 2 }}>{tab.label}</div>
+            {tab.badge > 0 && <div style={{ position: 'absolute', top: 0, right: 'calc(50% - 20px)', background: '#5B2D6E', color: 'white', fontSize: 9, fontWeight: 800, borderRadius: 10, minWidth: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{tab.badge}</div>}
+          </div>
         ))}
       </div>
     </div>
