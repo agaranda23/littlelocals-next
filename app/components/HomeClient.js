@@ -243,6 +243,28 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         <div style={{ padding: '16px 20px 8px' }}>
           <div style={{ fontSize: 22, fontWeight: 1000, color: '#1F2937', marginBottom: 4 }}>📅 My Plans</div>
           <div style={{ fontSize: 14, color: '#6B7280', marginBottom: 12 }}>Tap a date to view or add activities</div>
+
+          {(() => {
+            const favIds = (() => { try { return JSON.parse(localStorage.getItem('ll_favs') || '[]') } catch(e) { return [] } })()
+            const savedListings = favIds.map(id => listings.find(l => l.id === id)).filter(Boolean)
+            if (savedListings.length === 0) return null
+            return (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: '#5B2D6E', marginBottom: 8 }}>💜 Saved activities <span style={{ fontSize: 13, fontWeight: 600, color: '#9CA3AF' }}>({savedListings.length})</span></div>
+                <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: 4 }}>
+                  {savedListings.map(l => (
+                    <a key={l.id} href={'/listing/' + l.slug} style={{ flexShrink: 0, width: 110, textDecoration: 'none' }}>
+                      <div style={{ height: 80, borderRadius: 12, overflow: 'hidden', marginBottom: 5, background: '#F3F4F6', border: '2px solid #5B2D6E' }}>
+                        {l.image ? <img src={l.image} alt={l.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>{l.emoji || '🎯'}</div>}
+                      </div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
+                      <div style={{ fontSize: 10, color: '#9CA3AF' }}>{l.type}</div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <div onClick={prevMonth} style={{ padding: '6px 14px', background: 'white', borderRadius: 8, border: '1px solid #E5E7EB', cursor: 'pointer', fontSize: 18, fontWeight: 900 }}>‹</div>
             <div style={{ fontSize: 17, fontWeight: 1000, color: '#1F2937' }}>{monthNames[calMonth]} {calYear}</div>
