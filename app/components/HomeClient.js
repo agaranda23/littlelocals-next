@@ -71,6 +71,20 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const PAGE_SIZE = 6
   useEffect(() => { setExploringCount(Math.floor(Math.random() * 18) + 8) }, [])
 
+  const refreshSavedIds = () => {
+    try {
+      const favs = JSON.parse(localStorage.getItem('ll_favs') || '[]')
+      const cal = JSON.parse(localStorage.getItem('ll_calendar_v2') || '{}')
+      setSavedIds(new Set([...favs, ...Object.values(cal).flat()]))
+    } catch(e) {}
+  }
+
+  useEffect(() => {
+    refreshSavedIds()
+    window.addEventListener('focus', refreshSavedIds)
+    return () => window.removeEventListener('focus', refreshSavedIds)
+  }, [])
+
   useEffect(() => {
     try {
       const favs = JSON.parse(localStorage.getItem('ll_favs') || '[]')
