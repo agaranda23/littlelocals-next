@@ -60,7 +60,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const [nurseryFilter, setNurseryFilter] = useState(false)
 
   useEffect(() => { setCurrentPage(1) }, [dayFilter, search, ageFilter, freeOnly, weatherMode, worthJourney, nurseryFilter])
-  useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) }, [currentPage])
+  useEffect(() => { if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' }) }, [currentPage])
   const [userLocation, setUserLocation] = useState(null)
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [showInstall, setShowInstall] = useState(false)
