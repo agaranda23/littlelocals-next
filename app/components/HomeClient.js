@@ -659,7 +659,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '6px 0 16px', zIndex: 100 }}>
         {[
           { img: '/nav-home.png', label: 'Home', action: () => { window.scrollTo({ top: 0, behavior: 'smooth' }) } },
-          { img: '/nav-today.png', label: 'Today', action: () => { window.location.href = '/?day=today' } },
+          { img: '/nav-today.png', label: 'Today', action: () => { setDayFilter('today'); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
           { img: '/nav-explore.png', label: 'Explore', action: () => { window.scrollTo({ top: 0, behavior: 'smooth' }) } },
           { img: '/nav-plans.png', label: 'My Plans', action: openCalendar, badge: calendarTotal },
         ].map(tab => (
