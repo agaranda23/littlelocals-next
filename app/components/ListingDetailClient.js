@@ -256,7 +256,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
             <div style={{ position: 'relative' }}>
               <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
                 {images.map((img, i) => (
-                  {img.url?.endsWith('.mp4') ? <video key={i} src={img.url} muted loop playsInline onClick={() => setLightbox(i)} style={{ flexShrink: 0, width: 140, height: 105, objectFit: 'cover', borderRadius: 10, cursor: 'pointer' }} /> : <img key={i} src={img.url} alt="" onClick={() => setLightbox(i)} style={{ flexShrink: 0, width: 140, height: 105, objectFit: 'cover', borderRadius: 10, cursor: 'pointer' }} />}
+                  img.url?.endsWith('.mp4') ? <video key={i} src={img.url} muted loop playsInline onClick={() => setLightbox(i)} style={{ flexShrink: 0, width: 140, height: 105, objectFit: 'cover', borderRadius: 10, cursor: 'pointer' }} /> : <img key={i} src={img.url} alt="" onClick={() => setLightbox(i)} style={{ flexShrink: 0, width: 140, height: 105, objectFit: 'cover', borderRadius: 10, cursor: 'pointer' }} />
                 ))}
               </div>
             </div>
