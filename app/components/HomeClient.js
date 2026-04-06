@@ -363,6 +363,20 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         <div style={{ padding: '16px 20px', textAlign: 'center' }}>
           <div onClick={closeCalendar} style={{ display: 'inline-block', padding: '10px 24px', background: 'linear-gradient(135deg, #D4732A, #FB923C)', color: 'white', borderRadius: 12, fontSize: 15, fontWeight: 900, cursor: 'pointer' }}>Browse Activities to Add More</div>
         </div>
+
+        {/* Bottom nav */}
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '6px 0 16px', zIndex: 100 }}>
+          {[
+            { img: '/nav-home.png', label: 'Home', action: closeCalendar },
+            { img: '/nav-today.png', label: 'Today', action: () => { closeCalendar(); setDayFilter('today') } },
+            { img: '/nav-explore.png', label: 'Explore', action: () => { closeCalendar(); setDayFilter('week'); setSearch(''); setAgeFilter('all'); setFreeOnly(false); setWeatherMode('all'); setWorthJourney(false); setNurseryFilter(false) } },
+            { img: '/nav-plans.png', label: 'My Plans', action: () => {} },
+          ].map(tab => (
+            <div key={tab.label} onClick={tab.action} style={{ flex: 1, textAlign: 'center', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <img src={tab.img} alt={tab.label} style={{ width: 66, height: 66, objectFit: 'contain' }} />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
