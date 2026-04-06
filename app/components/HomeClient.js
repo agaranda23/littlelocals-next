@@ -483,14 +483,14 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
                   <div style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(255,255,255,0.92)', borderRadius: 8, padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 6 }}>
                     <img src={fav.logo} alt="" style={{ height: 20, width: 'auto', borderRadius: 4 }} />
                     <span style={{ fontSize: 12, fontWeight: 700, color: '#111827' }}>{fav.name}</span>
-                    {fav.verified && <img src="/verified-badge.svg" width={14} height={14} alt="" />}
+                    {fav.verified && <img src="/verified-badge-gold.svg" width={14} height={14} alt="" />}
                   </div>
                 )}
               </div>
               <div style={{ padding: '14px 16px' }}>
                 <div style={{ fontSize: 17, fontWeight: 800, color: '#D4732A', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
                   {fav.name}
-                  {fav.verified && <img src="/verified-badge.svg" width={16} height={16} alt="" />}
+                  {fav.verified && <img src="/verified-badge-gold.svg" width={16} height={16} alt="" />}
                 </div>
                 <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 6 }}>{fav.type}</div>
                 {fav.littlelocals_offer_text && (
