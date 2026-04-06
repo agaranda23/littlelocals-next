@@ -124,7 +124,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
 
         {/* Verified + today badges */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
-          {listing.verified && (
+          {listing.verified && images.length > 0 && (
             <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 600, color: '#1D4ED8', background: '#EFF6FF', border: '1px solid #BFDBFE', padding: '4px 12px', borderRadius: 20 }}>
               <img src="/verified-badge.svg" width={14} height={14} alt="" /> Verified
             </span>
@@ -133,7 +133,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         </div>
 
         {/* Verified banner */}
-        {listing.verified && (
+        {listing.verified && images.length > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 12, padding: '10px 14px', marginBottom: 12 }}>
             <img src="/verified-badge.svg" width={16} height={16} alt="" />
             <span style={{ fontSize: 12, color: '#1D4ED8', fontWeight: 600 }}>Verified · listing details checked by LITTLElocals</span>
