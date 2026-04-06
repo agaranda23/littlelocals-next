@@ -191,6 +191,84 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
     border: active ? 'none' : '1px solid #E5E7EB',
   })
 
+  if (showCalendar) {
+    const today = new Date()
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"]
+    const dayLabels = ["Mo","Tu","We","Th","Fr","Sa","Su"]
+    const todayKey = today.toISOString().split('T')[0]
+    const firstDay = new Date(calYear, calMonth, 1)
+    const lastDay = new Date(calYear, calMonth + 1, 0)
+    let startDow = firstDay.getDay()
+    startDow = startDow === 0 ? 6 : startDow - 1
+    const daysInMonth = lastDay.getDate()
+    const cells = []
+    for (let i = 0; i < startDow; i++) cells.push(null)
+    for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+    const prevMonth = () => { if (calMonth === 0) { setCalMonth(11); setCalYear(calYear - 1) } else setCalMonth(calMonth - 1) }
+    const nextMonth = () => { if (calMonth === 11) { setCalMonth(0); setCalYear(calYear + 1) } else setCalMonth(calMonth + 1) }
+    const selectedActivities = (calendarPlan[selectedDate] || []).map(id => listings.find(l => l.id === id)).filter(Boolean)
+    return (
+      <div style={{ maxWidth: 480, margin: '0 auto', background: '#F9FAFB', minHeight: '100vh', fontFamily: "Inter, -apple-system, sans-serif", color: '#1F2937', paddingBottom: 140 }}>
+        <div style={{ padding: '12px 20px 10px', position: 'sticky', top: 0, zIndex: 100, background: '#F9FAFB', borderBottom: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: 22, fontWeight: 1000, color: '#5B2D6E' }}>LITTLE<span style={{ color: '#D4732A' }}>locals</span></div>
+          <div onClick={closeCalendar} style={{ padding: '6px 14px', background: 'white', borderRadius: 10, border: '1px solid #E5E7EB', cursor: 'pointer', fontSize: 15, fontWeight: 800, color: '#1F2937' }}>← Back</div>
+        </div>
+        <div style={{ padding: '16px 20px 8px' }}>
+          <div style={{ fontSize: 22, fontWeight: 1000, color: '#1F2937', marginBottom: 4 }}>📅 My Plans</div>
+          <div style={{ fontSize: 14, color: '#6B7280', marginBottom: 12 }}>Tap a date to view or add activities</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <div onClick={prevMonth} style={{ padding: '6px 14px', background: 'white', borderRadius: 8, border: '1px solid #E5E7EB', cursor: 'pointer', fontSize: 18, fontWeight: 900 }}>‹</div>
+            <div style={{ fontSize: 17, fontWeight: 1000, color: '#1F2937' }}>{monthNames[calMonth]} {calYear}</div>
+            <div onClick={nextMonth} style={{ padding: '6px 14px', background: 'white', borderRadius: 8, border: '1px solid #E5E7EB', cursor: 'pointer', fontSize: 18, fontWeight: 900 }}>›</div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginBottom: 4 }}>
+            {dayLabels.map(d => <div key={d} style={{ textAlign: 'center', fontSize: 12, fontWeight: 900, color: '#6B7280', padding: 4 }}>{d}</div>)}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginBottom: 12 }}>
+            {cells.map((d, i) => {
+              if (d === null) return <div key={'e'+i} />
+              const dateKey = calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0')
+              const hasPlans = (calendarPlan[dateKey] || []).length > 0
+              const isToday = dateKey === todayKey
+              const isSelected = dateKey === selectedDate
+              const isPast = dateKey < todayKey
+              return (
+                <div key={dateKey} onClick={() => setSelectedDate(dateKey)} style={{ textAlign: 'center', padding: '8px 0', borderRadius: 10, cursor: 'pointer', position: 'relative', background: isSelected ? 'linear-gradient(135deg, #D4732A, #FB923C)' : isToday ? '#FFF0EB' : 'white', color: isSelected ? 'white' : isPast ? '#9CA3AF' : '#1F2937', border: isToday && !isSelected ? '2px solid #D4732A' : '1px solid #E5E7EB', fontWeight: isToday || isSelected ? 800 : 600, fontSize: 15 }}>
+                  {d}
+                  {hasPlans && <div style={{ position: 'absolute', bottom: 3, left: '50%', transform: 'translateX(-50%)', width: 5, height: 5, borderRadius: '50%', background: isSelected ? 'white' : '#D4732A' }} />}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+        <div style={{ padding: '0 20px 12px' }}>
+          <div style={{ fontSize: 16, fontWeight: 1000, color: '#1F2937', marginBottom: 8 }}>
+            {selectedDate === todayKey ? 'Today' : new Date(selectedDate+'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+            <span style={{ fontSize: 14, fontWeight: 700, color: '#6B7280', marginLeft: 8 }}>{selectedActivities.length} {selectedActivities.length === 1 ? 'activity' : 'activities'}</span>
+          </div>
+          {selectedActivities.length === 0 ? (
+            <div style={{ padding: '20px', textAlign: 'center', background: 'white', borderRadius: 14, border: '1px solid #E5E7EB' }}>
+              <div style={{ fontSize: 32, marginBottom: 6 }}>📅</div>
+              <div style={{ fontSize: 14, color: '#6B7280' }}>Nothing planned yet</div>
+              <div onClick={closeCalendar} style={{ display: 'inline-block', marginTop: 8, padding: '6px 16px', background: 'linear-gradient(135deg, #D4732A, #FB923C)', color: 'white', borderRadius: 10, fontSize: 14, fontWeight: 900, cursor: 'pointer' }}>Browse Activities</div>
+            </div>
+          ) : selectedActivities.map(item => (
+            <div key={item.id} style={{ padding: '10px 14px', background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 15, fontWeight: 900, color: '#1F2937' }}>{item.name}</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>{item.location}</div>
+              </div>
+              <div onClick={() => removeFromCalendar(item.id, selectedDate)} style={{ width: 26, height: 26, borderRadius: '50%', background: '#FFF0EB', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 14 }}>✕</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ padding: '16px 20px', textAlign: 'center' }}>
+          <div onClick={closeCalendar} style={{ display: 'inline-block', padding: '10px 24px', background: 'linear-gradient(135deg, #D4732A, #FB923C)', color: 'white', borderRadius: 12, fontSize: 15, fontWeight: 900, cursor: 'pointer' }}>Browse Activities to Add More</div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', paddingBottom: 100, fontFamily: 'system-ui, sans-serif' }}>
 
