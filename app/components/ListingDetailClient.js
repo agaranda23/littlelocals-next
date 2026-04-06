@@ -264,6 +264,16 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           </div>
         )}
 
+        {/* Videos from listing_images */}
+        {images.filter(img => img.url?.endsWith('.mp4')).length > 0 && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 10 }}>🎥 Videos</div>
+            {images.filter(img => img.url?.endsWith('.mp4')).map((img, i) => (
+              <video key={i} src={img.url} controls playsInline style={{ width: '100%', borderRadius: 12, marginBottom: 8, background: '#000' }} />
+            ))}
+          </div>
+        )}
+
         {/* Video */}
         {listing.video_url && listing.video_url.trim() !== '' && (
           <div style={{ marginBottom: 20 }}>
