@@ -298,15 +298,20 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 14, padding: '14px 16px', marginBottom: 16 }}>
             {(() => {
               const t = (listing.type || '').toLowerCase()
+              const n = (listing.name || '').toLowerCase()
               const isSwim = t.includes('swim') || t.includes('aqua') || t.includes('water')
               const isSport = t.includes('sport') || t.includes('football') || t.includes('fitness') || t.includes('gym')
               const isMusic = t.includes('music') || t.includes('sing')
               const isDance = t.includes('dance') || t.includes('ballet')
               const isArt = t.includes('art') || t.includes('craft')
-              const emoji = isSwim ? '🏊' : isSport ? '⚽' : isMusic ? '🎵' : isDance ? '💉' : isArt ? '🎨' : '📍'
-              const bg = isSwim ? '#EFF6FF' : isSport ? '#F0FDF4' : isMusic ? '#FDF4FF' : isDance ? '#FFF7ED' : isArt ? '#FFF7ED' : '#FDF4FF'
-              const color = isSwim ? '#1E40AF' : isSport ? '#15803D' : isMusic ? '#7E22CE' : isDance ? '#9A3412' : isArt ? '#92400E' : '#9D174D'
-              return <div style={{ fontSize: 13, fontWeight: 800, color, marginBottom: 10 }}>{emoji} Also by {listing.suggested_by || 'this organiser'}:</div>
+              const isNature = t.includes('park') || t.includes('nature') || t.includes('outdoor') || n.includes('park')
+              const isNursery = t.includes('nursery') || t.includes('childcare')
+              const emoji = isSwim ? '🏊' : isSport ? '⚽' : isMusic ? '🎵' : isDance ? '💃' : isArt ? '🎨' : isNature ? '🌳' : isNursery ? '🏫' : '📍'
+              const color = '#9D174D'
+              // Detect if venue-based (park, centre, venue) or organiser-based
+              const isVenueBased = isNature || t.includes('centre') || t.includes('center') || t.includes('park') || n.includes('park') || n.includes('manor') || n.includes('centre')
+              const label = isVenueBased ? 'Also at this venue:' : `Also by ${listing.suggested_by || 'this organiser'}:`
+              return <div style={{ fontSize: 13, fontWeight: 800, color, marginBottom: 10 }}>{emoji} {label}</div>
             })()}
             {relatedListings.map((r, i) => (
               <Link key={r.id} href={`/listing/${r.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
