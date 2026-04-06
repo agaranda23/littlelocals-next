@@ -549,16 +549,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         ))}
       </div>
 
-      {/* Mid-feed suggest CTA - shown after listings on page 1 */}
-      {!hasActiveFilters && currentPage === 1 && filtered.length > 3 && (
-        <div style={{ margin: '4px 16px 4px', background: '#FFF7ED', border: '2px dashed #D4732A', borderRadius: 18, padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 2 }}>✨ Suggest an activity for Ealing parents</div>
-            <div style={{ fontSize: 13, color: '#6B7280' }}>Help improve what families nearby can find</div>
-          </div>
-          <a href='mailto:hello@littlelocals.uk?subject=Suggest an activity' style={{ background: '#D4732A', color: 'white', border: 'none', borderRadius: 12, padding: '10px 16px', fontSize: 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', textDecoration: 'none' }}>Add activity</a>
-        </div>
-      )}
+
 
       {/* Install banner */}
       {!hasActiveFilters && currentPage === 1 && showInstall && (
