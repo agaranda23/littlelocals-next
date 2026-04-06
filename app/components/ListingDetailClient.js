@@ -309,7 +309,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
               const emoji = isSwim ? '🏊' : isSport ? '⚽' : isMusic ? '🎵' : isDance ? '💃' : isArt ? '🎨' : isNature ? '🌳' : isNursery ? '🏫' : '📍'
               const color = '#9D174D'
               // Detect if venue-based (park, centre, venue) or organiser-based
-              const isVenueBased = isNature || t.includes('centre') || t.includes('center') || t.includes('park') || n.includes('park') || n.includes('manor') || n.includes('centre')
+              const isVenueBased = isNature || t.includes('centre') || t.includes('center') || t.includes('park') || t.includes('playground') || t.includes('nature') || t.includes('outdoor') || n.includes('park') || n.includes('manor') || n.includes('centre') || n.includes('woodland') || n.includes('forest') || n.includes('garden')
               const label = isVenueBased ? 'Also at this venue:' : `Also by ${listing.suggested_by || 'this organiser'}:`
               return <div style={{ fontSize: 13, fontWeight: 800, color, marginBottom: 10 }}>{emoji} {label}</div>
             })()}
