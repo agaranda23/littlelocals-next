@@ -516,7 +516,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
             {fav.local_favourite_subtitle && (
               <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 10 }}>{fav.local_favourite_subtitle}</div>
             )}
-            <a href={'/listing/' + fav.slug} style={{ textDecoration: 'none', display: 'block', background: 'white', borderRadius: 18, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', border: '1px solid #F3F4F6' }}>
+            <a href={'/listing/' + fav.slug} style={{ textDecoration: 'none', display: 'block', background: 'white', borderRadius: 18, overflow: 'hidden', boxShadow: '0 4px 20px rgba(212,163,42,0.25)', border: '2px solid #D4A32A' }}>
               <div style={{ position: 'relative' }}>
                 {fav.image && <img src={fav.image} alt={fav.name} style={{ width: '100%', height: 200, objectFit: 'cover', display: 'block' }} />}
                 <div style={{ position: 'absolute', top: 10, left: 10, background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 700, color: '#92400E' }}>⭐ Local favourite</div>
