@@ -297,19 +297,25 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         {relatedListings.length > 0 && (
           <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 14, padding: '14px 16px', marginBottom: 16 }}>
             {(() => {
-              const t = (listing.type || '').toLowerCase()
-              const n = (listing.name || '').toLowerCase()
-              const isSwim = t.includes('swim') || t.includes('aqua') || t.includes('water')
-              const isSport = t.includes('sport') || t.includes('football') || t.includes('fitness') || t.includes('gym')
-              const isMusic = t.includes('music') || t.includes('sing')
-              const isDance = t.includes('dance') || t.includes('ballet')
-              const isArt = t.includes('art') || t.includes('craft')
-              const isNature = t.includes('park') || t.includes('nature') || t.includes('outdoor') || n.includes('park')
-              const isNursery = t.includes('nursery') || t.includes('childcare')
-              const emoji = isSwim ? '🏊' : isSport ? '⚽' : isMusic ? '🎵' : isDance ? '💃' : isArt ? '🎨' : isNature ? '🌳' : isNursery ? '🏫' : '📍'
+              const allNames = relatedListings.map(r => (r.name || '').toLowerCase()).join(' ')
+              const allTypes = relatedListings.map(r => (r.type || '').toLowerCase()).join(' ')
+              const combined = allNames + ' ' + allTypes + ' ' + (listing.name || '').toLowerCase() + ' ' + (listing.type || '').toLowerCase()
+              const emoji = combined.includes('little kicker') || combined.includes('football') || combined.includes('soccer') ? '⚽'
+                : combined.includes('swim') || combined.includes('aqua') || combined.includes('water bab') ? '🏊'
+                : combined.includes('rosie') || combined.includes('movemama') ? '🌸'
+                : combined.includes('hartbeep') ? '🎪'
+                : combined.includes('dance') || combined.includes('ballet') ? '💃'
+                : combined.includes('music') || combined.includes('sing') ? '🎵'
+                : combined.includes('art') || combined.includes('craft') || combined.includes('paint') ? '🎨'
+                : combined.includes('cook') || combined.includes('bak') ? '🍳'
+                : combined.includes('yoga') || combined.includes('pilates') || combined.includes('fitness') ? '💪'
+                : combined.includes('park') || combined.includes('nature') || combined.includes('outdoor') || combined.includes('woodland') || combined.includes('walk') ? '🌳'
+                : combined.includes('playground') ? '🛝'
+                : combined.includes('playgroup') || combined.includes('nursery') ? '🧸'
+                : combined.includes('baby') || combined.includes('sensory') ? '👶'
+                : '📍'
               const color = '#9D174D'
-              // Detect if venue-based (park, centre, venue) or organiser-based
-              const isVenueBased = isNature || t.includes('centre') || t.includes('center') || t.includes('park') || t.includes('playground') || t.includes('nature') || t.includes('outdoor') || n.includes('park') || n.includes('manor') || n.includes('centre') || n.includes('woodland') || n.includes('forest') || n.includes('garden')
+              const isVenueBased = combined.includes('park') || combined.includes('manor') || combined.includes('centre') || combined.includes('woodland') || combined.includes('garden') || combined.includes('playground') || (listing.type || '').toLowerCase().includes('nature') || (listing.type || '').toLowerCase().includes('outdoor') || (listing.type || '').toLowerCase().includes('playground')
               const label = isVenueBased ? 'Also at this venue:' : `Also by ${listing.suggested_by || 'this organiser'}:`
               return <div style={{ fontSize: 13, fontWeight: 800, color, marginBottom: 10 }}>{emoji} {label}</div>
             })()}
