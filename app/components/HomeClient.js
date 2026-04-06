@@ -44,6 +44,8 @@ function getGreeting(weather) {
 export default function HomeClient({ listings, recentListings = [], localFav = null, viewCounts = {} }) {
   const [savedIds, setSavedIds] = useState(new Set())
   const [showCalendar, setShowCalendar] = useState(false)
+  const [recentlyViewed, setRecentlyViewed] = useState([])
+  const [passport, setPassport] = useState([])
   const [calMonth, setCalMonth] = useState(new Date().getMonth())
   const [calYear, setCalYear] = useState(new Date().getFullYear())
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
@@ -79,6 +81,10 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         const parsed = JSON.parse(planData)
         if (typeof parsed === 'object' && !Array.isArray(parsed)) setCalendarPlan(parsed)
       }
+      const rv = localStorage.getItem('ll_recentlyViewed')
+      if (rv) setRecentlyViewed(JSON.parse(rv))
+      const pp = localStorage.getItem('ll_passport')
+      if (pp) setPassport(JSON.parse(pp))
     } catch(e) {}
   }, [])
 
@@ -262,6 +268,55 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
             </div>
           ))}
         </div>
+        {recentlyViewed.length > 0 && (
+          <div style={{ padding: '0 20px 16px' }}>
+            <div style={{ fontSize: 18, fontWeight: 1000, color: '#1F2937', marginBottom: 10 }}>👁 Recently viewed</div>
+            {recentlyViewed.slice(0, 5).map(r => {
+              const item = listings.find(l => l.id === r.id)
+              if (!item) return null
+              return (
+                <a key={r.id} href={'/listing/' + item.slug} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', marginBottom: 6, textDecoration: 'none' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 10, overflow: 'hidden', background: '#F3F4F6', flexShrink: 0 }}>
+                    {r.image ? <img src={r.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{item.emoji || '🎯'}</div>}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: '#1F2937' }}>{r.name}</div>
+                    <div style={{ fontSize: 13, color: '#9CA3AF' }}>{item.type} · {item.location}</div>
+                  </div>
+                  <span style={{ fontSize: 18, color: '#9CA3AF' }}>→</span>
+                </a>
+              )
+            })}
+          </div>
+        )}
+
+        <div style={{ padding: '0 20px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <div style={{ fontSize: 18, fontWeight: 1000, color: '#1F2937' }}>🏆 Activity Passport</div>
+            <div style={{ fontSize: 14, fontWeight: 900, color: '#166534' }}>{passport.length} visited</div>
+          </div>
+          {passport.length === 0 ? (
+            <div style={{ padding: '20px', textAlign: 'center', background: 'white', borderRadius: 14, border: '1px solid #E5E7EB' }}>
+              <div style={{ fontSize: 32, marginBottom: 6 }}>🏆</div>
+              <div style={{ fontSize: 15, fontWeight: 900, color: '#1F2937', marginBottom: 4 }}>Start collecting!</div>
+              <div style={{ fontSize: 13, color: '#6B7280' }}>Tap "Been here?" on activities your family has tried</div>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+              {passport.map(id => {
+                const item = listings.find(l => l.id === id)
+                if (!item) return null
+                return (
+                  <a key={id} href={'/listing/' + item.slug} style={{ textAlign: 'center', padding: '8px 4px', background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', textDecoration: 'none' }}>
+                    <div style={{ fontSize: 11, fontWeight: 900, color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
+                    <div style={{ fontSize: 11, color: '#166534', fontWeight: 800 }}>✓ Visited</div>
+                  </a>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
         <div style={{ padding: '16px 20px', textAlign: 'center' }}>
           <div onClick={closeCalendar} style={{ display: 'inline-block', padding: '10px 24px', background: 'linear-gradient(135deg, #D4732A, #FB923C)', color: 'white', borderRadius: 12, fontSize: 15, fontWeight: 900, cursor: 'pointer' }}>Browse Activities to Add More</div>
         </div>
