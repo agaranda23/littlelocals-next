@@ -38,11 +38,12 @@ function isNewlyAdded(l) {
 function isMorningSessions(l) {
   const t = (l.time || '').toLowerCase()
 
-  // Starts soon / On now badge
-  const getTimeBadge = () => {
+  // Starts soon / On now badge — client-side only
+  const [timeBadge, setTimeBadge] = useState(null)
+  useEffect(() => {
     const timeStr = l.time || ''
-    const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)/i)
-    if (!match) return null
+    const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i)
+    if (!match) return
     let hours = parseInt(match[1])
     const mins = parseInt(match[2])
     const ampm = match[3].toUpperCase()
@@ -52,12 +53,10 @@ function isMorningSessions(l) {
     const start = new Date()
     start.setHours(hours, mins, 0, 0)
     const diffMins = Math.round((start - now) / 60000)
-    if (diffMins < 0 && diffMins > -90) return { label: '🟢 On now', color: '#16A34A', bg: '#DCFCE7' }
-    if (diffMins >= 0 && diffMins <= 30) return { label: `⏰ Starts in ${diffMins} mins`, color: '#DC2626', bg: '#FEE2E2' }
-    if (diffMins > 30 && diffMins <= 120) return { label: `⏰ Starts in ${Math.round(diffMins/60) === 1 ? '1 hour' : diffMins + ' mins'}`, color: '#D4732A', bg: '#FFF7ED' }
-    return null
-  }
-  const timeBadge = getTimeBadge()
+    if (diffMins < 0 && diffMins > -90) setTimeBadge({ label: '🟢 On now', color: '#16A34A', bg: '#DCFCE7' })
+    else if (diffMins >= 0 && diffMins <= 30) setTimeBadge({ label: `⏰ Starts in ${diffMins} mins`, color: '#DC2626', bg: '#FEE2E2' })
+    else if (diffMins > 30 && diffMins <= 120) setTimeBadge({ label: `⏰ Starts in ${Math.round(diffMins/60) === 1 ? '1 hour' : diffMins + ' mins'}`, color: '#D4732A', bg: '#FFF7ED' })
+  }, [l.time])
   return t.includes('am') || t.includes('morning') || t.includes('9:') || t.includes('10:') || t.includes('11:')
 }
 
