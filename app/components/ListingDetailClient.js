@@ -191,6 +191,13 @@ export default function ListingDetailClient({ listing, images, relatedListings }
             ⭐ Local favourite this week
           </div>
         )}
+        {(() => {
+          if (!listing.created_at) return null
+          const days = (Date.now() - new Date(listing.created_at).getTime()) / (1000 * 60 * 60 * 24)
+          if (days <= 7) return <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 20, padding: '6px 14px', marginBottom: 12, fontSize: 13, fontWeight: 700, color: '#15803D' }}>🆕 New this week in Ealing</div>
+          if (days <= 30) return <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 20, padding: '6px 14px', marginBottom: 12, fontSize: 13, fontWeight: 700, color: '#1D4ED8' }}>✨ Added this month</div>
+          return null
+        })()}
 
         {/* Info grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
