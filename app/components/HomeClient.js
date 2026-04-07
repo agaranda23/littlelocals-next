@@ -200,6 +200,10 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const weekendCount = listings.filter(isOnWeekend).length
   const weekCount = listings.filter(isOnThisWeek).length
   const nurseryCount = listings.filter(l => (l.category||'').toLowerCase() === 'nursery').length
+  const outdoorCount = listings.filter(l => !l.indoor && l.indoor !== null).length
+  const indoorCount = listings.filter(l => l.indoor).length
+  const freeCount = listings.filter(l => l.free || (l.price||'').toLowerCase().includes('free')).length
+  const adventureCount = listings.filter(l => l.worth_journey).length
 
   // Sort filtered results
   const sortedFiltered = [...filtered].sort((a, b) => {
@@ -472,13 +476,13 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       {/* Filter chips */}
       <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 16px 8px', scrollbarWidth: 'none' }}>
         {[
-          ['Outdoor', weatherMode === 'sunny', () => setWeatherMode(weatherMode === 'sunny' ? 'all' : 'sunny')],
-          ['Indoor', weatherMode === 'rainy', () => setWeatherMode(weatherMode === 'rainy' ? 'all' : 'rainy')],
-          ['Free', freeOnly, () => setFreeOnly(!freeOnly)],
-          ['Adventure', worthJourney, () => setWorthJourney(!worthJourney)],
+          ['Outdoor', weatherMode === 'sunny', () => setWeatherMode(weatherMode === 'sunny' ? 'all' : 'sunny'), outdoorCount],
+          ['Indoor', weatherMode === 'rainy', () => setWeatherMode(weatherMode === 'rainy' ? 'all' : 'rainy'), indoorCount],
+          ['Free', freeOnly, () => setFreeOnly(!freeOnly), freeCount],
+          ['Adventure', worthJourney, () => setWorthJourney(!worthJourney), adventureCount],
           ['Nurseries', nurseryFilter, () => setNurseryFilter(!nurseryFilter), nurseryCount],
         ].map(([label, active, action, count]) => (
-          <span key={label} onClick={action} style={chipStyle(active)}>{label}{count ? ` ${count}` : ''}</span>
+          <span key={label} onClick={action} style={chipStyle(active)}>{label} {count}</span>
         ))}
       </div>
 
