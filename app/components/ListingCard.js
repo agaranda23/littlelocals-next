@@ -37,26 +37,6 @@ function isNewlyAdded(l) {
 
 function isMorningSessions(l) {
   const t = (l.time || '').toLowerCase()
-
-  // Starts soon / On now badge — client-side only
-  const [timeBadge, setTimeBadge] = useState(null)
-  useEffect(() => {
-    const timeStr = l.time || ''
-    const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i)
-    if (!match) return
-    let hours = parseInt(match[1])
-    const mins = parseInt(match[2])
-    const ampm = match[3].toUpperCase()
-    if (ampm === 'PM' && hours !== 12) hours += 12
-    if (ampm === 'AM' && hours === 12) hours = 0
-    const now = new Date()
-    const start = new Date()
-    start.setHours(hours, mins, 0, 0)
-    const diffMins = Math.round((start - now) / 60000)
-    if (diffMins < 0 && diffMins > -90) setTimeBadge({ label: '🟢 On now', color: '#16A34A', bg: '#DCFCE7' })
-    else if (diffMins >= 0 && diffMins <= 30) setTimeBadge({ label: `⏰ Starts in ${diffMins} mins`, color: '#DC2626', bg: '#FEE2E2' })
-    else if (diffMins > 30 && diffMins <= 120) setTimeBadge({ label: `⏰ Starts in ${Math.round(diffMins/60) === 1 ? '1 hour' : diffMins + ' mins'}`, color: '#D4732A', bg: '#FFF7ED' })
-  }, [l.time])
   return t.includes('am') || t.includes('morning') || t.includes('9:') || t.includes('10:') || t.includes('11:')
 }
 
@@ -100,6 +80,25 @@ function getTrustBadge(listing) {
 }
 
 export default function ListingCard({ listing, userLocation, recentViews = 0, isSaved = false }) {
+  // Starts soon / On now badge — client-side only
+  const [timeBadge, setTimeBadge] = useState(null)
+  useEffect(() => {
+    const timeStr = listing.time || ''
+    const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i)
+    if (!match) return
+    let hours = parseInt(match[1])
+    const mins = parseInt(match[2])
+    const ampm = match[3].toUpperCase()
+    if (ampm === 'PM' && hours !== 12) hours += 12
+    if (ampm === 'AM' && hours === 12) hours = 0
+    const now = new Date()
+    const start = new Date()
+    start.setHours(hours, mins, 0, 0)
+    const diffMins = Math.round((start - now) / 60000)
+    if (diffMins < 0 && diffMins > -90) setTimeBadge({ label: '🟢 On now', color: '#16A34A', bg: '#DCFCE7' })
+    else if (diffMins >= 0 && diffMins <= 30) setTimeBadge({ label: `⏰ Starts in ${diffMins} mins`, color: '#DC2626', bg: '#FEE2E2' })
+    else if (diffMins > 30 && diffMins <= 120) setTimeBadge({ label: `⏰ Starts in ${Math.round(diffMins/60) === 1 ? '1 hour' : diffMins + ' mins'}`, color: '#D4732A', bg: '#FFF7ED' })
+  }, [listing.time])
   const [saved, setSaved] = useState(isSaved)
   const [imgIdx, setImgIdx] = useState(0)
   const [touchStartX, setTouchStartX] = useState(null)
