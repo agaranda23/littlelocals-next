@@ -527,19 +527,16 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
             l.image && !usedSlugs.includes(l.slug) && ((l.days_of_week || []).includes(dayKey) || l.is_daily)
           )[0] || listings.filter(l => l.image && !usedSlugs.includes(l.slug))[0] || null
         }).filter(Boolean)
-        const savedCount = weekPicks.filter(p => savedIds.has(p.id)).length
-        const sortedPicks = [
-          ...weekPicks.filter(p => savedIds.has(p.id)),
-          ...weekPicks.filter(p => !savedIds.has(p.id))
-        ]
+        const savedThisWeek = weekPicks.filter(p => savedIds.has(p.id))
+        const savedCount = savedThisWeek.length
+        const sortedPicks = savedCount > 0
+          ? [...savedThisWeek, ...weekPicks.filter(p => !savedIds.has(p.id))]
+          : weekPicks
         const getWeekDayKey = (pick) => orderedDays[weekPicks.indexOf(pick)] || orderedDays[0]
         return (
           <div style={{ padding: '16px 0 4px' }}>
-            <div style={{ padding: '0 20px 2px', fontSize: 15, fontWeight: 800, color: '#111827' }}>📅 Your week with the kids</div>
-            <div style={{ padding: '0 20px 6px', fontSize: 12, color: '#9CA3AF' }}>Ideas nearby based on what's happening this week</div>
-            {savedCount > 0 && (
-              <div style={{ padding: '0 20px 8px', fontSize: 13, fontWeight: 700, color: '#5B2D6E' }}>✅ {savedCount} saved {savedCount === 1 ? 'activity' : 'activities'} this week</div>
-            )}
+            <div style={{ padding: '0 20px 2px', fontSize: 15, fontWeight: 800, color: '#111827' }}>📅 My week with the kids</div>
+            <div style={{ padding: '0 20px 6px', fontSize: 12, color: '#9CA3AF' }}>{savedCount > 0 ? `${savedCount} saved ${savedCount === 1 ? 'activity' : 'activities'} · tap ♥ to add more` : 'Tap ♥ on activities to build your week'}</div>
             <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 4px', scrollbarWidth: 'none' }}>
               {sortedPicks.map(pick => {
                 const dayKey = getWeekDayKey(pick)
