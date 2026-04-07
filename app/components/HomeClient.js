@@ -397,7 +397,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         </div>
 
         {/* Bottom nav */}
-        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '6px 0 16px', zIndex: 100 }}>
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '6px 0 16px', zIndex: 300 }}>
           {[
             { id: 'home', sel: '/home-nav-selected.png', unsel: '/home-nav-unselected.png', label: 'Home', action: () => { setActiveNav('home'); closeCalendar() } },
             { id: 'today', sel: '/today-nav-selected.png', unsel: '/today-nav-unselected.png', label: 'Today', action: () => { setActiveNav('today'); closeCalendar(); setDayFilter('today') } },
@@ -776,7 +776,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       </div>
 
       {/* Bottom nav */}
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '6px 0 16px', zIndex: 100 }}>
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #F3F4F6', display: 'flex', padding: '6px 0 16px', zIndex: 300 }}>
         {[
           { id: 'home', sel: '/home-nav-selected.png', unsel: '/home-nav-unselected.png', label: 'Home', action: () => { setActiveNav('home'); setShowMap(false); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
           { id: 'today', sel: '/today-nav-selected.png', unsel: '/today-nav-unselected.png', label: 'Today', action: () => { setActiveNav('today'); setShowMap(false); setDayFilter('today'); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
