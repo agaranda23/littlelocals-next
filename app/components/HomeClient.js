@@ -59,8 +59,13 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const [weatherMode, setWeatherMode] = useState('all')
   const [worthJourney, setWorthJourney] = useState(false)
   const [nurseryFilter, setNurseryFilter] = useState(false)
+  const [sortBy, setSortBy] = useState('recommended')
 
   useEffect(() => { setCurrentPage(1) }, [dayFilter, search, ageFilter, freeOnly, weatherMode, worthJourney, nurseryFilter])
+  useEffect(() => {
+    const saved = sessionStorage.getItem('ll_page')
+    if (saved) { setCurrentPage(parseInt(saved)); sessionStorage.removeItem('ll_page') }
+  }, [])
   const [userLocation, setUserLocation] = useState(null)
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [showInstall, setShowInstall] = useState(false)
@@ -194,6 +199,26 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const tomorrowCount = listings.filter(isOnTomorrow).length
   const weekendCount = listings.filter(isOnWeekend).length
   const weekCount = listings.filter(isOnThisWeek).length
+  const nurseryCount = listings.filter(l => (l.category||'').toLowerCase() === 'nursery').length
+
+  // Sort filtered results
+  const sortedFiltered = [...filtered].sort((a, b) => {
+    if (sortBy === 'nearest') {
+      if (!userLocation) return 0
+      const distA = (a.lat && a.lng) ? Math.hypot(a.lat - userLocation.lat, a.lng - userLocation.lng) : 999
+      const distB = (b.lat && b.lng) ? Math.hypot(b.lat - userLocation.lat, b.lng - userLocation.lng) : 999
+      return distA - distB
+    }
+    if (sortBy === 'newest') {
+      return new Date(b.created_at || 0) - new Date(a.created_at || 0)
+    }
+    if (sortBy === 'price') {
+      const priceA = (a.free || (a.price||'').toLowerCase().includes('free')) ? 0 : parseFloat((a.price||'').replace(/[^0-9.]/g,'')) || 999
+      const priceB = (b.free || (b.price||'').toLowerCase().includes('free')) ? 0 : parseFloat((b.price||'').replace(/[^0-9.]/g,'')) || 999
+      return priceA - priceB
+    }
+    return 0 // recommended — keep original order
+  })
 
   const hasActiveFilters = freeOnly || weatherMode !== 'all' || worthJourney || nurseryFilter || ageFilter !== 'all' || search
 
@@ -451,16 +476,24 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
           ['Indoor', weatherMode === 'rainy', () => setWeatherMode(weatherMode === 'rainy' ? 'all' : 'rainy')],
           ['Free', freeOnly, () => setFreeOnly(!freeOnly)],
           ['Adventure', worthJourney, () => setWorthJourney(!worthJourney)],
-          ['Nurseries', nurseryFilter, () => setNurseryFilter(!nurseryFilter)],
-        ].map(([label, active, action]) => (
-          <span key={label} onClick={action} style={chipStyle(active)}>{label}</span>
+          ['Nurseries', nurseryFilter, () => setNurseryFilter(!nurseryFilter), nurseryCount],
+        ].map(([label, active, action, count]) => (
+          <span key={label} onClick={action} style={chipStyle(active)}>{label}{count ? ` ${count}` : ''}</span>
         ))}
       </div>
 
-      {/* Count + clear */}
-      <div style={{ padding: '4px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* Count + clear + sort */}
+      <div style={{ padding: '4px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 13, color: '#6B7280' }}>{filtered.length} activities in Ealing</span>
-        {hasActiveFilters && <span onClick={clearAll} style={{ fontSize: 13, color: '#D4732A', fontWeight: 700, cursor: 'pointer' }}>Clear filters</span>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {hasActiveFilters && <span onClick={clearAll} style={{ fontSize: 13, color: '#D4732A', fontWeight: 700, cursor: 'pointer' }}>Clear</span>}
+          <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ fontSize: 12, fontWeight: 600, border: '1px solid #E5E7EB', borderRadius: 10, padding: '4px 8px', background: 'white', color: '#111827', cursor: 'pointer' }}>
+            <option value="recommended">⭐ Recommended</option>
+            <option value="nearest">📍 Nearest</option>
+            <option value="newest">🆕 Newest</option>
+            <option value="price">💰 Price</option>
+          </select>
+        </div>
       </div>
 
       {/* Greeting */}
@@ -625,8 +658,10 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
 
       {/* Listings */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '0 16px' }}>
-        {filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE).map(listing => (
-          <ListingCard key={listing.id} listing={listing} userLocation={userLocation} recentViews={listing.recentViews || 0} isSaved={savedIds.has(listing.id)} />
+        {sortedFiltered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE).map(listing => (
+          <div key={listing.id} onClick={() => sessionStorage.setItem('ll_page', String(currentPage))}>
+            <ListingCard listing={listing} userLocation={userLocation} recentViews={listing.recentViews || 0} isSaved={savedIds.has(listing.id)} />
+          </div>
         ))}
       </div>
 
