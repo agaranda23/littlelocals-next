@@ -48,7 +48,7 @@ export default function MapView({ listings, onClose }) {
   }, [])
 
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 80, zIndex: 200, background: 'white', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 90, zIndex: 200, background: 'white', display: 'flex', flexDirection: 'column' }}>
       <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'white', borderBottom: '1px solid #F3F4F6', zIndex: 201 }}>
         <div style={{ fontSize: 16, fontWeight: 800, color: '#111827' }}>🗺️ Activities near you</div>
         <button onClick={onClose} style={{ background: '#F3F4F6', border: 'none', borderRadius: 20, padding: '6px 14px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>✕ Close</button>
