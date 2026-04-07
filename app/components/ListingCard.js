@@ -37,6 +37,27 @@ function isNewlyAdded(l) {
 
 function isMorningSessions(l) {
   const t = (l.time || '').toLowerCase()
+
+  // Starts soon / On now badge
+  const getTimeBadge = () => {
+    const timeStr = l.time || ''
+    const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)/i)
+    if (!match) return null
+    let hours = parseInt(match[1])
+    const mins = parseInt(match[2])
+    const ampm = match[3].toUpperCase()
+    if (ampm === 'PM' && hours !== 12) hours += 12
+    if (ampm === 'AM' && hours === 12) hours = 0
+    const now = new Date()
+    const start = new Date()
+    start.setHours(hours, mins, 0, 0)
+    const diffMins = Math.round((start - now) / 60000)
+    if (diffMins < 0 && diffMins > -90) return { label: '🟢 On now', color: '#16A34A', bg: '#DCFCE7' }
+    if (diffMins >= 0 && diffMins <= 30) return { label: `⏰ Starts in ${diffMins} mins`, color: '#DC2626', bg: '#FEE2E2' }
+    if (diffMins > 30 && diffMins <= 120) return { label: `⏰ Starts in ${Math.round(diffMins/60) === 1 ? '1 hour' : diffMins + ' mins'}`, color: '#D4732A', bg: '#FFF7ED' }
+    return null
+  }
+  const timeBadge = getTimeBadge()
   return t.includes('am') || t.includes('morning') || t.includes('9:') || t.includes('10:') || t.includes('11:')
 }
 
@@ -121,6 +142,11 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
           {onToday && (
             <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(255,255,255,0.95)', borderRadius: 10, padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, fontWeight: 700, color: '#111827', boxShadow: '0 1px 6px rgba(0,0,0,0.12)' }}>
               <span>📅</span><span>Today</span>
+            </div>
+          )}
+          {timeBadge && (
+            <div style={{ position: 'absolute', top: onToday ? 46 : 10, left: 10, background: timeBadge.bg, borderRadius: 10, padding: '4px 10px', fontSize: 12, fontWeight: 700, color: timeBadge.color, boxShadow: '0 1px 6px rgba(0,0,0,0.12)' }}>
+              {timeBadge.label}
             </div>
           )}
           <button onClick={e => {
