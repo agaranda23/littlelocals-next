@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import ListingCard from './ListingCard'
+import MapView from './MapView'
 
 const DAY_NAMES = ['sun','mon','tue','wed','thu','fri','sat']
 
@@ -60,6 +61,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const [worthJourney, setWorthJourney] = useState(false)
   const [nurseryFilter, setNurseryFilter] = useState(false)
   const [sortBy, setSortBy] = useState('recommended')
+  const [showMap, setShowMap] = useState(false)
 
   useEffect(() => { setCurrentPage(1) }, [dayFilter, search, ageFilter, freeOnly, weatherMode, worthJourney, nurseryFilter])
   useEffect(() => {
@@ -415,6 +417,8 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   }
 
   return (
+    <>
+    {showMap && <MapView listings={listings} onClose={() => { setShowMap(false); setActiveNav('home') }} />}
     <div style={{ maxWidth: 600, margin: '0 auto', paddingBottom: 100, fontFamily: 'system-ui, sans-serif' }}>
 
       {/* Hero headline */}
@@ -779,7 +783,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         {[
           { id: 'home', sel: '/home-nav-selected.png', unsel: '/home-nav-unselected.png', label: 'Home', action: () => { setActiveNav('home'); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
           { id: 'today', sel: '/today-nav-selected.png', unsel: '/today-nav-unselected.png', label: 'Today', action: () => { setActiveNav('today'); setDayFilter('today'); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
-          { id: 'explore', sel: '/explore-nav-selected.png', unsel: '/explore-nav-unselected.png', label: 'Explore', action: () => { setActiveNav('explore'); setDayFilter('week'); setSearch(''); setAgeFilter('all'); setFreeOnly(false); setWeatherMode('all'); setWorthJourney(false); setNurseryFilter(false); setCurrentPage(1); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
+          { id: 'explore', sel: '/explore-nav-selected.png', unsel: '/explore-nav-unselected.png', label: 'Explore', action: () => { setActiveNav('explore'); setShowMap(true) } },
           { id: 'plans', sel: '/myplans-nav-selected.png', unsel: '/myplans-nav-unselected.png', label: 'My Plans', action: () => { setActiveNav('plans'); openCalendar() }, badge: calendarTotal },
         ].map(tab => {
           const isActive = activeNav === tab.id
@@ -792,6 +796,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         })}
       </div>
     </div>
+  </>
   )
 }
 
