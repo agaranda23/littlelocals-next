@@ -508,7 +508,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       <div style={{ padding: '0 20px 4px', borderBottom: '1px solid #F3F4F6', marginBottom: 8 }}>
         <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 2 }}>{getGreeting(weather)}</div>
         {weather && <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>{weather.temp}°C {weather.desc}</div>}
-        <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 8 }}>👀 {exploringCount} parents exploring today</div>
+        <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 8 }}>👀 {exploringCount} parents exploring LittleLocals today</div>
       </div>
 
 
@@ -590,7 +590,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         const isFree = fav.free || (fav.price || '').toLowerCase().includes('free')
         return (
           <div style={{ padding: '20px 16px 4px' }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#D4732A', marginBottom: 4 }}>⭐ Local favourite this week</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#D4732A', marginBottom: 4 }}>💜 LittleLocals pick this week</div>
             {fav.local_favourite_subtitle && (
               <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 10 }}>{fav.local_favourite_subtitle}</div>
             )}
@@ -631,7 +631,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         if (todayPicks.length === 0) return null
         return (
           <div style={{ padding: '20px 0 8px' }}>
-            <div style={{ padding: '0 20px 10px', fontSize: 15, fontWeight: 800, color: '#D4732A' }}>✨ Easy picks for right now</div>
+            <div style={{ padding: '0 20px 10px', fontSize: 15, fontWeight: 800, color: '#D4732A' }}>✨ Popular with Ealing parents right now</div>
             <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 4px', scrollbarWidth: 'none' }}>
               {todayPicks.map(l => {
                 const isEasySaved = savedIds.has(l.id)
