@@ -492,7 +492,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
 
       {/* Count + clear + sort */}
       <div style={{ padding: '4px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 13, color: '#6B7280' }}>{filtered.length} activities in Ealing</span>
+        <span style={{ fontSize: 13, color: '#6B7280' }}>{filtered.length} activities for families in Ealing this week</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {hasActiveFilters && <span onClick={clearAll} style={{ fontSize: 13, color: '#D4732A', fontWeight: 700, cursor: 'pointer' }}>Clear</span>}
           <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ fontSize: 12, fontWeight: 600, border: '1px solid #E5E7EB', borderRadius: 10, padding: '4px 8px', background: 'white', color: '#111827', cursor: 'pointer' }}>
