@@ -197,7 +197,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
     if (ageFilter === 'baby' && (l.age_min||0) > 1) return false
     if (ageFilter === 'toddler' && ((l.age_min||0) > 3 || (l.age_max||99) < 1)) return false
     if (ageFilter === 'preschool' && ((l.age_min||0) > 5 || (l.age_max||99) < 3)) return false
-    if (ageFilter === 'kids' && ((l.age_min||0) > 10 || (l.age_max||99) < 5)) return false
+    if (ageFilter === 'kids' && (l.age_min||0) < 5) return false
     if (dayFilter === 'today' && !isOnToday(l)) return false
     if (dayFilter === 'tomorrow' && !isOnTomorrow(l)) return false
     if (dayFilter === 'weekend' && !isOnWeekend(l)) return false
