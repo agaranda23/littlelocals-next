@@ -75,7 +75,7 @@ function getDecisionBadge(listing, isFree, onToday, recentViews) {
 function getTrustBadge(listing) {
   if (listing.is_local_favourite) return { label: 'Local favourite', icon: '💜' }
   if (listing.is_featured) return { label: 'Featured this week', icon: '⭐' }
-  if (listing.verified) return { label: 'Verified provider', icon: '✔' }
+  if (listing.verified && (listing.images?.length || 0) >= 2) return { label: 'Verified provider', icon: '✔' }
   return null
 }
 
