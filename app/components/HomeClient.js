@@ -77,7 +77,15 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const [exploringCount, setExploringCount] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const PAGE_SIZE = 6
-  useEffect(() => { setExploringCount(Math.floor(Math.random() * 18) + 8) }, [])
+  useEffect(() => {
+    const now = new Date()
+    const hour = now.getHours() + now.getMinutes() / 60
+    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000)
+    const jitter = (dayOfYear % 13) - 6
+    const curve = Math.round(7 + 23 * Math.pow(hour / 23, 1.4))
+    const count = Math.max(5, Math.min(36, curve + jitter))
+    setExploringCount(count)
+  }, [])
 
   const refreshSavedIds = () => {
     try {
