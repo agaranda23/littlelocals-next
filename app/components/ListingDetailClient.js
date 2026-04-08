@@ -9,6 +9,12 @@ export default function ListingDetailClient({ listing, images, relatedListings }
   const [imgIdx, setImgIdx] = useState(0)
   const [lightbox, setLightbox] = useState(false)
   const [reviews, setReviews] = useState([])
+  const [showForm, setShowForm] = useState(false)
+  const [reviewName, setReviewName] = useState('')
+  const [reviewRating, setReviewRating] = useState(5)
+  const [reviewText, setReviewText] = useState('')
+  const [reviewSubmitted, setReviewSubmitted] = useState(false)
+  const [reviewSubmitting, setReviewSubmitting] = useState(false)
 
   const [visited, setVisited] = useState(false)
   const [plannedDates, setPlannedDates] = useState([])
@@ -175,6 +181,15 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           <h1 style={{ fontSize: 22, fontWeight: 900, color: '#111827', margin: 0, lineHeight: 1.2 }}>
             {listing.name}
           </h1>
+          {reviews.length > 0 && (() => {
+            const avg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
+            return (
+              <a href="#reviews" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 6, textDecoration: 'none' }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#92400E' }}>⭐ {avg}</span>
+                <span style={{ fontSize: 12, color: '#6B7280' }}>· {reviews.length} review{reviews.length !== 1 ? 's' : ''}</span>
+              </a>
+            )
+          })()}
         </div>
 
         {listing.location && <div style={{ fontSize: 14, color: '#6B7280', marginBottom: 8 }}>{listing.location}</div>}
@@ -445,28 +460,107 @@ export default function ListingDetailClient({ listing, images, relatedListings }
       </div>
 
       {/* Reviews */}
-      {reviews.length > 0 && (() => {
-        const avg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
-        return (
-          <div style={{ margin: '0 16px 24px', fontFamily: 'sans-serif' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-              <span style={{ fontSize: 22, fontWeight: 800, color: '#111827' }}>⭐ {avg}</span>
-              <span style={{ fontSize: 14, color: '#6B7280' }}>· {reviews.length} review{reviews.length !== 1 ? 's' : ''}</span>
+      <div id="reviews" style={{ margin: '0 16px 24px', fontFamily: 'sans-serif' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {reviews.length > 0 ? (() => {
+              const avg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
+              return <>
+                <span style={{ fontSize: 22, fontWeight: 800, color: '#111827' }}>⭐ {avg}</span>
+                <span style={{ fontSize: 14, color: '#6B7280' }}>· {reviews.length} review{reviews.length !== 1 ? 's' : ''}</span>
+              </>
+            })() : <span style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>Reviews</span>}
+          </div>
+          {!showForm && !reviewSubmitted && (
+            <button onClick={() => setShowForm(true)} style={{ fontSize: 13, fontWeight: 700, color: '#5B2D6E', background: '#F3E8FF', border: 'none', borderRadius: 20, padding: '6px 14px', cursor: 'pointer' }}>
+              ✍️ Write a review
+            </button>
+          )}
+        </div>
+
+        {/* Thank you message */}
+        {reviewSubmitted && (
+          <div style={{ background: '#D1FAE5', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 13, fontWeight: 600, color: '#065F46' }}>
+            ✅ Thanks! Your review has been submitted.
+          </div>
+        )}
+
+        {/* Review form */}
+        {showForm && !reviewSubmitted && (
+          <div style={{ background: '#F9FAFB', borderRadius: 12, padding: '14px', border: '1px solid #E5E7EB', marginBottom: 16 }}>
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Your name</div>
+              <input
+                value={reviewName}
+                onChange={e => setReviewName(e.target.value)}
+                placeholder="e.g. Sarah"
+                style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }}
+              />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {reviews.map(r => (
-                <div key={r.id} style={{ background: '#F9FAFB', borderRadius: 12, padding: '12px 14px', border: '1px solid #E5E7EB' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontSize: 13 }}>{'⭐'.repeat(r.rating)}</span>
-                    <span style={{ fontWeight: 700, fontSize: 13, color: '#111827' }}>{r.reviewer_name}</span>
-                  </div>
-                  <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.5 }}>{r.review_text}</div>
-                </div>
-              ))}
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Rating</div>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {[1,2,3,4,5].map(n => (
+                  <button key={n} onClick={() => setReviewRating(n)} style={{ fontSize: 22, background: 'none', border: 'none', cursor: 'pointer', opacity: n <= reviewRating ? 1 : 0.3, padding: 0 }}>⭐</button>
+                ))}
+              </div>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Your review</div>
+              <textarea
+                value={reviewText}
+                onChange={e => setReviewText(e.target.value)}
+                placeholder="What did you think?"
+                rows={3}
+                style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', resize: 'none', outline: 'none' }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={async () => {
+                  if (!reviewName.trim() || !reviewText.trim()) return
+                  setReviewSubmitting(true)
+                  const newReview = { listing_id: listing.id, reviewer_name: reviewName.trim(), rating: reviewRating, review_text: reviewText.trim() }
+                  const { data } = await supabase.from('reviews').insert([newReview]).select().single()
+                  if (data) setReviews(prev => [data, ...prev])
+                  else setReviews(prev => [{ id: Date.now(), ...newReview }, ...prev])
+                  setReviewSubmitted(true)
+                  setShowForm(false)
+                  setReviewSubmitting(false)
+                }}
+                disabled={reviewSubmitting || !reviewName.trim() || !reviewText.trim()}
+                style={{ flex: 1, fontSize: 13, fontWeight: 700, color: 'white', background: reviewSubmitting ? '#9CA3AF' : '#5B2D6E', border: 'none', borderRadius: 20, padding: '9px 0', cursor: reviewSubmitting ? 'default' : 'pointer' }}
+              >
+                {reviewSubmitting ? 'Submitting…' : 'Submit review'}
+              </button>
+              <button onClick={() => setShowForm(false)} style={{ fontSize: 13, color: '#6B7280', background: 'none', border: '1px solid #D1D5DB', borderRadius: 20, padding: '9px 14px', cursor: 'pointer' }}>
+                Cancel
+              </button>
             </div>
           </div>
-        );
-      })()}
+        )}
+
+        {/* Review cards */}
+        {reviews.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {reviews.map(r => (
+              <div key={r.id} style={{ background: '#F9FAFB', borderRadius: 12, padding: '12px 14px', border: '1px solid #E5E7EB' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  <span style={{ fontSize: 13 }}>{'⭐'.repeat(r.rating)}</span>
+                  <span style={{ fontWeight: 700, fontSize: 13, color: '#111827' }}>{r.reviewer_name}</span>
+                </div>
+                <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.5 }}>{r.review_text}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty state */}
+        {reviews.length === 0 && !showForm && (
+          <div style={{ fontSize: 13, color: '#9CA3AF', textAlign: 'center', padding: '12px 0' }}>No reviews yet — be the first!</div>
+        )}
+      </div>
       {/* Lightbox */}
       {lightbox && (
         <div onClick={() => setLightbox(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
