@@ -186,8 +186,22 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
 
   const filtered = listings.filter(l => {
     if (search) {
-      const q = search.toLowerCase()
-      return (l.name||'').toLowerCase().includes(q) || (l.type||'').toLowerCase().includes(q)
+      const q = search.toLowerCase().trim()
+      const haystack = [l.name, l.type, l.category, l.description, l.area].filter(Boolean).join(' ').toLowerCase()
+      // exact match first
+      if (haystack.includes(q)) return true
+      // fuzzy: all words in query must appear somewhere
+      const words = q.split(/\s+/).filter(w => w.length > 2)
+      if (words.length > 0 && words.every(w => haystack.includes(w))) return true
+      // typo tolerance: check if any word in query is within 2 chars of a word in haystack
+      const haystackWords = haystack.split(/\s+/)
+      const fuzzyMatch = words.some(qw => haystackWords.some(hw => {
+        if (Math.abs(qw.length - hw.length) > 2) return false
+        let diff = 0
+        for (let i = 0; i < Math.min(qw.length, hw.length); i++) if (qw[i] !== hw[i]) diff++
+        return diff <= 2 && hw.startsWith(qw.slice(0, 3))
+      }))
+      return fuzzyMatch
     }
     if (freeOnly && !l.free && !(l.price||'').toLowerCase().includes('free')) return false
     if (weatherMode === 'rainy' && !l.indoor) return false
