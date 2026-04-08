@@ -170,7 +170,7 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
           <div style={{ position: 'absolute', bottom: 22, left: 10, background: 'rgba(255,255,255,0.92)', borderRadius: 10, padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 6, maxWidth: '80%', backdropFilter: 'blur(4px)' }}>
             {listing.logo && <img src={listing.logo} alt="" style={{ height: 20, width: 'auto', borderRadius: 3, flexShrink: 0 }} />}
             <span style={{ fontSize: 12, fontWeight: 800, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{listing.name}</span>
-            {listing.verified && <img src="/verified-badge.svg" width={14} height={14} alt="Verified" style={{ flexShrink: 0 }} />}
+            {listing.verified && (listing.images?.length || 0) >= 2 && <img src="/verified-badge.svg" width={14} height={14} alt="Verified" style={{ flexShrink: 0 }} />}
           </div>
         </div>
       )}
@@ -179,7 +179,7 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
           {!listing.image && (
             <div style={{ fontSize: 16, fontWeight: 800, color: '#111827', lineHeight: 1.3, display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap', marginBottom: 4 }}>
               {listing.name}
-              {listing.verified && <img src="/verified-badge.svg" width={16} height={16} style={{ verticalAlign: 'middle', flexShrink: 0 }} alt="Verified" />}
+              {listing.verified && (listing.images?.length || 0) >= 2 && <img src="/verified-badge.svg" width={16} height={16} style={{ verticalAlign: 'middle', flexShrink: 0 }} alt="Verified" />}
             </div>
           )}
           {(listing.price || isFree) && (
