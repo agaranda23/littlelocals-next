@@ -231,7 +231,15 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       const priceB = (b.free || (b.price||'').toLowerCase().includes('free')) ? 0 : parseFloat((b.price||'').replace(/[^0-9.]/g,'')) || 999
       return priceA - priceB
     }
-    return 0 // recommended — keep original order
+    // recommended — verified with images first, daily shuffle within tiers
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000)
+    const seed = (n) => ((n * 1103515245 + dayOfYear * 12345) & 0x7fffffff)
+    const tierA = (l) => l.verified && (l.images?.length || 0) >= 2
+    const tierB = (l) => (l.verified || (l.images?.length || 0) >= 1)
+    const ta = tierA(a) ? 0 : tierB(a) ? 1 : 2
+    const tb = tierA(b) ? 0 : tierB(b) ? 1 : 2
+    if (ta !== tb) return ta - tb
+    return seed(a.id || 0) - seed(b.id || 0)
   })
 
   const hasActiveFilters = freeOnly || weatherMode !== 'all' || worthJourney || nurseryFilter || ageFilter !== 'all' || search
