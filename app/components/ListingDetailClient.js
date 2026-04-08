@@ -8,6 +8,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
   const [saved, setSaved] = useState(false)
   const [imgIdx, setImgIdx] = useState(0)
   const [lightbox, setLightbox] = useState(false)
+  const [reviews, setReviews] = useState([])
 
   const [visited, setVisited] = useState(false)
   const [plannedDates, setPlannedDates] = useState([])
@@ -35,6 +36,17 @@ export default function ListingDetailClient({ listing, images, relatedListings }
       }
     } catch(e) {}
   }, [listing.id])
+
+  useEffect(() => {
+    if (!listing?.id) return
+    supabase
+      .from('reviews')
+      .select('id, reviewer_name, rating, review_text, created_at')
+      .eq('listing_id', listing.id)
+      .order('created_at', { ascending: false })
+      .then(({ data }) => { if (data) setReviews(data) })
+  }, [listing.id])
+
 
   const toggleVisited = () => {
     try {
@@ -431,6 +443,30 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         </div>
 
       </div>
+
+      {/* Reviews */}
+      {reviews.length > 0 && (() => {
+        const avg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
+        return (
+          <div style={{ margin: '0 16px 24px', fontFamily: 'sans-serif' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+              <span style={{ fontSize: 22, fontWeight: 800, color: '#111827' }}>⭐ {avg}</span>
+              <span style={{ fontSize: 14, color: '#6B7280' }}>· {reviews.length} review{reviews.length !== 1 ? 's' : ''}</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {reviews.map(r => (
+                <div key={r.id} style={{ background: '#F9FAFB', borderRadius: 12, padding: '12px 14px', border: '1px solid #E5E7EB' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 13 }}>{'⭐'.repeat(r.rating)}</span>
+                    <span style={{ fontWeight: 700, fontSize: 13, color: '#111827' }}>{r.reviewer_name}</span>
+                  </div>
+                  <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.5 }}>{r.review_text}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
       {/* Lightbox */}
       {lightbox && (
         <div onClick={() => setLightbox(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
