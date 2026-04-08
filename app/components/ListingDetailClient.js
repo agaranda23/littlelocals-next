@@ -422,10 +422,12 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         <div style={{ textAlign: 'center', marginTop: 16, marginBottom: 8 }}>
           <div style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 12 }}>Share this page with parents</div>
           <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 8 }}>⚠️ <a href={`mailto:hello@littlelocals.uk?subject=Report: ${listing.name}`} style={{ color: '#D4732A' }}>Report an issue</a></div>
-          <div style={{ fontSize: 13, color: '#6B7280', marginTop: 16, padding: '14px', background: '#F9FAFB', borderRadius: 12 }}>
-            <div style={{ fontWeight: 700, marginBottom: 4 }}>Run this activity?</div>
-            <div>Claim this listing to update photos and info</div>
-          </div>
+          <a href={`mailto:hello@littlelocals.uk?subject=Claim listing: ${listing.name}&body=Hi! I run ${listing.name} and would like to claim this listing to update photos and info.`}
+            style={{ display: 'block', marginTop: 16, padding: '14px', background: '#F5F3FF', borderRadius: 12, textDecoration: 'none', border: '1px solid #DDD6FE' }}>
+            <div style={{ fontWeight: 700, marginBottom: 4, color: '#5B2D6E', fontSize: 14 }}>🙋 Run this activity?</div>
+            <div style={{ fontSize: 13, color: '#6B7280' }}>Claim this listing to update your photos, timetable and info — free forever.</div>
+            <div style={{ marginTop: 8, fontSize: 13, fontWeight: 700, color: '#5B2D6E' }}>Claim your listing →</div>
+          </a>
         </div>
 
       </div>
