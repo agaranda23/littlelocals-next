@@ -47,6 +47,17 @@ export default async function HomePage() {
     .order('sort_order', { ascending: true })
     .in('listing_id', (listings || []).map(l => l.id))
 
+  const { data: allReviews } = await supabase
+    .from('reviews')
+    .select('listing_id, rating')
+
+  const reviewMap = {}
+  ;(allReviews || []).forEach(r => {
+    if (!reviewMap[r.listing_id]) reviewMap[r.listing_id] = { total: 0, count: 0 }
+    reviewMap[r.listing_id].total += r.rating
+    reviewMap[r.listing_id].count += 1
+  })
+
   const localFav = localFavData?.[0] || null
   if (localFav) {
     const { data: favImg } = await supabase
@@ -67,7 +78,7 @@ export default async function HomePage() {
   // Filter to Ealing borough only, keep worth_journey listings too
   const ealingListings = (listings || [])
     .filter(l => l.worth_journey || EALING_BOROUGH.some(a => (l.location || '').includes(a)))
-    .map(l => ({ ...l, image: (imageMap[l.id] || [])[0] || null, images: imageMap[l.id] || [], recentViews: viewCounts[l.id] || 0 }))
+    .map(l => ({ ...l, image: (imageMap[l.id] || [])[0] || null, images: imageMap[l.id] || [], recentViews: viewCounts[l.id] || 0, avgRating: reviewMap[l.id] ? (reviewMap[l.id].total / reviewMap[l.id].count).toFixed(1) : null, reviewCount: reviewMap[l.id]?.count || 0 }))
 
   return (
     <>

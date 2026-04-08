@@ -171,6 +171,7 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
             {listing.logo && <img src={listing.logo} alt="" style={{ height: 20, width: 'auto', borderRadius: 3, flexShrink: 0 }} />}
             <span style={{ fontSize: 12, fontWeight: 800, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{listing.name}</span>
             {listing.verified && (listing.images?.length || 0) >= 2 && <img src="/verified-badge.svg" width={14} height={14} alt="Verified" style={{ flexShrink: 0 }} />}
+            {listing.avgRating && <span style={{ fontSize: 11, fontWeight: 700, color: '#92400E', background: '#FEF3C7', borderRadius: 6, padding: '1px 5px', flexShrink: 0 }}>⭐ {listing.avgRating}</span>}
           </div>
         </div>
       )}
@@ -180,6 +181,7 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
             <div style={{ fontSize: 16, fontWeight: 800, color: '#111827', lineHeight: 1.3, display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap', marginBottom: 4 }}>
               {listing.name}
               {listing.verified && (listing.images?.length || 0) >= 2 && <img src="/verified-badge.svg" width={16} height={16} style={{ verticalAlign: 'middle', flexShrink: 0 }} alt="Verified" />}
+              {listing.avgRating && <span style={{ fontSize: 11, fontWeight: 700, color: '#92400E', background: '#FEF3C7', borderRadius: 6, padding: '1px 5px' }}>⭐ {listing.avgRating}</span>}
             </div>
           )}
           {(listing.price || isFree) && (
