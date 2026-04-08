@@ -61,6 +61,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const [worthJourney, setWorthJourney] = useState(false)
   const [nurseryFilter, setNurseryFilter] = useState(false)
   const [sortBy, setSortBy] = useState('recommended')
+  const [sessionSeed] = useState(() => Math.floor(Math.random() * 0x7fffffff))
   const [showMap, setShowMap] = useState(false)
 
   useEffect(() => { setCurrentPage(1) }, [dayFilter, search, ageFilter, freeOnly, weatherMode, worthJourney, nurseryFilter])
@@ -245,9 +246,8 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       const priceB = (b.free || (b.price||'').toLowerCase().includes('free')) ? 0 : parseFloat((b.price||'').replace(/[^0-9.]/g,'')) || 999
       return priceA - priceB
     }
-    // recommended — verified with images first, daily shuffle within tiers
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000)
-    const seed = (n) => ((n * 1103515245 + dayOfYear * 12345) & 0x7fffffff)
+    // recommended — verified with images first, per-session shuffle within tiers
+    const seed = (n) => ((n * 1103515245 + sessionSeed * 12345) & 0x7fffffff)
     const tierA = (l) => l.verified && (l.images?.length || 0) >= 2
     const tierB = (l) => (l.verified || (l.images?.length || 0) >= 1)
     const ta = tierA(a) ? 0 : tierB(a) ? 1 : 2
