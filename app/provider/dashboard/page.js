@@ -8,11 +8,29 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 )
 
+
+function getCompleteness(listing, imageCount) {
+  const checks = [
+    { label: 'At least 1 photo', done: imageCount >= 1, points: 15 },
+    { label: '3+ photos', done: imageCount >= 3, points: 20 },
+    { label: 'Logo uploaded', done: !!listing.logo, points: 10 },
+    { label: 'Description', done: !!listing.description, points: 15 },
+    { label: 'Website link', done: !!listing.website, points: 10 },
+    { label: 'Booking / trial info', done: !!listing.free_trial, points: 10 },
+    { label: 'Instagram', done: !!listing.instagram, points: 5 },
+    { label: 'WhatsApp group', done: !!listing.whatsapp_group_url, points: 5 },
+  ]
+  const score = checks.filter(c => c.done).reduce((s, c) => s + c.points, 0)
+  const missing = checks.filter(c => !c.done)
+  return { score, missing }
+}
+
 export default function ProviderDashboard() {
   const [user, setUser] = useState(null)
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
   const [notLinked, setNotLinked] = useState(false)
+  const [imageCounts, setImageCounts] = useState({})
 
   useEffect(() => {
     async function load() {
@@ -39,10 +57,21 @@ export default function ProviderDashboard() {
       const listingIds = owners.map(o => o.listing_id)
       const { data: listingData } = await supabase
         .from('listings')
-        .select('id, name, slug, type, location, verified, logo')
+        .select('id, name, slug, type, location, verified, logo, description, website, instagram, whatsapp_group_url, free_trial')
         .in('id', listingIds)
 
       setListings(listingData || [])
+
+      // Fetch image counts for completeness score
+      if (listingData && listingData.length > 0) {
+        const { data: imgs } = await supabase
+          .from('listing_images')
+          .select('listing_id')
+          .in('listing_id', listingData.map(l => l.id))
+        const counts = {}
+        ;(imgs || []).forEach(img => { counts[img.listing_id] = (counts[img.listing_id] || 0) + 1 })
+        setImageCounts(counts)
+      }
       setLoading(false)
     }
     load()
@@ -92,6 +121,27 @@ export default function ProviderDashboard() {
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{listing.type}{listing.location ? ' · ' + listing.location : ''}</div>
               </div>
             </div>
+            {(() => {
+              const { score, missing } = getCompleteness(listing, imageCounts[listing.id] || 0)
+              const barColor = score >= 71 ? '#065F46' : score >= 41 ? '#D97706' : '#DC2626'
+              const bgColor = score >= 71 ? '#D1FAE5' : score >= 41 ? '#FEF3C7' : '#FEE2E2'
+              return (
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: barColor }}>Listing completeness: {score}%</div>
+                    {missing.length > 0 && <div style={{ fontSize: 11, color: '#9CA3AF' }}>{missing.length} item{missing.length !== 1 ? 's' : ''} missing</div>}
+                  </div>
+                  <div style={{ background: '#E5E7EB', borderRadius: 999, height: 8, overflow: 'hidden', marginBottom: missing.length > 0 ? 8 : 0 }}>
+                    <div style={{ width: score + '%', height: '100%', background: barColor, borderRadius: 999, transition: 'width 0.4s' }} />
+                  </div>
+                  {missing.length > 0 && (
+                    <div style={{ background: bgColor, borderRadius: 8, padding: '6px 10px', fontSize: 12, color: barColor }}>
+                      💡 Add: {missing.slice(0, 2).map(m => m.label).join(', ')}{missing.length > 2 ? ` +${missing.length - 2} more` : ''}
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
             <div style={{ display: 'flex', gap: 8 }}>
               <Link href={'/provider/listings/' + listing.id + '/edit'}
                 style={{ flex: 1, display: 'block', textAlign: 'center', padding: '10px 0', background: '#5B2D6E', color: 'white', borderRadius: 10, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
