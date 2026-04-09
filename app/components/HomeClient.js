@@ -396,7 +396,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
                 <div style={{ fontSize: 15, fontWeight: 900, color: '#1F2937' }}>{item.name}</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{item.location}</div>
               </div>
-              
+              <a
                 href={(() => {
                   const date = selectedDate.replace(/-/g, '')
                   const title = encodeURIComponent(item.name)
