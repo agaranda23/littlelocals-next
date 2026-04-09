@@ -100,6 +100,8 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
     else if (diffMins > 30 && diffMins <= 120) setTimeBadge({ label: `⏰ Starts in ${Math.round(diffMins/60) === 1 ? '1 hour' : diffMins + ' mins'}`, color: '#D4732A', bg: '#FFF7ED' })
   }, [listing.time])
   const [saved, setSaved] = useState(isSaved)
+  const [heartAnim, setHeartAnim] = useState(false)
+  const lastTap = React.useRef(0)
   const [imgIdx, setImgIdx] = useState(0)
   const [touchStartX, setTouchStartX] = useState(null)
   const allImages = listing.images && listing.images.length > 0 ? listing.images : (listing.image ? [listing.image] : [])
@@ -147,9 +149,20 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
               {timeBadge.label}
             </div>
           )}
-          <button onClick={e => {
-              e.preventDefault(); e.stopPropagation(); navigator.vibrate && navigator.vibrate(50)
-              const next = !saved
+          <button
+            onClick={e => {
+              e.preventDefault(); e.stopPropagation()
+              const now = Date.now()
+              const isDoubleTap = now - lastTap.current < 300
+              lastTap.current = now
+              if (isDoubleTap || !saved) {
+                navigator.vibrate && navigator.vibrate([30, 10, 30])
+                setHeartAnim(true)
+                setTimeout(() => setHeartAnim(false), 400)
+              } else {
+                navigator.vibrate && navigator.vibrate(20)
+              }
+              const next = isDoubleTap ? true : !saved
               setSaved(next)
               try {
                 const existing = JSON.parse(localStorage.getItem('ll_favs') || '[]')
@@ -157,8 +170,8 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
                 localStorage.setItem('ll_favs', JSON.stringify(updated))
               } catch(e) {}
             }}
-            style={{ position: 'absolute', top: 10, right: 10, background: saved ? '#5B2D6E' : 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 16, boxShadow: '0 1px 6px rgba(0,0,0,0.12)', transition: 'background 0.2s' }}>
-            <span style={{ color: saved ? 'white' : 'inherit' }}>{saved ? '♥' : '🤍'}</span>
+            style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 18, boxShadow: '0 1px 6px rgba(0,0,0,0.12)', transform: heartAnim ? 'scale(1.4)' : 'scale(1)', transition: 'transform 0.15s cubic-bezier(0.17,0.89,0.32,1.49)' }}>
+            <span style={{ color: saved ? '#E11D48' : '#9CA3AF', transition: 'color 0.15s' }}>{saved ? '♥' : '♡'}</span>
           </button>
           {allImages.length > 1 && (
             <div style={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 }}>
