@@ -24,6 +24,8 @@ export default function EditListing({ params }) {
     instagram: '',
   })
   const [listing, setListing] = useState(null)
+  const [photos, setPhotos] = useState([])
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     async function resolveParams() {
@@ -66,6 +68,14 @@ export default function EditListing({ params }) {
         .eq('id', parseInt(listingId))
         .single()
 
+      // Fetch existing photos
+      const { data: existingPhotos } = await supabase
+        .from('listing_images')
+        .select('id, url, sort_order')
+        .eq('listing_id', parseInt(listingId))
+        .order('sort_order', { ascending: true })
+      setPhotos(existingPhotos || [])
+
       if (l) {
         setListing(l)
         setForm({
@@ -81,6 +91,35 @@ export default function EditListing({ params }) {
     }
     load()
   }, [listingId])
+
+  async function handleUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    const ext = file.name.split('.').pop()
+    const filename = `${listingId}/${Date.now()}.${ext}`
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('listing-images')
+      .upload(filename, file, { upsert: false })
+    if (uploadError) { alert('Upload failed: ' + uploadError.message); setUploading(false); return }
+    const { data: { publicUrl } } = supabase.storage.from('listing-images').getPublicUrl(filename)
+    const maxOrder = photos.length > 0 ? Math.max(...photos.map(p => p.sort_order || 0)) : 0
+    const { data: newPhoto } = await supabase
+      .from('listing_images')
+      .insert([{ listing_id: parseInt(listingId), url: publicUrl, sort_order: maxOrder + 1 }])
+      .select()
+      .single()
+    if (newPhoto) setPhotos(prev => [...prev, newPhoto])
+    setUploading(false)
+  }
+
+  async function handleDeletePhoto(photo) {
+    if (!confirm('Delete this photo?')) return
+    const path = photo.url.split('/listing-images/')[1]
+    await supabase.storage.from('listing-images').remove([path])
+    await supabase.from('listing_images').delete().eq('id', photo.id)
+    setPhotos(prev => prev.filter(p => p.id !== photo.id))
+  }
 
   async function handleSave() {
     setSaving(true)
@@ -173,6 +212,34 @@ export default function EditListing({ params }) {
             <label style={labelStyle}>WhatsApp group link</label>
             <input value={form.whatsapp_group_url} onChange={set('whatsapp_group_url')} placeholder="https://chat.whatsapp.com/..." style={inputStyle} />
           </div>
+        </div>
+
+        {/* Photos */}
+        <div style={{ background: 'white', borderRadius: 14, padding: 20, border: '1px solid #E5E7EB', marginBottom: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#5B2D6E', marginBottom: 16 }}>Photos</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 12 }}>
+            {photos.map(photo => (
+              <div key={photo.id} style={{ position: 'relative', aspectRatio: '1', borderRadius: 8, overflow: 'hidden' }}>
+                <img src={photo.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <button onClick={() => handleDeletePhoto(photo)}
+                  style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.6)', border: 'none', borderRadius: '50%', width: 24, height: 24, color: 'white', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  ✕
+                </button>
+              </div>
+            ))}
+            <label style={{ aspectRatio: '1', borderRadius: 8, border: '2px dashed #D1D5DB', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: uploading ? 'default' : 'pointer', background: '#F9FAFB' }}>
+              <input type="file" accept="image/*" onChange={handleUpload} disabled={uploading} style={{ display: 'none' }} />
+              {uploading ? (
+                <div style={{ fontSize: 11, color: '#9CA3AF' }}>Uploading...</div>
+              ) : (
+                <>
+                  <div style={{ fontSize: 24, marginBottom: 4 }}>+</div>
+                  <div style={{ fontSize: 11, color: '#9CA3AF' }}>Add photo</div>
+                </>
+              )}
+            </label>
+          </div>
+          <div style={{ fontSize: 11, color: '#9CA3AF' }}>Photos appear on your listing page. First photo is the cover image.</div>
         </div>
 
         <button onClick={handleSave} disabled={saving}
