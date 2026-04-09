@@ -70,6 +70,8 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
     if (saved) { setCurrentPage(parseInt(saved)); sessionStorage.removeItem('ll_page') }
   }, [])
   const [userLocation, setUserLocation] = useState(null)
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false)
+  const [locationDismissed, setLocationDismissed] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [showInstall, setShowInstall] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
@@ -166,12 +168,18 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   }
 
   useEffect(() => {
-    if (navigator.geolocation) {
+    const dismissed = localStorage.getItem('ll_location_dismissed')
+    const granted = localStorage.getItem('ll_location_granted')
+    if (dismissed) return
+    if (granted && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
         () => {}
       )
+      return
     }
+    const timer = setTimeout(() => setShowLocationPrompt(true), 2500)
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
@@ -279,6 +287,25 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
     color: active ? 'white' : '#6B7280',
     border: active ? 'none' : '1px solid #E5E7EB',
   })
+
+  function handleAllowLocation() {
+    setShowLocationPrompt(false)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+          localStorage.setItem('ll_location_granted', '1')
+        },
+        () => {}
+      )
+    }
+  }
+
+  function handleDismissLocation() {
+    setShowLocationPrompt(false)
+    setLocationDismissed(true)
+    localStorage.setItem('ll_location_dismissed', '1')
+  }
 
   if (showCalendar) {
     const today = new Date()
