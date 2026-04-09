@@ -8,7 +8,8 @@ const supabase = createClient(
 )
 
 export default async function AdminClaimsPage({ searchParams }) {
-  const pwd = searchParams?.pwd || ''
+  const params = await searchParams
+  const pwd = params?.pwd || ''
   const authed = pwd === process.env.ADMIN_PASSWORD
 
   if (!authed) {
