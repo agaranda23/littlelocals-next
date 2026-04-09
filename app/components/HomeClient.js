@@ -369,6 +369,20 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
                 <div style={{ fontSize: 15, fontWeight: 900, color: '#1F2937' }}>{item.name}</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{item.location}</div>
               </div>
+              
+                href={(() => {
+                  const date = selectedDate.replace(/-/g, '')
+                  const title = encodeURIComponent(item.name)
+                  const location = encodeURIComponent(item.location || 'Ealing')
+                  const details = encodeURIComponent('Planned on LittleLocals — littlelocals.uk/listing/' + item.slug)
+                  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${date}/${date}&location=${location}&details=${details}`
+                })()}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ flexShrink: 0, fontSize: 16, background: '#EFF6FF', borderRadius: 8, padding: '4px 8px', textDecoration: 'none', border: '1px solid #BFDBFE' }}
+                title="Add to Google Calendar">
+                📅
+              </a>
               <div onClick={() => removeFromCalendar(item.id, selectedDate)} style={{ width: 26, height: 26, borderRadius: '50%', background: '#FFF0EB', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 14 }}>✕</div>
             </div>
           ))}
