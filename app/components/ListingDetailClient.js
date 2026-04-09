@@ -17,6 +17,13 @@ export default function ListingDetailClient({ listing, images, relatedListings }
   const [reviewText, setReviewText] = useState('')
   const [reviewSubmitted, setReviewSubmitted] = useState(false)
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
+  const [showClaimForm, setShowClaimForm] = useState(false)
+  const [claimName, setClaimName] = useState('')
+  const [claimEmail, setClaimEmail] = useState('')
+  const [claimPhone, setClaimPhone] = useState('')
+  const [claimMessage, setClaimMessage] = useState('')
+  const [claimSubmitting, setClaimSubmitting] = useState(false)
+  const [claimSubmitted, setClaimSubmitted] = useState(false)
 
   const [visited, setVisited] = useState(false)
   const [plannedDates, setPlannedDates] = useState([])
@@ -451,12 +458,67 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         <div style={{ textAlign: 'center', marginTop: 16, marginBottom: 8 }}>
           <div style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 12 }}>Share this page with parents</div>
           <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 8 }}>⚠️ <a href={`mailto:hello@littlelocals.uk?subject=Report: ${listing.name}`} style={{ color: '#D4732A' }}>Report an issue</a></div>
-          <a href={`mailto:hello@littlelocals.uk?subject=Claim listing: ${listing.name}&body=Hi! I run ${listing.name} and would like to claim this listing to update photos and info.`}
-            style={{ display: 'block', marginTop: 16, padding: '14px', background: '#F5F3FF', borderRadius: 12, textDecoration: 'none', border: '1px solid #DDD6FE' }}>
-            <div style={{ fontWeight: 700, marginBottom: 4, color: '#5B2D6E', fontSize: 14 }}>🙋 Run this activity?</div>
-            <div style={{ fontSize: 13, color: '#6B7280' }}>Claim this listing to update your photos, timetable and info — free forever.</div>
-            <div style={{ marginTop: 8, fontSize: 13, fontWeight: 700, color: '#5B2D6E' }}>Claim your listing →</div>
-          </a>
+          {claimSubmitted ? (
+            <div style={{ marginTop: 16, padding: '14px', background: '#D1FAE5', borderRadius: 12, border: '1px solid #6EE7B7', textAlign: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#065F46' }}>✅ Request received!</div>
+              <div style={{ fontSize: 13, color: '#065F46', marginTop: 4 }}>We'll be in touch within 24 hours.</div>
+            </div>
+          ) : !showClaimForm ? (
+            <div onClick={() => setShowClaimForm(true)}
+              style={{ display: 'block', marginTop: 16, padding: '14px', background: '#F5F3FF', borderRadius: 12, border: '1px solid #DDD6FE', cursor: 'pointer' }}>
+              <div style={{ fontWeight: 700, marginBottom: 4, color: '#5B2D6E', fontSize: 14 }}>🙋 Run this activity?</div>
+              <div style={{ fontSize: 13, color: '#6B7280' }}>Claim this listing to update your photos, timetable and info — free forever.</div>
+              <div style={{ marginTop: 8, fontSize: 13, fontWeight: 700, color: '#5B2D6E' }}>Claim your listing →</div>
+            </div>
+          ) : (
+            <div style={{ marginTop: 16, padding: '14px', background: '#F5F3FF', borderRadius: 12, border: '1px solid #DDD6FE' }}>
+              <div style={{ fontWeight: 700, marginBottom: 12, color: '#5B2D6E', fontSize: 14 }}>🙋 Claim {listing.name}</div>
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Your name *</div>
+                <input value={claimName} onChange={e => setClaimName(e.target.value)} placeholder="e.g. Sarah Jones"
+                  style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Email address *</div>
+                <input value={claimEmail} onChange={e => setClaimEmail(e.target.value)} placeholder="e.g. sarah@myclass.co.uk" type="email"
+                  style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Phone <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(optional)</span></div>
+                <input value={claimPhone} onChange={e => setClaimPhone(e.target.value)} placeholder="e.g. 07700 900000" type="tel"
+                  style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }} />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Anything to add? <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(optional)</span></div>
+                <textarea value={claimMessage} onChange={e => setClaimMessage(e.target.value)} placeholder="Tell us a bit about your business..." rows={3}
+                  style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', resize: 'none', outline: 'none' }} />
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  onClick={async () => {
+                    if (!claimName.trim() || !claimEmail.trim()) return
+                    setClaimSubmitting(true)
+                    await supabase.from('claim_requests').insert([{
+                      listing_id: listing.id,
+                      name: claimName.trim(),
+                      email: claimEmail.trim(),
+                      phone: claimPhone.trim() || null,
+                      message: claimMessage.trim() || null
+                    }])
+                    setClaimSubmitted(true)
+                    setClaimSubmitting(false)
+                  }}
+                  disabled={claimSubmitting || !claimName.trim() || !claimEmail.trim()}
+                  style={{ flex: 1, fontSize: 13, fontWeight: 700, color: 'white', background: claimSubmitting ? '#9CA3AF' : '#5B2D6E', border: 'none', borderRadius: 20, padding: '10px 0', cursor: claimSubmitting ? 'default' : 'pointer' }}>
+                  {claimSubmitting ? 'Sending…' : 'Submit claim'}
+                </button>
+                <button onClick={() => setShowClaimForm(false)}
+                  style={{ fontSize: 13, color: '#6B7280', background: 'none', border: '1px solid #D1D5DB', borderRadius: 20, padding: '10px 14px', cursor: 'pointer' }}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
       </div>
