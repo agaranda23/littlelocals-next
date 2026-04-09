@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const DAY_NAMES = ['sun','mon','tue','wed','thu','fri','sat']
 
@@ -101,7 +101,7 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
   }, [listing.time])
   const [saved, setSaved] = useState(isSaved)
   const [heartAnim, setHeartAnim] = useState(false)
-  const lastTap = React.useRef(0)
+  const lastTap = useRef(0)
   const [imgIdx, setImgIdx] = useState(0)
   const [touchStartX, setTouchStartX] = useState(null)
   const allImages = listing.images && listing.images.length > 0 ? listing.images : (listing.image ? [listing.image] : [])
