@@ -45,6 +45,8 @@ export default function EditListing({ params }) {
         .eq('user_id', session.user.id)
         .single()
 
+      console.log('session uid:', session?.user?.id)
+      console.log('provider:', provider)
       if (!provider) { setNotAuthed(true); setLoading(false); return }
 
       const { data: owner } = await supabase
@@ -55,6 +57,7 @@ export default function EditListing({ params }) {
         .eq('approved', true)
         .single()
 
+      console.log('owner:', owner)
       if (!owner) { setNotAuthed(true); setLoading(false); return }
 
       const { data: l } = await supabase
