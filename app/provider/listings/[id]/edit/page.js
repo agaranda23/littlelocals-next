@@ -80,8 +80,6 @@ export default function EditListing({ params }) {
       setLoading(false)
     }
     load()
-    }
-    load()
   }, [listingId])
 
   async function handleSave() {
