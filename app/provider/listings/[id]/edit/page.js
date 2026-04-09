@@ -9,7 +9,7 @@ const supabase = createClient(
 )
 
 export default function EditListing({ params }) {
-  const listingId = params.id
+  const [listingId, setListingId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -26,6 +26,15 @@ export default function EditListing({ params }) {
   const [listing, setListing] = useState(null)
 
   useEffect(() => {
+    async function resolveParams() {
+      const resolved = await params
+      setListingId(resolved.id)
+    }
+    resolveParams()
+  }, [])
+
+  useEffect(() => {
+    if (!listingId) return
     async function load() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) { window.location.href = '/provider/login'; return }
@@ -66,6 +75,8 @@ export default function EditListing({ params }) {
         })
       }
       setLoading(false)
+    }
+    load()
     }
     load()
   }, [listingId])
