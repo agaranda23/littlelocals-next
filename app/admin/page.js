@@ -46,7 +46,7 @@ export default async function AdminHome({ searchParams }) {
     supabase.from('reviews').select('*', { count: 'exact', head: true }),
     supabase.from('providers').select('*', { count: 'exact', head: true }).eq('approved', true),
     supabase.from('claim_requests').select('name, email, listings(name)').eq('status', 'pending').order('created_at', { ascending: false }).limit(3),
-    supabase.from('providers').select('id, name, email, created_at, listing_owners(listing_id, listings(name, slug))').eq('approved', true).order('created_at', { ascending: false }),
+    supabase.from('providers').select('id, name, email, created_at').eq('approved', true).order('created_at', { ascending: false }),
   ])
 
   const statCards = [
@@ -142,16 +142,7 @@ export default async function AdminHome({ searchParams }) {
                   </div>
                   <div style={{ fontSize: 11, color: '#9CA3AF' }}>{new Date(p.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
                 </div>
-                {p.listing_owners?.length > 0 && (
-                  <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                    {p.listing_owners.map((lo, i) => (
-                      <a key={i} href={'/listing/' + lo.listings?.slug} target="_blank" rel="noopener noreferrer"
-                        style={{ fontSize: 11, background: '#F3E8FF', color: '#5B2D6E', padding: '2px 8px', borderRadius: 6, textDecoration: 'none', fontWeight: 600 }}>
-                        {lo.listings?.name || 'Unknown listing'}
-                      </a>
-                    ))}
-                  </div>
-                )}
+
               </div>
             ))}
           </div>
