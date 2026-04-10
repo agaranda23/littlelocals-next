@@ -26,6 +26,8 @@ export default function EditListing({ params }) {
   const [listing, setListing] = useState(null)
   const [photos, setPhotos] = useState([])
   const [uploading, setUploading] = useState(false)
+  const [logoUploading, setLogoUploading] = useState(false)
+  const [logoUrl, setLogoUrl] = useState(null)
 
   useEffect(() => {
     async function resolveParams() {
@@ -47,8 +49,6 @@ export default function EditListing({ params }) {
         .eq('user_id', session.user.id)
         .single()
 
-      console.log('session uid:', session?.user?.id)
-      console.log('provider:', provider)
       if (!provider) { setNotAuthed(true); setLoading(false); return }
 
       const { data: owner } = await supabase
@@ -59,7 +59,6 @@ export default function EditListing({ params }) {
         .eq('approved', true)
         .single()
 
-      console.log('owner:', owner)
       if (!owner) { setNotAuthed(true); setLoading(false); return }
 
       const { data: l } = await supabase
@@ -78,6 +77,7 @@ export default function EditListing({ params }) {
 
       if (l) {
         setListing(l)
+        setLogoUrl(l.logo || null)
         setForm({
           description: l.description || '',
           price: l.price || '',
@@ -119,6 +119,22 @@ export default function EditListing({ params }) {
     await supabase.storage.from('listing-images').remove([path])
     await supabase.from('listing_images').delete().eq('id', photo.id)
     setPhotos(prev => prev.filter(p => p.id !== photo.id))
+  }
+
+  async function handleLogoUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setLogoUploading(true)
+    const ext = file.name.split('.').pop()
+    const filename = `${listingId}/logo-${Date.now()}.${ext}`
+    const { error: uploadError } = await supabase.storage
+      .from('listing-images')
+      .upload(filename, file, { upsert: true })
+    if (uploadError) { alert('Upload failed: ' + uploadError.message); setLogoUploading(false); return }
+    const { data: { publicUrl } } = supabase.storage.from('listing-images').getPublicUrl(filename)
+    await supabase.from('listings').update({ logo: publicUrl }).eq('id', parseInt(listingId))
+    setLogoUrl(publicUrl)
+    setLogoUploading(false)
   }
 
   async function handleSave() {
@@ -174,6 +190,24 @@ export default function EditListing({ params }) {
             ⚠️ {error}
           </div>
         )}
+
+        <div style={{ background: 'white', borderRadius: 14, padding: 20, border: '1px solid #E5E7EB', marginBottom: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#5B2D6E', marginBottom: 16 }}>Logo</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            {logoUrl ? (
+              <img src={logoUrl} alt="Logo" style={{ width: 64, height: 64, borderRadius: 12, objectFit: 'cover', border: '1px solid #E5E7EB' }} />
+            ) : (
+              <div style={{ width: 64, height: 64, borderRadius: 12, background: '#F3F4F6', border: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>🏷️</div>
+            )}
+            <div>
+              <label style={{ display: 'inline-block', padding: '8px 16px', background: '#F3F4F6', borderRadius: 8, fontSize: 13, fontWeight: 600, color: '#374151', cursor: logoUploading ? 'default' : 'pointer' }}>
+                <input type="file" accept="image/*" onChange={handleLogoUpload} disabled={logoUploading} style={{ display: 'none' }} />
+                {logoUploading ? 'Uploading...' : logoUrl ? '🔄 Change logo' : '⬆️ Upload logo'}
+              </label>
+              <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>Square image works best. PNG or JPG.</div>
+            </div>
+          </div>
+        </div>
 
         <div style={{ background: 'white', borderRadius: 14, padding: 20, border: '1px solid #E5E7EB', marginBottom: 12 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: '#5B2D6E', marginBottom: 16 }}>About your activity</div>

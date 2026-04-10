@@ -72,6 +72,13 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const [userLocation, setUserLocation] = useState(null)
   const [showLocationPrompt, setShowLocationPrompt] = useState(false)
   const [locationDismissed, setLocationDismissed] = useState(false)
+  const [showSuggestForm, setShowSuggestForm] = useState(false)
+  const [suggestName, setSuggestName] = useState('')
+  const [suggestLocation, setSuggestLocation] = useState('')
+  const [suggestWebsite, setSuggestWebsite] = useState('')
+  const [suggestNotes, setSuggestNotes] = useState('')
+  const [suggestSubmitting, setSuggestSubmitting] = useState(false)
+  const [suggestDone, setSuggestDone] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [showInstall, setShowInstall] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
@@ -819,15 +826,73 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       )}
 
       {/* Suggest an activity CTA */}
-      <div style={{ margin: '24px 16px 0', background: '#FFF7ED', border: '2px dashed #D4732A', borderRadius: 18, padding: '20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 16, fontWeight: 800, color: '#111827', marginBottom: 4 }}>✨ Suggest an activity for Ealing parents</div>
-          <div style={{ fontSize: 13, color: '#6B7280' }}>Help improve what families nearby can find</div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 24 }}>✨</span>
-          <a href='mailto:hello@littlelocals.uk?subject=Suggest an activity' style={{ background: '#D4732A', color: 'white', border: 'none', borderRadius: 12, padding: '10px 18px', fontSize: 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', textDecoration: 'none' }}>Add activity</a>
-        </div>
+      <div style={{ margin: '24px 16px 0', background: '#FFF7ED', border: '2px dashed #D4732A', borderRadius: 18, padding: '20px 16px' }}>
+        {suggestDone ? (
+          <div style={{ textAlign: 'center', padding: '8px 0' }}>
+            <div style={{ fontSize: 20, marginBottom: 6 }}>🎉</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 4 }}>Thanks for the suggestion!</div>
+            <div style={{ fontSize: 13, color: '#6B7280' }}>We'll review it and add it to LittleLocals soon.</div>
+          </div>
+        ) : !showSuggestForm ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 16, fontWeight: 800, color: '#111827', marginBottom: 4 }}>✨ Know a great activity?</div>
+              <div style={{ fontSize: 13, color: '#6B7280' }}>Help other Ealing families discover it</div>
+            </div>
+            <button onClick={() => setShowSuggestForm(true)} style={{ background: '#D4732A', color: 'white', border: 'none', borderRadius: 12, padding: '10px 18px', fontSize: 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              Suggest one →
+            </button>
+          </div>
+        ) : (
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 14 }}>✨ Suggest an activity</div>
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Activity name *</div>
+              <input value={suggestName} onChange={e => setSuggestName(e.target.value)} placeholder="e.g. Little Kickers Football"
+                style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }} />
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Location <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(optional)</span></div>
+              <input value={suggestLocation} onChange={e => setSuggestLocation(e.target.value)} placeholder="e.g. Ealing, Hanwell"
+                style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }} />
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Website <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(optional)</span></div>
+              <input value={suggestWebsite} onChange={e => setSuggestWebsite(e.target.value)} placeholder="https://..."
+                style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }} />
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Anything else? <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(optional)</span></div>
+              <textarea value={suggestNotes} onChange={e => setSuggestNotes(e.target.value)} placeholder="Tell us more..." rows={2}
+                style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', resize: 'none', outline: 'none' }} />
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={async () => {
+                  if (!suggestName.trim()) return
+                  setSuggestSubmitting(true)
+                  const { createClient } = await import('@supabase/supabase-js')
+                  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+                  await sb.from('listing_suggestions').insert([{
+                    name: suggestName.trim(),
+                    location: suggestLocation.trim() || null,
+                    website: suggestWebsite.trim() || null,
+                    notes: suggestNotes.trim() || null,
+                  }])
+                  setSuggestDone(true)
+                  setSuggestSubmitting(false)
+                }}
+                disabled={suggestSubmitting || !suggestName.trim()}
+                style={{ flex: 1, padding: '10px 0', background: suggestSubmitting ? '#9CA3AF' : '#D4732A', color: 'white', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: suggestSubmitting ? 'default' : 'pointer' }}>
+                {suggestSubmitting ? 'Sending...' : 'Submit suggestion'}
+              </button>
+              <button onClick={() => setShowSuggestForm(false)}
+                style={{ padding: '10px 14px', background: 'none', color: '#6B7280', border: '1px solid #D1D5DB', borderRadius: 10, fontSize: 13, cursor: 'pointer' }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer */}

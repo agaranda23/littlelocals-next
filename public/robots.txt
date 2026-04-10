@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /provider/
+
+Sitemap: https://littlelocals.uk/sitemap.xml

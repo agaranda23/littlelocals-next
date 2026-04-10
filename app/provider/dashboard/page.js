@@ -31,6 +31,7 @@ export default function ProviderDashboard() {
   const [loading, setLoading] = useState(true)
   const [notLinked, setNotLinked] = useState(false)
   const [imageCounts, setImageCounts] = useState({})
+  const [reviewsMap, setReviewsMap] = useState({})
 
   useEffect(() => {
     async function load() {
@@ -71,6 +72,20 @@ export default function ProviderDashboard() {
         const counts = {}
         ;(imgs || []).forEach(img => { counts[img.listing_id] = (counts[img.listing_id] || 0) + 1 })
         setImageCounts(counts)
+      }
+      // Fetch reviews
+      if (listingData && listingData.length > 0) {
+        const { data: revs } = await supabase
+          .from('reviews')
+          .select('id, listing_id, reviewer_name, rating, review_text, created_at')
+          .in('listing_id', listingData.map(l => l.id))
+          .order('created_at', { ascending: false })
+        const rmap = {}
+        ;(revs || []).forEach(r => {
+          if (!rmap[r.listing_id]) rmap[r.listing_id] = []
+          rmap[r.listing_id].push(r)
+        })
+        setReviewsMap(rmap)
       }
       setLoading(false)
     }
@@ -152,6 +167,30 @@ export default function ProviderDashboard() {
                 👁 View
               </Link>
             </div>
+
+            {/* Reviews */}
+            {(reviewsMap[listing.id] || []).length > 0 && (
+              <div style={{ marginTop: 16 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                  ⭐ {(reviewsMap[listing.id].reduce((s,r) => s + r.rating, 0) / reviewsMap[listing.id].length).toFixed(1)} · {reviewsMap[listing.id].length} review{reviewsMap[listing.id].length !== 1 ? 's' : ''}
+                </div>
+                {reviewsMap[listing.id].slice(0, 3).map(r => (
+                  <div key={r.id} style={{ background: '#F9FAFB', borderRadius: 8, padding: '8px 12px', marginBottom: 6, border: '1px solid #E5E7EB' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                      <span style={{ fontSize: 11 }}>{'⭐'.repeat(r.rating)}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: '#111827' }}>{r.reviewer_name}</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.4 }}>{r.review_text}</div>
+                  </div>
+                ))}
+                {reviewsMap[listing.id].length > 3 && (
+                  <div style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', marginTop: 4 }}>+{reviewsMap[listing.id].length - 3} more reviews</div>
+                )}
+              </div>
+            )}
+            {(reviewsMap[listing.id] || []).length === 0 && (
+              <div style={{ marginTop: 12, fontSize: 12, color: '#9CA3AF', textAlign: 'center' }}>No reviews yet</div>
+            )}
           </div>
         ))}
       </div>
