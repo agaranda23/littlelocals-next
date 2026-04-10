@@ -32,6 +32,7 @@ export default function ProviderDashboard() {
   const [notLinked, setNotLinked] = useState(false)
   const [imageCounts, setImageCounts] = useState({})
   const [reviewsMap, setReviewsMap] = useState({})
+  const [viewCounts, setViewCounts] = useState({})
 
   useEffect(() => {
     async function load() {
@@ -86,6 +87,18 @@ export default function ProviderDashboard() {
           rmap[r.listing_id].push(r)
         })
         setReviewsMap(rmap)
+      }
+      // Fetch view counts (last 30 days)
+      if (listingData && listingData.length > 0) {
+        const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+        const { data: views } = await supabase
+          .from('listing_views')
+          .select('listing_id')
+          .in('listing_id', listingData.map(l => l.id))
+          .gte('viewed_at', since)
+        const vcounts = {}
+        ;(views || []).forEach(v => { vcounts[v.listing_id] = (vcounts[v.listing_id] || 0) + 1 })
+        setViewCounts(vcounts)
       }
       setLoading(false)
     }
@@ -166,6 +179,22 @@ export default function ProviderDashboard() {
                 style={{ padding: '10px 14px', background: '#F3F4F6', color: '#374151', borderRadius: 10, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
                 👁 View
               </Link>
+            </div>
+
+            {/* Stats row */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+              <div style={{ flex: 1, background: '#F9FAFB', borderRadius: 10, padding: '10px 12px', textAlign: 'center', border: '1px solid #E5E7EB' }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color: '#5B2D6E' }}>{viewCounts[listing.id] || 0}</div>
+                <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>views (30 days)</div>
+              </div>
+              <div style={{ flex: 1, background: '#F9FAFB', borderRadius: 10, padding: '10px 12px', textAlign: 'center', border: '1px solid #E5E7EB' }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color: '#5B2D6E' }}>{(reviewsMap[listing.id] || []).length}</div>
+                <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>reviews</div>
+              </div>
+              <div style={{ flex: 1, background: '#F9FAFB', borderRadius: 10, padding: '10px 12px', textAlign: 'center', border: '1px solid #E5E7EB' }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color: '#5B2D6E' }}>{imageCounts[listing.id] || 0}</div>
+                <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>photos</div>
+              </div>
             </div>
 
             {/* Reviews */}

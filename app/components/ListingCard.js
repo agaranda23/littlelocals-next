@@ -135,7 +135,7 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
   })()
 
   const card = (
-    <div style={{ background: 'white', borderRadius: 18, overflow: 'hidden', boxShadow: saved ? '0 2px 16px rgba(91,45,110,0.18)' : '0 2px 16px rgba(0,0,0,0.08)', border: saved ? '2px solid #5B2D6E' : '1px solid #F3F4F6', cursor: listing.slug ? 'pointer' : 'default' }}>
+    <div style={{ background: 'white', borderRadius: 18, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', border: '1px solid #F3F4F6', cursor: listing.slug ? 'pointer' : 'default' }}>
       {listing.image && (
         <div style={{ position: 'relative', height: 200, overflow: 'hidden' }}>
           <img src={currentImage} alt={listing.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} />

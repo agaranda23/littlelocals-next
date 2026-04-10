@@ -63,7 +63,7 @@ export default function EditListing({ params }) {
 
       const { data: l } = await supabase
         .from('listings')
-        .select('id, name, slug, description, price, website, free_trial, whatsapp_group_url, instagram')
+        .select('id, name, slug, description, price, website, free_trial, whatsapp_group_url, instagram, is_paused, logo, age_min, age_max')
         .eq('id', parseInt(listingId))
         .single()
 
@@ -85,6 +85,9 @@ export default function EditListing({ params }) {
           free_trial: l.free_trial || '',
           whatsapp_group_url: l.whatsapp_group_url || '',
           instagram: l.instagram || '',
+          is_paused: l.is_paused || false,
+          age_min: l.age_min ?? '',
+          age_max: l.age_max ?? '',
         })
       }
       setLoading(false)
@@ -223,9 +226,23 @@ export default function EditListing({ params }) {
             <input value={form.price} onChange={set('price')} placeholder="e.g. £8 per session" style={inputStyle} />
           </div>
 
-          <div style={{ marginBottom: 0 }}>
+          <div style={{ marginBottom: 14 }}>
             <label style={labelStyle}>Free trial / taster info</label>
             <input value={form.free_trial} onChange={set('free_trial')} placeholder="e.g. First session free" style={inputStyle} />
+          </div>
+          <div style={{ marginBottom: 0 }}>
+            <label style={labelStyle}>Age range</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <select value={form.age_min} onChange={set('age_min')} style={{ ...inputStyle, flex: 1 }}>
+                <option value="">Min age</option>
+                {[0,1,2,3,4,5,6,7,8,9,10,11,12].map(a => <option key={a} value={a}>{a === 0 ? 'Newborn' : `${a} yr`}</option>)}
+              </select>
+              <span style={{ color: '#9CA3AF', fontSize: 13 }}>to</span>
+              <select value={form.age_max} onChange={set('age_max')} style={{ ...inputStyle, flex: 1 }}>
+                <option value="">Max age</option>
+                {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16].map(a => <option key={a} value={a}>{`${a} yr`}</option>)}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -274,6 +291,24 @@ export default function EditListing({ params }) {
             </label>
           </div>
           <div style={{ fontSize: 11, color: '#9CA3AF' }}>Photos appear on your listing page. First photo is the cover image.</div>
+        </div>
+
+        <div style={{ background: 'white', borderRadius: 14, padding: 20, border: '1px solid #E5E7EB', marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Pause listing</div>
+              <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>Temporarily hide from parents (e.g. school holidays)</div>
+            </div>
+            <button onClick={() => setForm(prev => ({ ...prev, is_paused: !prev.is_paused }))}
+              style={{ width: 48, height: 26, borderRadius: 999, border: 'none', cursor: 'pointer', background: form.is_paused ? '#DC2626' : '#D1D5DB', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+              <div style={{ position: 'absolute', top: 3, left: form.is_paused ? 25 : 3, width: 20, height: 20, borderRadius: '50%', background: 'white', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+            </button>
+          </div>
+          {form.is_paused && (
+            <div style={{ marginTop: 10, background: '#FEE2E2', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#DC2626', fontWeight: 600 }}>
+              ⚠️ Your listing is currently hidden from parents
+            </div>
+          )}
         </div>
 
         <button onClick={handleSave} disabled={saving}
