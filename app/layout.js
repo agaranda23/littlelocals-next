@@ -3,7 +3,7 @@ import Script from 'next/script'
 
 export const metadata = {
   title: 'LITTLElocals — Things to do with kids in Ealing',
-  description: 'Quick ideas around Ealing for babies, toddlers and kids',
+  description: 'Discover the best activities for babies, toddlers and kids in Ealing. Classes, soft play, parks, nurseries and more — all in one place.',
   themeColor: '#5C4B6B',
   manifest: '/manifest.json',
   icons: {
@@ -14,6 +14,22 @@ export const metadata = {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'LITTLElocals',
+  },
+  alternates: { canonical: 'https://littlelocals.uk' },
+  openGraph: {
+    title: 'LITTLElocals — Things to do with kids in Ealing',
+    description: 'Discover the best activities for babies, toddlers and kids in Ealing. Classes, soft play, parks, nurseries and more — all in one place.',
+    url: 'https://littlelocals.uk',
+    siteName: 'LITTLElocals',
+    images: [{ url: 'https://littlelocals.uk/bear-logo.png', width: 512, height: 512, alt: 'LITTLElocals' }],
+    locale: 'en_GB',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'LITTLElocals — Things to do with kids in Ealing',
+    description: 'Discover the best activities for babies, toddlers and kids in Ealing.',
+    images: ['https://littlelocals.uk/bear-logo.png'],
   },
 }
 

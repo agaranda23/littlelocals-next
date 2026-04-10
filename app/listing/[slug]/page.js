@@ -11,17 +11,44 @@ export async function generateMetadata({ params }) {
   const { slug } = await params
   const { data: listing } = await supabase
     .from('listings')
-    .select('name, description, type, location, ages')
+    .select('id, name, description, type, location, ages')
     .eq('slug', slug)
     .single()
   if (!listing) return { title: 'LITTLElocals' }
   const title = `${listing.name} — Kids Activities in ${listing.location || 'Ealing'} | LITTLElocals`
-  const description = listing.description || `${listing.name} is a ${listing.type} activity in ${listing.location || 'Ealing'}${listing.ages ? ' for ' + listing.ages : ''}. Find kids activities near you on LITTLElocals.`
+  const description = listing.description
+    ? listing.description.slice(0, 155) + (listing.description.length > 155 ? '...' : '')
+    : `${listing.name} is a ${listing.type} activity in ${listing.location || 'Ealing'}${listing.ages ? ' for ' + listing.ages : ''}. Find kids activities near you on LITTLElocals.`
+
+  // Get cover image
+  const { data: imgData } = await supabase
+    .from('listing_images')
+    .select('url')
+    .eq('listing_id', listing.id)
+    .order('sort_order', { ascending: true })
+    .limit(1)
+  const ogImage = imgData?.[0]?.url || 'https://littlelocals.uk/bear-logo.png'
+  const url = `https://littlelocals.uk/listing/${slug}`
+
   return {
     title,
     description,
-    openGraph: { title, description, siteName: 'LITTLElocals' },
-    twitter: { card: 'summary', title, description },
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: 'LITTLElocals',
+      images: [{ url: ogImage, width: 1200, height: 630, alt: listing.name }],
+      type: 'website',
+      locale: 'en_GB',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
   }
 }
 
