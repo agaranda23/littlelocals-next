@@ -31,23 +31,14 @@ export default async function AdminHome({ searchParams }) {
     )
   }
 
-  // Fetch stats in parallel
-  const [
-    { count: totalListings },
-    { count: pendingClaims },
-    { count: pendingSuggestions },
-    { count: totalReviews },
-    { count: totalProviders },
-    { data: recentClaims },
-  ] = await Promise.all([
-    supabase.from('listings').select('*', { count: 'exact', head: true }),
-    supabase.from('claim_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-    supabase.from('listing_suggestions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-    supabase.from('reviews').select('*', { count: 'exact', head: true }),
-    supabase.from('providers').select('*', { count: 'exact', head: true }).eq('approved', true),
-    supabase.from('claim_requests').select('name, email, listings(name)').eq('status', 'pending').order('created_at', { ascending: false }).limit(3),
-    supabase.from('providers').select('id, name, email, created_at').eq('approved', true).order('created_at', { ascending: false }),
-  ])
+  // Fetch stats
+  const { count: totalListings } = await supabase.from('listings').select('*', { count: 'exact', head: true })
+  const { count: pendingClaims } = await supabase.from('claim_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending')
+  const { count: pendingSuggestions } = await supabase.from('listing_suggestions').select('*', { count: 'exact', head: true }).eq('status', 'pending')
+  const { count: totalReviews } = await supabase.from('reviews').select('*', { count: 'exact', head: true })
+  const { count: totalProviders } = await supabase.from('providers').select('*', { count: 'exact', head: true }).eq('approved', true)
+  const { data: recentClaims } = await supabase.from('claim_requests').select('name, email, listings(name)').eq('status', 'pending').order('created_at', { ascending: false }).limit(3)
+  const { data: activeProviders } = await supabase.from('providers').select('id, name, email, created_at').eq('approved', true).order('created_at', { ascending: false })
 
   const statCards = [
     { label: 'Total listings', value: totalListings, emoji: '📋', color: '#5B2D6E' },
