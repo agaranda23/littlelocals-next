@@ -46,6 +46,7 @@ export default async function AdminHome({ searchParams }) {
     supabase.from('reviews').select('*', { count: 'exact', head: true }),
     supabase.from('providers').select('*', { count: 'exact', head: true }).eq('approved', true),
     supabase.from('claim_requests').select('name, email, listings(name)').eq('status', 'pending').order('created_at', { ascending: false }).limit(3),
+    supabase.from('providers').select('id, name, email, created_at, listing_owners(listing_id, listings(name, slug))').eq('approved', true).order('created_at', { ascending: false }),
   ])
 
   const statCards = [
@@ -126,6 +127,33 @@ export default async function AdminHome({ searchParams }) {
               </div>
             ))}
             <Link href={'/admin/claims?pwd=' + pwd} style={{ fontSize: 13, color: '#5B2D6E', fontWeight: 600, textDecoration: 'none' }}>View all →</Link>
+          </div>
+        )}
+        {/* Active providers */}
+        {activeProviders && activeProviders.length > 0 && (
+          <div style={{ marginTop: 24 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#9CA3AF', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 1 }}>Active providers</div>
+            {activeProviders.map(p => (
+              <div key={p.id} style={{ background: 'white', borderRadius: 10, padding: '12px 16px', marginBottom: 8, border: '1px solid #E5E7EB' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{p.name}</div>
+                    <div style={{ fontSize: 12, color: '#6B7280' }}>{p.email}</div>
+                  </div>
+                  <div style={{ fontSize: 11, color: '#9CA3AF' }}>{new Date(p.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                </div>
+                {p.listing_owners?.length > 0 && (
+                  <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                    {p.listing_owners.map((lo, i) => (
+                      <a key={i} href={'/listing/' + lo.listings?.slug} target="_blank" rel="noopener noreferrer"
+                        style={{ fontSize: 11, background: '#F3E8FF', color: '#5B2D6E', padding: '2px 8px', borderRadius: 6, textDecoration: 'none', fontWeight: 600 }}>
+                        {lo.listings?.name || 'Unknown listing'}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>
