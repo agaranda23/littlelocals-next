@@ -16,6 +16,7 @@ export const metadata = {
     title: 'LITTLElocals',
   },
   alternates: { canonical: 'https://littlelocals.uk' },
+  verification: { google: 'eb7ec24e2c1dd639' },
   openGraph: {
     title: 'LITTLElocals — Things to do with kids in Ealing',
     description: 'Discover the best activities for babies, toddlers and kids in Ealing. Classes, soft play, parks, nurseries and more — all in one place.',
@@ -38,12 +39,12 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-Z2FJ3TC5WQ" strategy="afterInteractive" />
-        <Script id="google-analytics" strategy="afterInteractive">{`
+        <Script id="ga" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: `
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', 'G-Z2FJ3TC5WQ');
-        `}</Script>
+        ` }} />
       </head>
       <body style={{ margin: 0, background: '#F9FAFB', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
         {children}
