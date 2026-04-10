@@ -16,7 +16,7 @@ export const metadata = {
     title: 'LITTLElocals',
   },
   alternates: { canonical: 'https://littlelocals.uk' },
-  verification: { google: 'eb7ec24e2c1dd639' },
+  verification: { google: 'j3u8I7p8oCF3zD41F4zYbeTW2RmKEtSBgrhO64qeYqU' },
   openGraph: {
     title: 'LITTLElocals — Things to do with kids in Ealing',
     description: 'Discover the best activities for babies, toddlers and kids in Ealing. Classes, soft play, parks, nurseries and more — all in one place.',
