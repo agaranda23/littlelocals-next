@@ -518,7 +518,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
 
       {/* Hero headline */}
       <div style={{ padding: '16px 20px 12px' }}>
-        <h1 style={{ fontSize: 28, fontWeight: 900, color: '#111827', margin: '0 0 4px', lineHeight: 1.2 }}>{getHeadline()}</h1>
+        <h1 style={{ fontSize: 28, fontWeight: 900, color: '#111827', margin: '0 0 4px', lineHeight: 1.2 }}>{mounted ? getHeadline() : 'What shall we do today?'}</h1>
         <p style={{ fontSize: 14, color: '#6B7280', margin: 0 }}>Quick ideas around Ealing for babies, toddlers and kids</p>
       </div>
 
@@ -613,7 +613,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
 
       {/* Greeting */}
       <div style={{ padding: '0 20px 4px', borderBottom: '1px solid #F3F4F6', marginBottom: 8 }}>
-        <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 2 }}>{getGreeting(weather)}</div>
+        <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 2 }}>{mounted ? getGreeting(weather) : '👋 Hello, Ealing parents'}</div>
         {weather && <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>{weather.temp}°C {weather.desc}</div>}
         <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 8 }}>👀 {exploringCount} parents exploring LittleLocals today</div>
       </div>
