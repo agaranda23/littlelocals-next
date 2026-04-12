@@ -76,7 +76,8 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const [worthJourney, setWorthJourney] = useState(false)
   const [nurseryFilter, setNurseryFilter] = useState(false)
   const [sortBy, setSortBy] = useState('recommended')
-  const [sessionSeed] = useState(() => Math.floor(Math.random() * 0x7fffffff))
+  const [sessionSeed, setSessionSeed] = useState(1234567)
+  useEffect(() => { setSessionSeed(Math.floor(Math.random() * 0x7fffffff)) }, [])
   const [showMap, setShowMap] = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
