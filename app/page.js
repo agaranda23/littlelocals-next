@@ -16,12 +16,11 @@ export default async function HomePage() {
     { data: listings },
     { data: localFavData },
     { data: recentListings },
-    { data: images },
     { data: allReviews }
   ] = await Promise.all([
     supabase
       .from('listings')
-      .select('id, name, slug, location, type, emoji, ages, age_min, age_max, price, free, indoor, verified, popular, logo, days_of_week, is_daily, day, worth_journey, category, homepage_score, is_local_favourite, local_favourite_subtitle, littlelocals_offer_text, description, free_trial, lat, lng, whatsapp_group_url, instagram, created_at')
+      .select('id, name, slug, location, type, emoji, ages, age_min, age_max, price, free, indoor, verified, popular, logo, days_of_week, is_daily, day, worth_journey, category, homepage_score, is_local_favourite, local_favourite_subtitle, littlelocals_offer_text, description, free_trial, lat, lng, whatsapp_group_url, instagram, created_at, primary_image')
       .order('homepage_score', { ascending: false })
       .eq('is_paused', false)
       .limit(400),
@@ -35,11 +34,7 @@ export default async function HomePage() {
       .select('id, name, slug, type')
       .order('created_at', { ascending: false })
       .limit(12),
-    supabase
-      .from('listing_images')
-      .select('listing_id, url')
-      .order('sort_order', { ascending: true })
-      .limit(800),
+
     supabase
       .from('reviews')
       .select('listing_id, rating')
@@ -67,16 +62,12 @@ export default async function HomePage() {
     if (favImg?.[0]) localFav.image = favImg[0].url
   }
 
-  const imageMap = {}
-  ;(images || []).forEach(img => {
-    if (!imageMap[img.listing_id]) imageMap[img.listing_id] = []
-    imageMap[img.listing_id].push(img.url)
-  })
+
 
   // Filter to Ealing borough only, keep worth_journey listings too
   const ealingListings = (listings || [])
     .filter(l => l.worth_journey || EALING_BOROUGH.some(a => (l.location || '').includes(a)))
-    .map(l => ({ ...l, image: (imageMap[l.id] || [])[0] || null, images: imageMap[l.id] || [], recentViews: viewCounts[l.id] || 0, avgRating: reviewMap[l.id] ? (reviewMap[l.id].total / reviewMap[l.id].count).toFixed(1) : null, reviewCount: reviewMap[l.id]?.count || 0 }))
+    .map(l => ({ ...l, image: l.primary_image || null, images: l.primary_image ? [l.primary_image] : [], recentViews: 0, avgRating: reviewMap[l.id] ? (reviewMap[l.id].total / reviewMap[l.id].count).toFixed(1) : null, reviewCount: reviewMap[l.id]?.count || 0 }))
 
   return (
     <>
