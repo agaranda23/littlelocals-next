@@ -58,6 +58,7 @@ function getDayContextLine(dayFilter, count) {
 
 export default function HomeClient({ listings, recentListings = [], localFav = null, viewCounts = {} }) {
   const [savedIds, setSavedIds] = useState(new Set())
+  const [mounted, setMounted] = useState(false)
   const [activeNav, setActiveNav] = useState('home')
   const [showCalendar, setShowCalendar] = useState(false)
   const [recentlyViewed, setRecentlyViewed] = useState([])
@@ -78,6 +79,8 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const [sessionSeed] = useState(() => Math.floor(Math.random() * 0x7fffffff))
   const [showMap, setShowMap] = useState(false)
 
+  useEffect(() => { setMounted(true) }, [])
+  useEffect(() => { setMounted(true) }, [])
   useEffect(() => { setCurrentPage(1) }, [dayFilter, search, ageFilter, freeOnly, weatherMode, worthJourney, nurseryFilter])
   useEffect(() => {
     const saved = sessionStorage.getItem('ll_page')
@@ -569,11 +572,11 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         ))}
       </div>
 
-      {/* Day context line */}
-      {(() => {
+      {/* Day context line - client only to avoid hydration mismatch */}
+      {mounted && (() => {
         const count = dayFilter === 'today' ? todayCount : dayFilter === 'tomorrow' ? tomorrowCount : dayFilter === 'weekend' ? weekendCount : weekCount
         const line = getDayContextLine(dayFilter, count)
-        if (!line) return null
+        if (!mounted || !line) return null
         return (
           <div style={{ padding: '0 20px 8px', fontSize: 13, color: '#D4732A', fontWeight: 600 }}>
             📍 {line}
