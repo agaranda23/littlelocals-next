@@ -27,6 +27,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
 
   const [visited, setVisited] = useState(false)
   const [plannedDates, setPlannedDates] = useState([])
+  const [detailSignal, setDetailSignal] = useState(null)
 
   // Track recently viewed
   useEffect(() => {
@@ -37,6 +38,36 @@ export default function ListingDetailClient({ listing, images, relatedListings }
       localStorage.setItem('ll_recentlyViewed', JSON.stringify(updated))
     } catch(e) {}
   }, [listing.id])
+
+  // Contextual social proof signal (verified only)
+  useEffect(() => {
+    if (!listing.verified) return
+    try {
+      const saved = JSON.parse(localStorage.getItem('ll_favs') || '[]')
+      if (saved.includes(listing.id)) {
+        setDetailSignal('💜 You saved this activity')
+        return
+      }
+      if (listing.is_local_favourite) {
+        setDetailSignal('⭐ Popular with local parents this week')
+        return
+      }
+      const today = ['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()]
+      const isOnToday = listing.is_daily || !listing.days_of_week || listing.days_of_week.length === 0 || (listing.days_of_week || []).includes(today)
+      if (isOnToday) {
+        setDetailSignal('⏰ Families are heading to this today')
+        return
+      }
+      const isOnWeekend = listing.is_daily || (listing.days_of_week || []).some(d => ['sat','sun'].includes(d))
+      if (isOnWeekend) {
+        setDetailSignal('📅 Parents are planning this weekend')
+        return
+      }
+      setDetailSignal('💜 Saved by Ealing parents')
+    } catch(e) {
+      setDetailSignal('💜 Saved by Ealing parents')
+    }
+  }, [listing])
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -264,9 +295,11 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           </a>
         )}
 
-        {/* Social proof */}
-        {listing.popular && (
-          <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 12 }}>✨ Frequently chosen by Ealing parents recently</div>
+        {/* Social proof signal - verified only */}
+        {detailSignal && (
+          <div style={{ fontSize: 13, color: '#6B7280', fontWeight: 600, marginBottom: 12 }}>
+            {detailSignal}
+          </div>
         )}
 
         {/* Description */}

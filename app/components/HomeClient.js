@@ -42,6 +42,20 @@ function getGreeting(weather) {
   return '🌙 Planning ahead with the kids?'
 }
 
+function getDayContextLine(dayFilter, count) {
+  const h = new Date().getHours()
+  if (dayFilter === 'today') {
+    if (h >= 6 && h < 12) return `${count} things happening this morning in Ealing`
+    if (h >= 12 && h < 17) return `${count} things happening this afternoon in Ealing`
+    if (h >= 17) return `${count} things happening later today in Ealing`
+    return `${count} things happening today in Ealing`
+  }
+  if (dayFilter === 'tomorrow') return `${count} things happening tomorrow in Ealing`
+  if (dayFilter === 'weekend') return `${count} things on this weekend in Ealing`
+  if (dayFilter === 'week') return `${count} things happening this week in Ealing`
+  return null
+}
+
 export default function HomeClient({ listings, recentListings = [], localFav = null, viewCounts = {} }) {
   const [savedIds, setSavedIds] = useState(new Set())
   const [activeNav, setActiveNav] = useState('home')
@@ -554,6 +568,18 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
           <span key={key} onClick={() => setDayFilter(key)} style={dayChipStyle(dayFilter === key)}>{label} {count}</span>
         ))}
       </div>
+
+      {/* Day context line */}
+      {(() => {
+        const count = dayFilter === 'today' ? todayCount : dayFilter === 'tomorrow' ? tomorrowCount : dayFilter === 'weekend' ? weekendCount : weekCount
+        const line = getDayContextLine(dayFilter, count)
+        if (!line) return null
+        return (
+          <div style={{ padding: '0 20px 8px', fontSize: 13, color: '#D4732A', fontWeight: 600 }}>
+            📍 {line}
+          </div>
+        )
+      })()}
 
       {/* Filter chips */}
       <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 16px 8px', scrollbarWidth: 'none' }}>
