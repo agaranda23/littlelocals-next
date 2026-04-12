@@ -138,7 +138,7 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
     <div style={{ background: 'white', borderRadius: 18, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', border: '1px solid #F3F4F6', cursor: listing.slug ? 'pointer' : 'default' }}>
       {listing.image && (
         <div style={{ position: 'relative', height: 200, overflow: 'hidden' }}>
-          <img src={currentImage} alt={listing.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} />
+          <img src={currentImage} alt={listing.name} style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#F3F4F6', display: 'block' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} />
           {onToday && (
             <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(255,255,255,0.95)', borderRadius: 10, padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, fontWeight: 700, color: '#111827', boxShadow: '0 1px 6px rgba(0,0,0,0.12)' }}>
               <span>📅</span><span>Today</span>
