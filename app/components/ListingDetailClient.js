@@ -9,7 +9,7 @@ const DAY_NAMES = ['sun','mon','tue','wed','thu','fri','sat']
 export default function ListingDetailClient({ listing, images, relatedListings }) {
   const [saved, setSaved] = useState(false)
   const [imgIdx, setImgIdx] = useState(0)
-  const [lightbox, setLightbox] = useState(false)
+  const [lightbox, setLightbox] = useState(null)
   const [reviews, setReviews] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [reviewName, setReviewName] = useState('')
@@ -659,9 +659,9 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         )}
       </div>
       {/* Lightbox */}
-      {lightbox && (
-        <div onClick={() => setLightbox(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <button onClick={() => setLightbox(false)} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 40, height: 40, color: 'white', fontSize: 20, cursor: 'pointer', zIndex: 1001 }}>✕</button>
+      {lightbox !== null && (
+        <div onClick={() => setLightbox(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <button onClick={() => setLightbox(null)} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 40, height: 40, color: 'white', fontSize: 20, cursor: 'pointer', zIndex: 1001 }}>✕</button>
           {lightbox === 'timetable' ? (
             <img src={listing.timetable_image} alt="Timetable" style={{ maxWidth: '95vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} onClick={e => e.stopPropagation()} />
           ) : (
