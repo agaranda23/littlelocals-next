@@ -7,7 +7,7 @@ const CATEGORIES = [
   { label: '🎵 Music', keywords: ['music', 'sing', 'song', 'tunes', 'hartbeep'] },
   { label: '💃 Dance', keywords: ['dance', 'ballet', 'movement'] },
   { label: '🌳 Parks', keywords: ['park', 'playground', 'nature', 'outdoor', 'woodland'] },
-  { label: '🧸 Nursery', keywords: ['nursery', 'playgroup', 'toddler group', 'stay and play'] },
+  { label: '🧸 Nursery', keywords: ['nursery'] },
   { label: '🎨 Arts', keywords: ['art', 'craft', 'paint', 'creative'] },
   { label: '💰 Free', keywords: [] },
 ]
