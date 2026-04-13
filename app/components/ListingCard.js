@@ -203,7 +203,11 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
             </div>
           )}
         </div>
-        {dayLabel && <div style={{ fontSize: 13, fontWeight: 600, color: '#D4732A', marginBottom: 3 }}>📅 {dayLabel}</div>}
+        {(dayLabel || listing.time) && (
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#D4732A', marginBottom: 3 }}>
+            📅 {dayLabel}{dayLabel && listing.time ? ' · ' : ''}{listing.time ? listing.time.split('–')[0].trim() : ''}
+          </div>
+        )}
         <div style={{ fontSize: 13, color: '#6B7280', marginBottom: listing.description ? 5 : 6 }}>
           {listing.type}{listing.ages ? ' · ' + listing.ages : ''}
         </div>
