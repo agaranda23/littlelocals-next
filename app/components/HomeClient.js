@@ -42,6 +42,20 @@ function getGreeting(weather) {
   return '🌙 Planning ahead with the kids?'
 }
 
+function parseStartMinutes(timeStr) {
+  if (!timeStr) return null
+  try {
+    const match = timeStr.match(/(d+):(d+)s*(AM|PM|am|pm)/i)
+    if (!match) return null
+    let hours = parseInt(match[1])
+    const mins = parseInt(match[2])
+    const period = match[3].toUpperCase()
+    if (period === 'PM' && hours !== 12) hours += 12
+    if (period === 'AM' && hours === 12) hours = 0
+    return hours * 60 + mins
+  } catch(e) { return null }
+}
+
 function getDayContextLine(dayFilter, count) {
   const h = new Date().getHours()
   if (dayFilter === 'today') {
@@ -278,6 +292,16 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       const priceA = (a.free || (a.price||'').toLowerCase().includes('free')) ? 0 : parseFloat((a.price||'').replace(/[^0-9.]/g,'')) || 999
       const priceB = (b.free || (b.price||'').toLowerCase().includes('free')) ? 0 : parseFloat((b.price||'').replace(/[^0-9.]/g,'')) || 999
       return priceA - priceB
+    }
+    if (sortBy === 'startssoon') {
+      const nowMins = new Date().getHours() * 60 + new Date().getMinutes()
+      const getStartMins = (l) => {
+        const m = parseStartMinutes(l.time)
+        if (m === null) return 9999
+        const diff = m - nowMins
+        return diff >= -90 ? diff : 9999
+      }
+      return getStartMins(a) - getStartMins(b)
     }
     // recommended — verified with images first, per-session shuffle within tiers
     const seed = (n) => ((n * 1103515245 + sessionSeed * 12345) & 0x7fffffff)
@@ -608,6 +632,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
             <option value="nearest">📍 Nearest</option>
             <option value="newest">🆕 Newest</option>
             <option value="price">💰 Price</option>
+            <option value="startssoon">⏰ Starts soon</option>
           </select>
         </div>
       </div>
