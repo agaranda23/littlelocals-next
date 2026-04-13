@@ -597,17 +597,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         ))}
       </div>
 
-      {/* Day context line - client only to avoid hydration mismatch */}
-      {mounted && (() => {
-        const count = dayFilter === 'today' ? todayCount : dayFilter === 'tomorrow' ? tomorrowCount : dayFilter === 'weekend' ? weekendCount : weekCount
-        const line = getDayContextLine(dayFilter, count)
-        if (!mounted || !line) return null
-        return (
-          <div style={{ padding: '0 20px 8px', fontSize: 13, color: '#D4732A', fontWeight: 600 }}>
-            📍 {line}
-          </div>
-        )
-      })()}
+
 
       {/* Filter chips */}
       <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 16px 8px', scrollbarWidth: 'none' }}>
@@ -624,7 +614,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
 
       {/* Count + clear + sort */}
       <div style={{ padding: '4px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 13, color: '#6B7280' }}>{filtered.length} activities for families in Ealing this week</span>
+        {mounted && <span style={{ fontSize: 13, color: '#D4732A', fontWeight: 600 }}>📍 {getDayContextLine(dayFilter, filtered.length) || filtered.length + ' activities in Ealing'}</span>}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {hasActiveFilters && <span onClick={clearAll} style={{ fontSize: 13, color: '#D4732A', fontWeight: 700, cursor: 'pointer' }}>Clear</span>}
           <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ fontSize: 12, fontWeight: 600, border: '1px solid #E5E7EB', borderRadius: 10, padding: '4px 8px', background: 'white', color: '#111827', cursor: 'pointer' }}>
