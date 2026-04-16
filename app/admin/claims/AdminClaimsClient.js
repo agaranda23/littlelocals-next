@@ -20,6 +20,20 @@ export default function AdminClaimsClient({ claims: initial, pwd }) {
   async function updateStatus(id, status) {
     setLoading(id + status)
     await supabase.from('claim_requests').update({ status }).eq('id', id)
+    if (status === 'approved') {
+      const claim = claims.find(c => c.id === id)
+      if (claim) {
+        await fetch('/.netlify/functions/send-magic-link', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: claim.email,
+            name: claim.name,
+            listingName: claim.listings?.name || 'your listing'
+          })
+        })
+      }
+    }
     setClaims(prev => prev.map(c => c.id === id ? { ...c, status } : c))
     setLoading(null)
   }
