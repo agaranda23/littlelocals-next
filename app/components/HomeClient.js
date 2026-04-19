@@ -768,37 +768,6 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         )
       })()}
 
-      {/* Easy picks for right now */}
-      {!hasActiveFilters && currentPage === 1 && (() => {
-        const todayAll = listings.filter(l => l.image && isOnToday(l))
-        const todayPicks = [
-          ...todayAll.filter(l => savedIds.has(l.id)),
-          ...todayAll.filter(l => !savedIds.has(l.id))
-        ].slice(0, 4)
-        if (todayPicks.length === 0) return null
-        return (
-          <div style={{ padding: '20px 0 8px' }}>
-            <div style={{ padding: '0 20px 10px', fontSize: 15, fontWeight: 800, color: '#D4732A' }}>✨ Popular with Ealing parents right now</div>
-            <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 4px', scrollbarWidth: 'none' }}>
-              {todayPicks.map(l => {
-                const isEasySaved = savedIds.has(l.id)
-                return (
-                  <a key={l.id} href={'/listing/' + l.slug} style={{ flexShrink: 0, width: 130, textDecoration: 'none', display: 'block', borderRadius: 14, border: isEasySaved ? '2px solid #5B2D6E' : '2px solid transparent', boxShadow: isEasySaved ? '0 2px 10px rgba(91,45,110,0.2)' : 'none', overflow: 'hidden' }}>
-                    <div style={{ position: 'relative', height: 90, borderRadius: 12, overflow: 'hidden', marginBottom: 6 }}>
-                      <img src={l.image} alt={l.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      {l.logo && <img src={l.logo} alt="" style={{ position: 'absolute', bottom: 4, left: 4, height: 18, width: 'auto', borderRadius: 3, background: 'white', padding: 2 }} />}
-                      <div style={{ position: 'absolute', top: 4, right: 4, background: '#22C55E', color: 'white', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 5 }}>Today</div>
-                      {isEasySaved && <div style={{ position: 'absolute', bottom: 4, right: 4, background: '#5B2D6E', color: 'white', fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 5 }}>💜 Saved</div>}
-                    </div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '0 4px 4px' }}>{l.name}</div>
-                  </a>
-                )
-              })}
-            </div>
-          </div>
-        )
-      })()}
-
       {/* Trusted by Ealing parents divider */}
       {!hasActiveFilters && currentPage === 1 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px 16px' }}>
