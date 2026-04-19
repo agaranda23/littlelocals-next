@@ -139,7 +139,12 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
       {listing.image && (
         <div style={{ position: 'relative', height: 200, overflow: 'hidden' }}>
           <img src={currentImage} alt={listing.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} />
-          {onToday && (
+          {listing.temporarily_closed && (
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+              <div style={{ fontSize: 48, color: 'white', fontWeight: 900, opacity: 0.9 }}>✕</div>
+            </div>
+          )}
+          {onToday && !listing.temporarily_closed && (
             <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(255,255,255,0.95)', borderRadius: 10, padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, fontWeight: 700, color: '#111827', boxShadow: '0 1px 6px rgba(0,0,0,0.12)' }}>
               <span>📅</span><span>Today</span>
             </div>

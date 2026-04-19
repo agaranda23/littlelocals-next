@@ -209,6 +209,17 @@ export default function ListingDetailClient({ listing, images, relatedListings }
 
       <div style={{ padding: '16px 16px 0' }}>
 
+        {/* Temporarily closed banner */}
+        {listing.temporarily_closed && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#FEE2E2', border: '1px solid #FECACA', borderRadius: 12, padding: '12px 14px', marginBottom: 12 }}>
+            <span style={{ fontSize: 20 }}>🚫</span>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#991B1B' }}>Temporarily closed</div>
+              <div style={{ fontSize: 12, color: '#B91C1C' }}>This venue is currently closed. We'll update this listing when it reopens.</div>
+            </div>
+          </div>
+        )}
+
         {/* Category + status pills */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
           {listing.type && <span style={{ fontSize: 12, fontWeight: 700, background: '#111827', color: 'white', padding: '4px 12px', borderRadius: 20 }}>{listing.type}</span>}
