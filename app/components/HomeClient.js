@@ -636,6 +636,29 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       </div>
 
 
+      {/* Just added near you */}
+      {!hasActiveFilters && recentListings.length > 0 && (
+        <div style={{ padding: '24px 0 8px' }}>
+          <div style={{ padding: '0 20px 10px', fontSize: 15, fontWeight: 800, color: '#D4732A' }}>✨ Just added near you</div>
+          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px', scrollbarWidth: 'none' }}>
+            {recentListings.map(l => {
+              const fullListing = listings.find(fl => fl.id === l.id)
+              const img = fullListing?.image || null
+              return (
+                <a key={l.id} href={`/listing/${l.slug}`} style={{ flexShrink: 0, width: 140, textDecoration: 'none', display: 'block' }}>
+                  <div style={{ height: 90, borderRadius: 12, overflow: 'hidden', marginBottom: 6, background: '#F3F4F6', position: 'relative' }}>
+                    {img ? <img src={img} alt={l.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>{l.emoji || '🎯'}</div>}
+                    <div style={{ position: 'absolute', top: 6, left: 6, background: '#D4732A', color: 'white', fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 5 }}>NEW</div>
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
+                  <div style={{ fontSize: 11, color: '#9CA3AF' }}>{l.type}</div>
+                </a>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Your week with the kids */}
       {!hasActiveFilters && currentPage === 1 && (() => {
         const todayKey = DAY_NAMES[new Date().getDay()]
@@ -847,29 +870,6 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         )
       })()}
 
-
-      {/* Just added near you */}
-      {!hasActiveFilters && recentListings.length > 0 && (
-        <div style={{ padding: '24px 0 8px' }}>
-          <div style={{ padding: '0 20px 10px', fontSize: 15, fontWeight: 800, color: '#D4732A' }}>✨ Just added near you</div>
-          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px', scrollbarWidth: 'none' }}>
-            {recentListings.map(l => {
-              const fullListing = listings.find(fl => fl.id === l.id)
-              const img = fullListing?.image || null
-              return (
-                <a key={l.id} href={`/listing/${l.slug}`} style={{ flexShrink: 0, width: 140, textDecoration: 'none', display: 'block' }}>
-                  <div style={{ height: 90, borderRadius: 12, overflow: 'hidden', marginBottom: 6, background: '#F3F4F6', position: 'relative' }}>
-                    {img ? <img src={img} alt={l.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>{l.emoji || '🎯'}</div>}
-                    <div style={{ position: 'absolute', top: 6, left: 6, background: '#D4732A', color: 'white', fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 5 }}>NEW</div>
-                  </div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
-                  <div style={{ fontSize: 11, color: '#9CA3AF' }}>{l.type}</div>
-                </a>
-              )
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Suggest an activity CTA */}
       <div style={{ margin: '24px 16px 0', background: '#FFF7ED', border: '2px dashed #D4732A', borderRadius: 18, padding: '20px 16px' }}>
