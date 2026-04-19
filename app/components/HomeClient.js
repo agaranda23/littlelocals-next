@@ -109,6 +109,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const [suggestLocation, setSuggestLocation] = useState('')
   const [suggestWebsite, setSuggestWebsite] = useState('')
   const [suggestNotes, setSuggestNotes] = useState('')
+  const [suggestImage, setSuggestImage] = useState('')
   const [suggestSubmitting, setSuggestSubmitting] = useState(false)
   const [suggestDone, setSuggestDone] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState(null)
@@ -906,6 +907,11 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
               <input value={suggestWebsite} onChange={e => setSuggestWebsite(e.target.value)} placeholder="https://..."
                 style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }} />
             </div>
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Image URL <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(optional — Instagram post, website photo etc)</span></div>
+              <input value={suggestImage} onChange={e => setSuggestImage(e.target.value)} placeholder="https://..."
+                style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }} />
+            </div>
             <div style={{ marginBottom: 14 }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Anything else? <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(optional)</span></div>
               <textarea value={suggestNotes} onChange={e => setSuggestNotes(e.target.value)} placeholder="Tell us more..." rows={2}
@@ -923,6 +929,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
                     location: suggestLocation.trim() || null,
                     website: suggestWebsite.trim() || null,
                     notes: suggestNotes.trim() || null,
+                    image_url: suggestImage.trim() || null,
                   }])
                   setSuggestDone(true)
                   setSuggestSubmitting(false)
