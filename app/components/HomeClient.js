@@ -294,6 +294,24 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       const priceB = (b.free || (b.price||'').toLowerCase().includes('free')) ? 0 : parseFloat((b.price||'').replace(/[^0-9.]/g,'')) || 999
       return priceA - priceB
     }
+    // Search relevance sort — when search is active, rank by match quality
+    if (search) {
+      const q = search.toLowerCase().trim()
+      const score = (l) => {
+        const name = (l.name || '').toLowerCase()
+        const type = (l.type || '').toLowerCase()
+        const category = (l.category || '').toLowerCase()
+        const desc = (l.description || '').toLowerCase()
+        if (name === q) return 100
+        if (name.startsWith(q)) return 90
+        if (name.includes(q)) return 80
+        if (type.includes(q) || category.includes(q)) return 60
+        if (desc.includes(q)) return 40
+        return 10
+      }
+      return score(b) - score(a)
+    }
+
     if (sortBy === 'startssoon') {
       const nowMins = new Date().getHours() * 60 + new Date().getMinutes()
       const getStartMins = (l) => {
