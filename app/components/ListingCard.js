@@ -208,7 +208,7 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
             </div>
           )}
         </div>
-        {(dayLabel || listing.time) && (
+        {!listing.temporarily_closed && (dayLabel || listing.time) && (
           <div style={{ fontSize: 13, fontWeight: 600, color: '#D4732A', marginBottom: 3 }}>
             📅 {dayLabel}{dayLabel && listing.time ? ' · ' : ''}{listing.time ? listing.time.split('–')[0].trim() : ''}
           </div>
