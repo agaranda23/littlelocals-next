@@ -33,7 +33,7 @@ export default async function HomePage() {
       .from('listings')
       .select('id, name, slug, type')
       .order('created_at', { ascending: false })
-      .limit(12),
+      .limit(16),
 
     supabase
       .from('reviews')
