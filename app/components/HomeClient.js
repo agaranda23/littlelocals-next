@@ -683,14 +683,13 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         const weekDays = ['mon','tue','wed','thu','fri','sat','sun']
         const todayIdx = weekDays.indexOf(todayKey)
         const orderedDays = [...weekDays.slice(todayIdx), ...weekDays.slice(0, todayIdx)].slice(0, 5)
+        const usedIds = new Set()
         const weekPicks = orderedDays.map(dayKey => {
-          const usedSlugs = orderedDays.slice(0, orderedDays.indexOf(dayKey)).map(dk => {
-            const p = listings.filter(l => l.image && (l.days_of_week || []).includes(dk))[0]
-            return p?.slug
-          }).filter(Boolean)
-          return listings.filter(l =>
-            l.image && !usedSlugs.includes(l.slug) && ((l.days_of_week || []).includes(dayKey) || l.is_daily)
-          )[0] || listings.filter(l => l.image && !usedSlugs.includes(l.slug))[0] || null
+          const pick = listings.filter(l =>
+            l.image && !usedIds.has(l.id) && ((l.days_of_week || []).includes(dayKey) || l.is_daily)
+          )[0] || listings.filter(l => l.image && !usedIds.has(l.id))[0] || null
+          if (pick) usedIds.add(pick.id)
+          return pick
         }).filter(Boolean)
         const savedThisWeek = weekPicks.filter(p => savedIds.has(p.id))
         const savedCount = savedThisWeek.length
