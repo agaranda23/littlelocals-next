@@ -244,6 +244,11 @@ export default function ListingCard({ listing, userLocation, recentViews = 0, is
                   {decisionBadge.icon} {decisionBadge.label}
                 </span>
               )}
+              {listing.worth_journey && (
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#92400E', background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 20, padding: '3px 10px' }}>
+                  🚗 Worth the trip
+                </span>
+              )}
               {showThree && !isFree && (
                 <span style={{ fontSize: 12, fontWeight: 600, color: '#065F46', background: '#D1FAE5', borderRadius: 20, padding: '3px 10px' }}>
                   💰 Free
