@@ -256,8 +256,8 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       return fuzzyMatch
     }
     if (freeOnly && !l.free && !(l.price||'').toLowerCase().includes('free')) return false
-    if (weatherMode === 'rainy' && !l.indoor) return false
-    if (weatherMode === 'sunny' && l.indoor) return false
+    if (weatherMode === 'rainy' && l.indoor === false) return false
+    if (weatherMode === 'sunny' && l.indoor === true) return false
     if (worthJourney && !l.worth_journey) return false
     if (nurseryFilter && (l.category||'').toLowerCase() !== 'nursery') return false
     if (softPlayFilter) {
@@ -280,8 +280,8 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const weekendCount = listings.filter(isOnWeekend).length
   const weekCount = listings.filter(isOnThisWeek).length
   const nurseryCount = listings.filter(l => (l.category||'').toLowerCase() === 'nursery').length
-  const outdoorCount = listings.filter(l => !l.indoor && l.indoor !== null).length
-  const indoorCount = listings.filter(l => l.indoor).length
+  const outdoorCount = listings.filter(l => l.indoor === false || l.indoor === null).length
+  const indoorCount = listings.filter(l => l.indoor === true || l.indoor === null).length
   const freeCount = listings.filter(l => l.free || (l.price||'').toLowerCase().includes('free')).length
   const adventureCount = listings.filter(l => l.worth_journey).length
   const softPlayCount = listings.filter(l => {
