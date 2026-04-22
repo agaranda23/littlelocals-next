@@ -569,7 +569,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   return (
     <>
     {showMap && <MapView listings={listings} onClose={() => { setShowMap(false); setActiveNav('home') }} />}
-    <div style={{ maxWidth: 600, margin: '0 auto', paddingBottom: 100, fontFamily: 'system-ui, sans-serif' }} onClick={() => { setShowAgeDropdown(false); setShowTypeDropdown(false) }}>
+    <div style={{ maxWidth: 600, margin: '0 auto', paddingBottom: 100, fontFamily: 'system-ui, sans-serif' }}>
 
       {/* Hero headline */}
       <div style={{ padding: '16px 20px 12px' }}>
@@ -624,7 +624,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       <div style={{ display: 'flex', gap: 8, padding: '0 16px 8px' }}>
         
         {/* All Ages dropdown */}
-        <div style={{ position: 'relative', flex: 1 }}>
+        <div style={{ position: 'relative', flex: 1 }} onClick={e => e.stopPropagation()}>
           <div
             onClick={() => { setShowAgeDropdown(v => !v); setShowTypeDropdown(false) }}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: ageFilter !== 'all' ? '#5B2D6E' : 'white', color: ageFilter !== 'all' ? 'white' : '#374151', border: ageFilter !== 'all' ? 'none' : '1px solid #E5E7EB', borderRadius: 20, padding: '7px 14px', fontSize: 13, fontWeight: ageFilter !== 'all' ? 700 : 500, cursor: 'pointer' }}
@@ -645,7 +645,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         </div>
 
         {/* All Types dropdown */}
-        <div style={{ position: 'relative', flex: 1 }}>
+        <div style={{ position: 'relative', flex: 1 }} onClick={e => e.stopPropagation()}>
           <div
             onClick={() => { setShowTypeDropdown(v => !v); setShowAgeDropdown(false) }}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: (weatherMode !== 'all' || freeOnly || worthJourney || nurseryFilter || softPlayFilter) ? '#D4732A' : 'white', color: (weatherMode !== 'all' || freeOnly || worthJourney || nurseryFilter || softPlayFilter) ? 'white' : '#374151', border: (weatherMode !== 'all' || freeOnly || worthJourney || nurseryFilter || softPlayFilter) ? 'none' : '1px solid #E5E7EB', borderRadius: 20, padding: '7px 14px', fontSize: 13, fontWeight: (weatherMode !== 'all' || freeOnly || worthJourney || nurseryFilter || softPlayFilter) ? 700 : 500, cursor: 'pointer' }}
