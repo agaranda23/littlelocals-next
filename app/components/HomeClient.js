@@ -678,7 +678,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
                 ['indoor', `🏠 Indoor (${indoorCount})`, () => { setWeatherMode('rainy'); setFreeOnly(false); setWorthJourney(false); setNurseryFilter(false); setSoftPlayFilter(false) }, weatherMode === 'rainy'],
                 ['outdoor', `🌳 Outdoor (${outdoorCount})`, () => { setWeatherMode('sunny'); setFreeOnly(false); setWorthJourney(false); setNurseryFilter(false); setSoftPlayFilter(false) }, weatherMode === 'sunny'],
                 ['free', `💰 Free (${freeCount})`, () => { setFreeOnly(true); setWorthJourney(false); setNurseryFilter(false); setSoftPlayFilter(false); setWeatherMode('all') }, freeOnly],
-                ['adventure', `🚗 Adventure (${adventureCount})`, () => { setWorthJourney(true); setFreeOnly(false); setNurseryFilter(false); setSoftPlayFilter(false); setWeatherMode('all') }, worthJourney],
+                ['adventure', `🚗 Worth the Trip (${adventureCount})`, () => { setWorthJourney(true); setFreeOnly(false); setNurseryFilter(false); setSoftPlayFilter(false); setWeatherMode('all') }, worthJourney],
               ].map(([key, label, action, active]) => (
                 <div key={key} onClick={() => { action(); setShowTypeDropdown(false) }}
                   style={{ padding: '10px 14px', fontSize: 13, fontWeight: active ? 700 : 500, color: active ? '#D4732A' : '#374151', background: active ? '#FFF7ED' : 'white', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }}>
