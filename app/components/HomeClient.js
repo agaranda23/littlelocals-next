@@ -326,6 +326,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
     if (sortBy === 'startssoon') {
       const nowMins = new Date().getHours() * 60 + new Date().getMinutes()
       const getStartMins = (l) => {
+        if (!isOnToday(l)) return 9999
         const m = parseStartMinutes(l.time)
         if (m === null) return 9999
         const diff = m - nowMins
