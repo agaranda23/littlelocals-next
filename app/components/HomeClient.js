@@ -656,13 +656,13 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
           {showTypeDropdown && (
             <div style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', zIndex: 100, overflow: 'hidden' }}>
               {[
-                ['all', '🎯 All Types', () => { setWeatherMode('all'); setFreeOnly(false); setWorthJourney(false); setNurseryFilter(false); setSoftPlayFilter(false) }, true],
-                ['softplay', `🛝 Soft Play (${softPlayCount})`, () => { setSoftPlayFilter(!softPlayFilter); setNurseryFilter(false) }, softPlayFilter],
-                ['nursery', `🧸 Nurseries (${nurseryCount})`, () => { setNurseryFilter(!nurseryFilter); setSoftPlayFilter(false) }, nurseryFilter],
-                ['indoor', `🏠 Indoor (${indoorCount})`, () => setWeatherMode(weatherMode === 'rainy' ? 'all' : 'rainy'), weatherMode === 'rainy'],
-                ['outdoor', `🌳 Outdoor (${outdoorCount})`, () => setWeatherMode(weatherMode === 'sunny' ? 'all' : 'sunny'), weatherMode === 'sunny'],
-                ['free', `💰 Free (${freeCount})`, () => setFreeOnly(!freeOnly), freeOnly],
-                ['adventure', `🚗 Adventure (${adventureCount})`, () => setWorthJourney(!worthJourney), worthJourney],
+                ['all', '🎯 All Types', () => { setWeatherMode('all'); setFreeOnly(false); setWorthJourney(false); setNurseryFilter(false); setSoftPlayFilter(false) }, !softPlayFilter && !nurseryFilter && weatherMode === 'all' && !freeOnly && !worthJourney],
+                ['softplay', `🛝 Soft Play (${softPlayCount})`, () => { setSoftPlayFilter(true); setNurseryFilter(false); setFreeOnly(false); setWorthJourney(false); setWeatherMode('all') }, softPlayFilter],
+                ['nursery', `🧸 Nurseries (${nurseryCount})`, () => { setNurseryFilter(true); setSoftPlayFilter(false); setFreeOnly(false); setWorthJourney(false); setWeatherMode('all') }, nurseryFilter],
+                ['indoor', `🏠 Indoor (${indoorCount})`, () => { setWeatherMode('rainy'); setFreeOnly(false); setWorthJourney(false); setNurseryFilter(false); setSoftPlayFilter(false) }, weatherMode === 'rainy'],
+                ['outdoor', `🌳 Outdoor (${outdoorCount})`, () => { setWeatherMode('sunny'); setFreeOnly(false); setWorthJourney(false); setNurseryFilter(false); setSoftPlayFilter(false) }, weatherMode === 'sunny'],
+                ['free', `💰 Free (${freeCount})`, () => { setFreeOnly(true); setWorthJourney(false); setNurseryFilter(false); setSoftPlayFilter(false); setWeatherMode('all') }, freeOnly],
+                ['adventure', `🚗 Adventure (${adventureCount})`, () => { setWorthJourney(true); setFreeOnly(false); setNurseryFilter(false); setSoftPlayFilter(false); setWeatherMode('all') }, worthJourney],
               ].map(([key, label, action, active]) => (
                 <div key={key} onClick={() => { action(); setShowTypeDropdown(false) }}
                   style={{ padding: '10px 14px', fontSize: 13, fontWeight: active ? 700 : 500, color: active ? '#D4732A' : '#374151', background: active ? '#FFF7ED' : 'white', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }}>
