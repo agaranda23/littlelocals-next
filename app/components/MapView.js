@@ -54,11 +54,12 @@ export default function MapView({ listings, onClose }) {
         attribution: '© OpenStreetMap'
       }).addTo(map)
       mapInstanceRef.current = map
-      updateMarkers(L, map, listings)
-      // Re-run with filtered after initial load
-      setTimeout(() => {
-        if (mapInstanceRef.current) updateMarkers(L, mapInstanceRef.current, listings.filter(l => l.lat && l.lng))
-      }, 100)
+      // Wait for map to be fully ready before adding markers
+      map.whenReady(() => {
+        setTimeout(() => {
+          updateMarkers(L, map, listings.filter(l => l.lat && l.lng))
+        }, 200)
+      })
     }
     document.head.appendChild(script)
   }, [])
