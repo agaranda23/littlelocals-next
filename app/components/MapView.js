@@ -55,6 +55,10 @@ export default function MapView({ listings, onClose }) {
       }).addTo(map)
       mapInstanceRef.current = map
       updateMarkers(L, map, listings)
+      // Re-run with filtered after initial load
+      setTimeout(() => {
+        if (mapInstanceRef.current) updateMarkers(L, mapInstanceRef.current, listings.filter(l => l.lat && l.lng))
+      }, 100)
     }
     document.head.appendChild(script)
   }, [])
@@ -62,7 +66,7 @@ export default function MapView({ listings, onClose }) {
   useEffect(() => {
     if (!mapInstanceRef.current || !window.L) return
     updateMarkers(window.L, mapInstanceRef.current, filtered)
-  }, [filtered.length, activeCategory, search])
+  }, [filtered.length, activeCategory, search, listings.length])
 
   function updateMarkers(L, map, listingsToShow) {
     markersRef.current.forEach(m => map.removeLayer(m))
