@@ -37,8 +37,9 @@ function getHeadline() {
 
 function getGreeting(weather) {
   const h = new Date().getHours()
-  if (h >= 5 && h < 12) return weather?.isRainy ? '🌧️ Rainy morning — easy indoor ideas below' : '🌤️ Good morning, Ealing parents'
-  if (h >= 12 && h < 18) return weather?.isRainy ? '🌧️ Rainy afternoon — indoor ideas below' : '👋 Afternoon, Ealing parents'
+  const emoji = weather?.emoji || (weather?.isRainy ? '🌧️' : '👋')
+  if (h >= 5 && h < 12) return weather?.isRainy ? `${emoji} Rainy morning — indoor ideas below` : `🌤️ Good morning, Ealing parents`
+  if (h >= 12 && h < 18) return weather?.isRainy ? `${emoji} Rainy afternoon — indoor ideas below` : `👋 Afternoon, Ealing parents`
   return '🌙 Planning ahead with the kids?'
 }
 
@@ -232,7 +233,21 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         const temp = Math.round(d.current_weather?.temperature || 0)
         const code = d.current_weather?.weathercode || 0
         const isRainy = code >= 51
-        setWeather({ temp, isRainy, desc: isRainy ? 'and rainy' : 'and sunny' })
+        const getWeatherEmoji = (c) => {
+          if (c === 0) return { emoji: '☀️', desc: 'and sunny' }
+          if (c <= 2) return { emoji: '🌤️', desc: 'and mostly sunny' }
+          if (c === 3) return { emoji: '☁️', desc: 'and cloudy' }
+          if (c <= 49) return { emoji: '🌫️', desc: 'and foggy' }
+          if (c <= 59) return { emoji: '🌦️', desc: 'and drizzly' }
+          if (c <= 69) return { emoji: '🌧️', desc: 'and rainy' }
+          if (c <= 79) return { emoji: '🌨️', desc: 'and snowy' }
+          if (c <= 82) return { emoji: '🌧️', desc: 'and showery' }
+          if (c <= 84) return { emoji: '🌨️', desc: 'and hail showers' }
+          if (c <= 94) return { emoji: '⛈️', desc: 'and stormy' }
+          return { emoji: '⛈️', desc: 'and thundery' }
+        }
+        const { emoji, desc } = getWeatherEmoji(code)
+        setWeather({ temp, isRainy, desc, emoji })
       }).catch(() => {})
   }, [])
 
@@ -693,7 +708,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
       {/* Greeting */}
       <div style={{ padding: '0 20px 4px', borderBottom: '1px solid #F3F4F6', marginBottom: 8 }}>
         <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 2 }}>{mounted ? getGreeting(weather) : '👋 Hello, Ealing parents'}</div>
-        {weather && <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>{weather.temp}°C {weather.desc}</div>}
+        {weather && <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>{weather.emoji} {weather.temp}°C {weather.desc}</div>}
         <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 8 }}>👀 {exploringCount} parents exploring LittleLocals today</div>
       </div>
 
