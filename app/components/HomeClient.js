@@ -89,6 +89,9 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const [weatherMode, setWeatherMode] = useState('all')
   const [worthJourney, setWorthJourney] = useState(false)
   const [nurseryFilter, setNurseryFilter] = useState(false)
+  const [softPlayFilter, setSoftPlayFilter] = useState(false)
+  const [showAgeDropdown, setShowAgeDropdown] = useState(false)
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false)
   const [sortBy, setSortBy] = useState('recommended')
   const [sessionSeed, setSessionSeed] = useState(1234567)
   useEffect(() => { setSessionSeed(Math.floor(Math.random() * 0x7fffffff)) }, [])
@@ -257,6 +260,10 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
     if (weatherMode === 'sunny' && l.indoor) return false
     if (worthJourney && !l.worth_journey) return false
     if (nurseryFilter && (l.category||'').toLowerCase() !== 'nursery') return false
+    if (softPlayFilter) {
+      const hay = [l.name, l.type, l.category, l.description].filter(Boolean).join(' ').toLowerCase()
+      if (!hay.includes('soft play')) return false
+    }
     if (ageFilter === 'baby' && (l.age_min||0) > 1) return false
     if (ageFilter === 'toddler' && ((l.age_min||0) > 3 || (l.age_max||99) < 1)) return false
     if (ageFilter === 'preschool' && ((l.age_min||0) > 5 || (l.age_max||99) < 3)) return false
@@ -277,6 +284,10 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const indoorCount = listings.filter(l => l.indoor).length
   const freeCount = listings.filter(l => l.free || (l.price||'').toLowerCase().includes('free')).length
   const adventureCount = listings.filter(l => l.worth_journey).length
+  const softPlayCount = listings.filter(l => {
+    const hay = [l.name, l.type, l.category, l.description].filter(Boolean).join(' ').toLowerCase()
+    return hay.includes('soft play')
+  }).length
 
   // Sort filtered results
   const sortedFiltered = [...filtered].sort((a, b) => {
@@ -558,7 +569,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   return (
     <>
     {showMap && <MapView listings={listings} onClose={() => { setShowMap(false); setActiveNav('home') }} />}
-    <div style={{ maxWidth: 600, margin: '0 auto', paddingBottom: 100, fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ maxWidth: 600, margin: '0 auto', paddingBottom: 100, fontFamily: 'system-ui, sans-serif' }} onClick={() => { setShowAgeDropdown(false); setShowTypeDropdown(false) }}>
 
       {/* Hero headline */}
       <div style={{ padding: '16px 20px 12px' }}>
@@ -602,13 +613,6 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         </div>
       )}
 
-      {/* Age chips */}
-      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 16px 8px', scrollbarWidth: 'none' }}>
-        {[['baby','👶 Baby 0–12m'],['toddler','🧒 Toddler 1–3'],['preschool','👦 Preschool 3–5'],['kids','🎒 Kids 5+']].map(([key, label]) => (
-          <span key={key} onClick={() => setAgeFilter(ageFilter === key ? 'all' : key)} style={chipStyle(ageFilter === key, '#5B2D6E')}>{label}</span>
-        ))}
-      </div>
-
       {/* Day tabs */}
       <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 16px 8px', scrollbarWidth: 'none' }}>
         {[['today','Today',todayCount],['tomorrow','Tomorrow',tomorrowCount],['weekend','Weekend',weekendCount],['week','Week',weekCount]].map(([key, label, count]) => (
@@ -616,19 +620,58 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         ))}
       </div>
 
+      {/* Age + Type dropdowns */}
+      <div style={{ display: 'flex', gap: 8, padding: '0 16px 8px' }}>
+        
+        {/* All Ages dropdown */}
+        <div style={{ position: 'relative', flex: 1 }}>
+          <div
+            onClick={() => { setShowAgeDropdown(v => !v); setShowTypeDropdown(false) }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: ageFilter !== 'all' ? '#5B2D6E' : 'white', color: ageFilter !== 'all' ? 'white' : '#374151', border: ageFilter !== 'all' ? 'none' : '1px solid #E5E7EB', borderRadius: 20, padding: '7px 14px', fontSize: 13, fontWeight: ageFilter !== 'all' ? 700 : 500, cursor: 'pointer' }}
+          >
+            <span>{ageFilter === 'all' ? '👶 All Ages' : ageFilter === 'baby' ? '👶 Baby 0–12m' : ageFilter === 'toddler' ? '🧒 Toddler 1–3' : ageFilter === 'preschool' ? '👦 Preschool 3–5' : '🎒 Kids 5+'}</span>
+            <span style={{ marginLeft: 6, fontSize: 10 }}>▾</span>
+          </div>
+          {showAgeDropdown && (
+            <div style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', zIndex: 100, overflow: 'hidden' }}>
+              {[['all','All Ages'],['baby','👶 Baby 0–12m'],['toddler','🧒 Toddler 1–3'],['preschool','👦 Preschool 3–5'],['kids','🎒 Kids 5+']].map(([key, label]) => (
+                <div key={key} onClick={() => { setAgeFilter(key); setShowAgeDropdown(false) }}
+                  style={{ padding: '10px 14px', fontSize: 13, fontWeight: ageFilter === key ? 700 : 500, color: ageFilter === key ? '#5B2D6E' : '#374151', background: ageFilter === key ? '#F3E8FF' : 'white', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }}>
+                  {label}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-
-      {/* Filter chips */}
-      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 16px 8px', scrollbarWidth: 'none' }}>
-        {[
-          ['Outdoor', weatherMode === 'sunny', () => setWeatherMode(weatherMode === 'sunny' ? 'all' : 'sunny'), outdoorCount],
-          ['Indoor', weatherMode === 'rainy', () => setWeatherMode(weatherMode === 'rainy' ? 'all' : 'rainy'), indoorCount],
-          ['Free', freeOnly, () => setFreeOnly(!freeOnly), freeCount],
-          ['Adventure', worthJourney, () => setWorthJourney(!worthJourney), adventureCount],
-          ['Nurseries', nurseryFilter, () => setNurseryFilter(!nurseryFilter), nurseryCount],
-        ].map(([label, active, action, count]) => (
-          <span key={label} onClick={action} style={chipStyle(active)}>{label} {count}</span>
-        ))}
+        {/* All Types dropdown */}
+        <div style={{ position: 'relative', flex: 1 }}>
+          <div
+            onClick={() => { setShowTypeDropdown(v => !v); setShowAgeDropdown(false) }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: (weatherMode !== 'all' || freeOnly || worthJourney || nurseryFilter || softPlayFilter) ? '#D4732A' : 'white', color: (weatherMode !== 'all' || freeOnly || worthJourney || nurseryFilter || softPlayFilter) ? 'white' : '#374151', border: (weatherMode !== 'all' || freeOnly || worthJourney || nurseryFilter || softPlayFilter) ? 'none' : '1px solid #E5E7EB', borderRadius: 20, padding: '7px 14px', fontSize: 13, fontWeight: (weatherMode !== 'all' || freeOnly || worthJourney || nurseryFilter || softPlayFilter) ? 700 : 500, cursor: 'pointer' }}
+          >
+            <span>{softPlayFilter ? '🛝 Soft Play' : nurseryFilter ? '🧸 Nurseries' : freeOnly ? '💰 Free' : worthJourney ? '🚗 Adventure' : weatherMode === 'sunny' ? '🌳 Outdoor' : weatherMode === 'rainy' ? '🏠 Indoor' : '🎯 All Types'}</span>
+            <span style={{ marginLeft: 6, fontSize: 10 }}>▾</span>
+          </div>
+          {showTypeDropdown && (
+            <div style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', zIndex: 100, overflow: 'hidden' }}>
+              {[
+                ['all', '🎯 All Types', () => { setWeatherMode('all'); setFreeOnly(false); setWorthJourney(false); setNurseryFilter(false); setSoftPlayFilter(false) }, true],
+                ['softplay', `🛝 Soft Play (${softPlayCount})`, () => { setSoftPlayFilter(!softPlayFilter); setNurseryFilter(false) }, softPlayFilter],
+                ['nursery', `🧸 Nurseries (${nurseryCount})`, () => { setNurseryFilter(!nurseryFilter); setSoftPlayFilter(false) }, nurseryFilter],
+                ['indoor', `🏠 Indoor (${indoorCount})`, () => setWeatherMode(weatherMode === 'rainy' ? 'all' : 'rainy'), weatherMode === 'rainy'],
+                ['outdoor', `🌳 Outdoor (${outdoorCount})`, () => setWeatherMode(weatherMode === 'sunny' ? 'all' : 'sunny'), weatherMode === 'sunny'],
+                ['free', `💰 Free (${freeCount})`, () => setFreeOnly(!freeOnly), freeOnly],
+                ['adventure', `🚗 Adventure (${adventureCount})`, () => setWorthJourney(!worthJourney), worthJourney],
+              ].map(([key, label, action, active]) => (
+                <div key={key} onClick={() => { action(); setShowTypeDropdown(false) }}
+                  style={{ padding: '10px 14px', fontSize: 13, fontWeight: active ? 700 : 500, color: active ? '#D4732A' : '#374151', background: active ? '#FFF7ED' : 'white', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }}>
+                  {label}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Count + clear + sort */}
