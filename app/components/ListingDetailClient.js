@@ -264,6 +264,13 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           </div>
         )}
 
+        {/* Worth the journey badge */}
+        {listing.worth_journey && (
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 20, padding: '6px 14px', marginBottom: 12, fontSize: 13, fontWeight: 700, color: '#92400E' }}>
+            🚗 Worth the trip
+          </div>
+        )}
+
         {/* Local favourite badge */}
         {listing.is_local_favourite && (
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: 20, padding: '6px 14px', marginBottom: 12, fontSize: 13, fontWeight: 700, color: '#92400E' }}>
