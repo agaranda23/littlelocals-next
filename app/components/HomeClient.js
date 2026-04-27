@@ -651,11 +651,29 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         </div>
       )}
 
-      {/* Day tabs */}
-      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 16px 8px', scrollbarWidth: 'none' }}>
-        {[['today','Today',todayCount],['tomorrow','Tomorrow',tomorrowCount],['weekend','Weekend',weekendCount],['week','Week',weekCount]].map(([key, label, count]) => (
-          <span key={key} onClick={() => setDayFilter(key)} style={dayChipStyle(dayFilter === key)}>{label} {count}</span>
-        ))}
+      {/* Day tabs — number cards */}
+      <div style={{ display: 'flex', gap: 8, padding: '0 16px 12px' }}>
+        {[['today','Today',todayCount],['tomorrow','Tomorrow',tomorrowCount],['weekend','Weekend',weekendCount],['week','Week',weekCount]].map(([key, label, count]) => {
+          const active = dayFilter === key
+          return (
+            <div key={key} onClick={() => setDayFilter(key)}
+              style={{
+                flex: 1,
+                cursor: 'pointer',
+                background: active ? '#D4732A' : 'white',
+                color: active ? 'white' : '#111827',
+                border: active ? 'none' : '1px solid #E5E7EB',
+                borderRadius: 14,
+                padding: '10px 6px',
+                textAlign: 'center',
+                transition: 'all 0.15s',
+                boxShadow: active ? '0 2px 8px rgba(212, 115, 42, 0.25)' : 'none'
+              }}>
+              <div style={{ fontSize: 22, fontWeight: 900, lineHeight: 1, letterSpacing: '-0.5px' }}>{count}</div>
+              <div style={{ fontSize: 11, fontWeight: 600, marginTop: 4, opacity: active ? 0.95 : 0.7, textTransform: 'uppercase', letterSpacing: '0.3px' }}>{label}</div>
+            </div>
+          )
+        })}
       </div>
 
       {/* Count + clear + sort */}
