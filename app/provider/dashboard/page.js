@@ -35,8 +35,19 @@ export default function ProviderDashboard() {
   const [viewCounts, setViewCounts] = useState({})
 
   useEffect(() => {
+    async function getSessionWithRetry() {
+      // Try up to 5 times over ~2.5s — handles the race where session
+      // is still being hydrated from URL after a magic-link redirect.
+      for (let i = 0; i < 5; i++) {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) return session
+        await new Promise(r => setTimeout(r, 500))
+      }
+      return null
+    }
+
     async function load() {
-      const { data: { session } } = await supabase.auth.getSession()
+      const session = await getSessionWithRetry()
       if (!session) { window.location.href = '/provider/login'; return }
       setUser(session.user)
 

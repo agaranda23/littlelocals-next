@@ -20,10 +20,14 @@ export default function AuthRedirectHandler() {
 
     async function handleAuth() {
       try {
-        // Supabase auto-detects and exchanges the token from URL on init.
-        // We just wait a beat and check the session.
-        await new Promise(r => setTimeout(r, 300))
-        const { data: { session } } = await supabase.auth.getSession()
+        // Try up to 6 times over ~3s for Supabase to detect & exchange
+        // the token from the URL hash and persist the session.
+        let session = null
+        for (let i = 0; i < 6; i++) {
+          const { data } = await supabase.auth.getSession()
+          if (data?.session) { session = data.session; break }
+          await new Promise(r => setTimeout(r, 500))
+        }
 
         if (session) {
           // Clean the URL (remove the auth hash/query) before redirecting
@@ -40,7 +44,17 @@ export default function AuthRedirectHandler() {
       }
     }
 
+    // Also listen for SIGNED_IN events as a backup signal.
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session && !window.location.pathname.startsWith('/provider/dashboard')) {
+        window.history.replaceState({}, '', window.location.pathname)
+        window.location.href = '/provider/dashboard'
+      }
+    })
+
     handleAuth()
+
+    return () => { sub?.subscription?.unsubscribe?.() }
   }, [])
 
   return null
