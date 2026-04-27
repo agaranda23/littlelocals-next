@@ -360,7 +360,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
     return seed(a.id || 0) - seed(b.id || 0)
   })
 
-  const hasActiveFilters = freeOnly || weatherMode !== 'all' || worthJourney || nurseryFilter || ageFilter !== 'all' || search
+  const hasActiveFilters = freeOnly || weatherMode !== 'all' || worthJourney || nurseryFilter || softPlayFilter || ageFilter !== 'all' || search
 
   const clearAll = () => {
     setCurrentPage(1)
@@ -640,7 +640,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
           </div>
           <div style={{ fontSize: 13, fontWeight: 700, color: '#6B7280', marginBottom: 10 }}>MORE</div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-            {[['Free', freeOnly, () => setFreeOnly(!freeOnly)], ['Adventure', worthJourney, () => setWorthJourney(!worthJourney)], ['Nurseries', nurseryFilter, () => setNurseryFilter(!nurseryFilter)]].map(([label, active, action]) => (
+            {[['Free', freeOnly, () => setFreeOnly(!freeOnly)], ['Adventure', worthJourney, () => setWorthJourney(!worthJourney)], ['Nurseries', nurseryFilter, () => setNurseryFilter(!nurseryFilter)], ['Soft Play', softPlayFilter, () => setSoftPlayFilter(!softPlayFilter)]].map(([label, active, action]) => (
               <span key={label} onClick={action} style={{ fontSize: 13, fontWeight: active ? 700 : 500, padding: '6px 14px', borderRadius: 20, cursor: 'pointer', background: active ? '#D4732A' : '#F3F4F6', color: active ? 'white' : '#374151' }}>{label}</span>
             ))}
           </div>
@@ -653,60 +653,6 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         {[['today','Today',todayCount],['tomorrow','Tomorrow',tomorrowCount],['weekend','Weekend',weekendCount],['week','Week',weekCount]].map(([key, label, count]) => (
           <span key={key} onClick={() => setDayFilter(key)} style={dayChipStyle(dayFilter === key)}>{label} {count}</span>
         ))}
-      </div>
-
-      {/* Age + Type dropdowns */}
-      <div style={{ display: 'flex', gap: 8, padding: '0 16px 8px' }}>
-        
-        {/* All Ages dropdown */}
-        <div style={{ position: 'relative', flex: 1 }} onClick={e => e.stopPropagation()}>
-          <div
-            onClick={() => { setShowAgeDropdown(v => !v); setShowTypeDropdown(false) }}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: ageFilter !== 'all' ? '#F3E8FF' : 'white', color: ageFilter !== 'all' ? '#5B2D6E' : '#374151', border: ageFilter !== 'all' ? '1px solid #5B2D6E' : '1px solid #E5E7EB', borderRadius: 20, padding: '7px 14px', fontSize: 13, fontWeight: ageFilter !== 'all' ? 700 : 500, cursor: 'pointer' }}
-          >
-            <span>{ageFilter === 'all' ? '👶 All Ages' : ageFilter === 'baby' ? '👶 Baby 0–12m' : ageFilter === 'toddler' ? '🧒 Toddler 1–3' : ageFilter === 'preschool' ? '👦 Preschool 3–5' : '🎒 Kids 5+'}</span>
-            <span style={{ marginLeft: 6, fontSize: 10 }}>▾</span>
-          </div>
-          {showAgeDropdown && (
-            <div style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', zIndex: 100, overflow: 'hidden' }}>
-              {[['all','All Ages'],['baby','👶 Baby 0–12m'],['toddler','🧒 Toddler 1–3'],['preschool','👦 Preschool 3–5'],['kids','🎒 Kids 5+']].map(([key, label]) => (
-                <div key={key} onClick={() => { setAgeFilter(key); setShowAgeDropdown(false) }}
-                  style={{ padding: '10px 14px', fontSize: 13, fontWeight: ageFilter === key ? 700 : 500, color: ageFilter === key ? '#5B2D6E' : '#374151', background: ageFilter === key ? '#F3E8FF' : 'white', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }}>
-                  {label}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* All Types dropdown */}
-        <div style={{ position: 'relative', flex: 1 }} onClick={e => e.stopPropagation()}>
-          <div
-            onClick={() => { setShowTypeDropdown(v => !v); setShowAgeDropdown(false) }}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: (weatherMode !== 'all' || freeOnly || worthJourney || nurseryFilter || softPlayFilter) ? '#D4732A' : 'white', color: (weatherMode !== 'all' || freeOnly || worthJourney || nurseryFilter || softPlayFilter) ? 'white' : '#374151', border: (weatherMode !== 'all' || freeOnly || worthJourney || nurseryFilter || softPlayFilter) ? 'none' : '1px solid #E5E7EB', borderRadius: 20, padding: '7px 14px', fontSize: 13, fontWeight: (weatherMode !== 'all' || freeOnly || worthJourney || nurseryFilter || softPlayFilter) ? 700 : 500, cursor: 'pointer' }}
-          >
-            <span>{softPlayFilter ? '🛝 Soft Play' : nurseryFilter ? '🧸 Nurseries' : freeOnly ? '💰 Free' : worthJourney ? '🚗 Adventure' : weatherMode === 'sunny' ? '🌳 Outdoor' : weatherMode === 'rainy' ? '🏠 Indoor' : '🎯 All Types'}</span>
-            <span style={{ marginLeft: 6, fontSize: 10 }}>▾</span>
-          </div>
-          {showTypeDropdown && (
-            <div style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', zIndex: 100, overflow: 'hidden' }}>
-              {[
-                ['all', '🎯 All Types', () => { setWeatherMode('all'); setFreeOnly(false); setWorthJourney(false); setNurseryFilter(false); setSoftPlayFilter(false) }, !softPlayFilter && !nurseryFilter && weatherMode === 'all' && !freeOnly && !worthJourney],
-                ['softplay', `🛝 Soft Play (${softPlayCount})`, () => { setSoftPlayFilter(true); setNurseryFilter(false); setFreeOnly(false); setWorthJourney(false); setWeatherMode('all') }, softPlayFilter],
-                ['nursery', `🧸 Nurseries (${nurseryCount})`, () => { setNurseryFilter(true); setSoftPlayFilter(false); setFreeOnly(false); setWorthJourney(false); setWeatherMode('all') }, nurseryFilter],
-                ['indoor', `🏠 Indoor (${indoorCount})`, () => { setWeatherMode('rainy'); setFreeOnly(false); setWorthJourney(false); setNurseryFilter(false); setSoftPlayFilter(false) }, weatherMode === 'rainy'],
-                ['outdoor', `🌳 Outdoor (${outdoorCount})`, () => { setWeatherMode('sunny'); setFreeOnly(false); setWorthJourney(false); setNurseryFilter(false); setSoftPlayFilter(false) }, weatherMode === 'sunny'],
-                ['free', `💰 Free (${freeCount})`, () => { setFreeOnly(true); setWorthJourney(false); setNurseryFilter(false); setSoftPlayFilter(false); setWeatherMode('all') }, freeOnly],
-                ['adventure', `🚗 Worth the Trip (${adventureCount})`, () => { setWorthJourney(true); setFreeOnly(false); setNurseryFilter(false); setSoftPlayFilter(false); setWeatherMode('all') }, worthJourney],
-              ].map(([key, label, action, active]) => (
-                <div key={key} onClick={() => { action(); setShowTypeDropdown(false) }}
-                  style={{ padding: '10px 14px', fontSize: 13, fontWeight: active ? 700 : 500, color: active ? '#D4732A' : '#374151', background: active ? '#FFF7ED' : 'white', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }}>
-                  {label}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Count + clear + sort */}
