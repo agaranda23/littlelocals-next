@@ -1,4 +1,5 @@
 import './globals.css'
+import AuthRedirectHandler from './components/AuthRedirectHandler'
 import Script from 'next/script'
 
 export const metadata = {
@@ -47,6 +48,7 @@ export default function RootLayout({ children }) {
         ` }} />
       </head>
       <body style={{ margin: 0, background: '#F9FAFB', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+        <AuthRedirectHandler />
         {children}
       </body>
     </html>
