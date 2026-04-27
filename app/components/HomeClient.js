@@ -37,10 +37,11 @@ function getHeadline() {
 
 function getGreeting(weather) {
   const h = new Date().getHours()
-  const emoji = weather?.emoji || (weather?.isRainy ? '🌧️' : '👋')
-  if (h >= 5 && h < 12) return weather?.isRainy ? `${emoji} Rainy morning — indoor ideas below` : `🌤️ Good morning, Ealing parents`
-  if (h >= 12 && h < 18) return weather?.isRainy ? `${emoji} Rainy afternoon — indoor ideas below` : `👋 Afternoon, Ealing parents`
-  return '🌙 Planning ahead with the kids?'
+  const day = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()]
+  if (h >= 5 && h < 12) return '🌅 ' + day + ' morning in Ealing'
+  if (h >= 12 && h < 17) return '☀️ ' + day + ' afternoon in Ealing'
+  if (h >= 17 && h < 21) return '🌆 ' + day + ' evening in Ealing'
+  return '🌙 ' + day + ' night in Ealing'
 }
 
 function parseStartMinutes(timeStr) {
@@ -587,6 +588,24 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
     {showMap && <MapView listings={listings} onClose={() => { setShowMap(false); setActiveNav('home') }} />}
     <div style={{ maxWidth: 600, margin: '0 auto', paddingBottom: 100, fontFamily: 'system-ui, sans-serif' }}>
 
+      {/* Atmosphere strip — live local context */}
+      <div style={{
+        padding: '10px 20px',
+        background: '#F9FAFB',
+        borderBottom: '1px solid #F3F4F6',
+        fontSize: 13,
+        color: '#6B7280',
+        display: 'flex',
+        flexWrap: 'wrap',
+        columnGap: 14,
+        rowGap: 4,
+        alignItems: 'center'
+      }}>
+        <span style={{ fontWeight: 600, color: '#374151' }}>{mounted ? getGreeting(weather) : '👋 Hello, Ealing parents'}</span>
+        {weather && <span>{weather.emoji} {weather.temp}°C {weather.desc}</span>}
+        <span>👀 {exploringCount} exploring</span>
+      </div>
+
       {/* Hero headline */}
       <div style={{ padding: '16px 20px 12px' }}>
         <h1 style={{ fontSize: 28, fontWeight: 900, color: '#111827', margin: '0 0 4px', lineHeight: 1.2 }}>{mounted ? getHeadline() : 'What shall we do today?'}</h1>
@@ -705,12 +724,6 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         </div>
       </div>
 
-      {/* Greeting */}
-      <div style={{ padding: '0 20px 4px', borderBottom: '1px solid #F3F4F6', marginBottom: 8 }}>
-        <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 2 }}>{mounted ? getGreeting(weather) : '👋 Hello, Ealing parents'}</div>
-        {weather && <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>{weather.emoji} {weather.temp}°C {weather.desc}</div>}
-        <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 8 }}>👀 {exploringCount} parents exploring LittleLocals today</div>
-      </div>
 
 
       {/* Just added near you */}
