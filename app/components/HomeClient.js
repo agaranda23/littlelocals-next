@@ -619,7 +619,10 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search activities..." style={{ border: 'none', outline: 'none', flex: 1, fontSize: 15, color: '#111827', background: 'transparent' }} />
         </div>
         <button onClick={() => setShowFilters(f => !f)} style={{ background: showFilters ? '#5B2D6E' : 'white', border: showFilters ? 'none' : '1px solid #E5E7EB', borderRadius: 14, padding: '10px 16px', fontSize: 14, fontWeight: 700, color: showFilters ? 'white' : '#111827', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
-          ≡ Filters
+          ≡ Filters{(() => {
+            const n = (ageFilter !== 'all' ? 1 : 0) + (weatherMode !== 'all' ? 1 : 0) + (freeOnly ? 1 : 0) + (worthJourney ? 1 : 0) + (nurseryFilter ? 1 : 0) + (softPlayFilter ? 1 : 0);
+            return n > 0 ? ' · ' + n : '';
+          })()}
         </button>
       </div>
 
