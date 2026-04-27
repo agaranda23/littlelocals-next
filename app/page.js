@@ -26,8 +26,9 @@ export default async function HomePage() {
       .limit(400),
     supabase
       .from('listings')
-      .select('id, name, slug, type, price, free, verified, logo, is_local_favourite, local_favourite_subtitle, littlelocals_offer_text')
+      .select('id, name, slug, type, price, free, verified, logo, is_local_favourite, local_favourite_subtitle, littlelocals_offer_text, local_favourite_set_at')
       .eq('is_local_favourite', true)
+      .gte('local_favourite_set_at', new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString())
       .limit(1),
     supabase
       .from('listings')
