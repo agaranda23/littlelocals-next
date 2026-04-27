@@ -378,9 +378,9 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const dayChipStyle = (active) => ({
     flexShrink: 0, fontSize: 13, fontWeight: active ? 700 : 500,
     padding: '6px 14px', borderRadius: 20, cursor: 'pointer', whiteSpace: 'nowrap',
-    background: active ? '#D4732A' : 'white',
-    color: active ? 'white' : '#6B7280',
-    border: active ? 'none' : '1px solid #E5E7EB',
+    background: active ? '#FFF7ED' : 'white',
+    color: active ? '#D4732A' : '#6B7280',
+    border: active ? '1px solid #D4732A' : '1px solid #E5E7EB',
   })
 
   function handleAllowLocation() {
@@ -643,7 +643,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         <div style={{ position: 'relative', flex: 1 }} onClick={e => e.stopPropagation()}>
           <div
             onClick={() => { setShowAgeDropdown(v => !v); setShowTypeDropdown(false) }}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: ageFilter !== 'all' ? '#5B2D6E' : 'white', color: ageFilter !== 'all' ? 'white' : '#374151', border: ageFilter !== 'all' ? 'none' : '1px solid #E5E7EB', borderRadius: 20, padding: '7px 14px', fontSize: 13, fontWeight: ageFilter !== 'all' ? 700 : 500, cursor: 'pointer' }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: ageFilter !== 'all' ? '#F3E8FF' : 'white', color: ageFilter !== 'all' ? '#5B2D6E' : '#374151', border: ageFilter !== 'all' ? '1px solid #5B2D6E' : '1px solid #E5E7EB', borderRadius: 20, padding: '7px 14px', fontSize: 13, fontWeight: ageFilter !== 'all' ? 700 : 500, cursor: 'pointer' }}
           >
             <span>{ageFilter === 'all' ? '👶 All Ages' : ageFilter === 'baby' ? '👶 Baby 0–12m' : ageFilter === 'toddler' ? '🧒 Toddler 1–3' : ageFilter === 'preschool' ? '👦 Preschool 3–5' : '🎒 Kids 5+'}</span>
             <span style={{ marginLeft: 6, fontSize: 10 }}>▾</span>
