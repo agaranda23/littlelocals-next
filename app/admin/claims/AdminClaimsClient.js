@@ -29,7 +29,8 @@ export default function AdminClaimsClient({ claims: initial, pwd }) {
           body: JSON.stringify({
             email: claim.email,
             name: claim.name,
-            listingName: claim.listings?.name || 'your listing'
+            listingName: claim.listings?.name || 'your listing',
+            listingId: claim.listing_id
           })
         })
       }
