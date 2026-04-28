@@ -357,7 +357,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: '#111827', marginBottom: 10 }}>🎥 Videos</div>
             <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
-              {images.filter(img => img.url?.endsWith('.mp4')).map((img, i) => (
+              {images.filter(img => img.url?.endsWith'.mp4')).map((img, i) => (
                 <div key={i} onClick={() => setLightbox(images.indexOf(img))} style={{ flexShrink: 0, width: 140, height: 105, borderRadius: 10, overflow: 'hidden', background: '#000', cursor: 'pointer', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <video src={img.url} muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <div style={{ position: 'absolute', background: 'rgba(0,0,0,0.5)', borderRadius: '50%', width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -575,7 +575,20 @@ export default function ListingDetailClient({ listing, images, relatedListings }
 
       </div>
 
-      {/* Reviews */}
+            {/* Follow us on Social Media */}
+      <div style={{ textAlign: 'center', padding: '16px 16px', marginBottom: 8 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#6B7280', marginBottom: 12 }}>Follow LITTLElocals</div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
+          <a href="https://www.instagram.com/littlelocalsuk" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', color: 'white', padding: '10px 20px', borderRadius: 20, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+            📸 Instagram
+          </a>
+          <a href="https://www.facebook.com/share/1Au74Jrkm4/" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#1877F2', color: 'white', padding: '10px 20px', borderRadius: 20, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+            👍 Facebook
+          </a>
+        </div>
+      </div>
+
+{/* Reviews */}
       <div id="reviews" style={{ margin: '0 16px 24px', fontFamily: 'sans-serif' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
