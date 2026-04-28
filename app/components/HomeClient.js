@@ -980,6 +980,14 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
           <span style={{ fontSize: 20, fontWeight: 900, color: '#111827', letterSpacing: -0.5 }}>LITTLE<span style={{ color: '#D4732A' }}>locals</span></span>
         </div>
         <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 12 }}>Built by parents, for parents.</div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 16 }}>
+          <a href="https://www.instagram.com/littlelocalsuk" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', color: 'white', padding: '8px 18px', borderRadius: 20, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+            📸 Instagram
+          </a>
+          <a href="https://www.facebook.com/share/1Au74Jrkm4/" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#1877F2', color: 'white', padding: '8px 18px', borderRadius: 20, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+            👍 Facebook
+          </a>
+        </div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 12 }}>
           {[['Privacy Policy','/privacy'],['Cookie Policy','/cookies'],['Terms of Service','/terms'],['Contact','mailto:hello@littlelocals.uk']].map(([label, href]) => (
             <a key={label} href={href} style={{ fontSize: 11, color: '#9CA3AF', textDecoration: 'underline' }}>{label}</a>
