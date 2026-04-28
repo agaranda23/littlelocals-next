@@ -19,7 +19,7 @@ export default function ProviderLogin() {
     setError('')
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
-      options: { emailRedirectTo: 'https://littlelocals.uk/provider/dashboard' }
+      options: { emailRedirectTo: 'https://littlelocals.uk/provider/auth?next=/provider/dashboard' }
     })
     if (error) { setError(error.message); setLoading(false) }
     else { setSent(true); setLoading(false) }

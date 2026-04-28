@@ -71,15 +71,19 @@ exports.handler = async (event) => {
       if (linkInsertErr) throw new Error('Listing link failed: ' + linkInsertErr.message);
     }
 
-    // 4. Generate a real magic link via admin API. Lasts 24h (Supabase OTP expiry setting).
+    // 4. Generate a real magic link via admin API.
+    // We use the hashed_token (not action_link) so we can build our own URL
+    // that calls verifyOtp client-side. This avoids the PKCE/implicit flow
+    // mismatch that breaks the default action_link redirect.
     const { data: linkData, error: linkErr } = await supabase.auth.admin.generateLink({
       type: 'magiclink',
       email,
       options: { redirectTo: 'https://littlelocals.uk/provider/dashboard' }
     });
     if (linkErr) throw new Error('Generate link failed: ' + linkErr.message);
-    const magicLink = linkData?.properties?.action_link;
-    if (!magicLink) throw new Error('No magic link returned');
+    const hashedToken = linkData?.properties?.hashed_token;
+    if (!hashedToken) throw new Error('No hashed token returned');
+    const magicLink = `https://littlelocals.uk/provider/auth?token=${hashedToken}&type=magiclink&next=/provider/dashboard`;
 
     // 5. Email the link via Resend.
     const resend = new Resend(process.env.RESEND_API_KEY);
