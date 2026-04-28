@@ -1,4 +1,4 @@
-xport const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic'
 import { createClient } from '@supabase/supabase-js'
 import Header from './components/Header'
 import HomeClient from './components/HomeClient'
