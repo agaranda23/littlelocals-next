@@ -700,7 +700,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
           <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px', scrollbarWidth: 'none' }}>
             {recentListings.map(l => {
               const fullListing = listings.find(fl => fl.id === l.id)
-              const img = fullListing?.image || null
+              const img = l.primary_image || fullListing?.image || null
               return (
                 <a key={l.id} href={`/listing/${l.slug}`} style={{ flexShrink: 0, width: 140, textDecoration: 'none', display: 'block' }}>
                   <div style={{ height: 90, borderRadius: 12, overflow: 'hidden', marginBottom: 6, background: '#F3F4F6', position: 'relative' }}>

@@ -33,7 +33,7 @@ export default async function HomePage() {
             .limit(1),
           supabase
             .from('listings')
-            .select('id, name, slug, type')
+            .select('id, name, slug, type, primary_image, emoji')
             .order('created_at', { ascending: false })
             .limit(16),
 
