@@ -144,9 +144,27 @@ export default function EditListing({ params }) {
     setSaving(true)
     setSaved(false)
     setError('')
+
+    // Sanitise: empty strings -> null, coerce known types
+    const boolFields = ['is_paused']
+    const intFields = ['age_min', 'age_max']
+    const payload = {}
+    for (const [k, v] of Object.entries(form)) {
+      if (v === '' || v === undefined) {
+        payload[k] = null
+      } else if (boolFields.includes(k)) {
+        payload[k] = v === true || v === 'true'
+      } else if (intFields.includes(k)) {
+        const n = parseInt(v, 10)
+        payload[k] = isNaN(n) ? null : n
+      } else {
+        payload[k] = v
+      }
+    }
+
     const { error } = await supabase
       .from('listings')
-      .update(form)
+      .update(payload)
       .eq('id', parseInt(listingId))
     if (error) { setError(error.message) }
     else { setSaved(true) }
