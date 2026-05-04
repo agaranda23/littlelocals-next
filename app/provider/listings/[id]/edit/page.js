@@ -19,7 +19,7 @@ export default function EditListing({ params }) {
     description: '',
     price: '',
     website: '',
-    free_trial: '',
+    free_trial_info: '',
     whatsapp_group_url: '',
     instagram: '',
   })
@@ -82,7 +82,7 @@ export default function EditListing({ params }) {
           description: l.description || '',
           price: l.price || '',
           website: l.website || '',
-          free_trial: l.free_trial || '',
+          free_trial_info: l.free_trial_info || '',
           whatsapp_group_url: l.whatsapp_group_url || '',
           instagram: l.instagram || '',
           is_paused: l.is_paused || false,
@@ -161,6 +161,9 @@ export default function EditListing({ params }) {
         payload[k] = v
       }
     }
+
+    // Derive boolean free_trial from text field
+    payload.free_trial = !!(payload.free_trial_info && payload.free_trial_info.trim())
 
     const { error } = await supabase
       .from('listings')
