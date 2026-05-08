@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic'
 import { createClient } from '@supabase/supabase-js'
 import Header from './components/Header'
 import HomeClient from './components/HomeClient'
-import IntroVideo from './components/IntroVideo'
 
 const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -74,7 +73,6 @@ export default async function HomePage() {
   return (
           <>
             <Header />
-            <IntroVideo />
             <HomeClient listings={ealingListings} recentListings={recentListings || []} localFav={localFav} viewCounts={viewCounts} />
     </>
   )
