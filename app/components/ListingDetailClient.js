@@ -94,6 +94,23 @@ export default function ListingDetailClient({ listing, images, relatedListings }
       .then(({ data }) => { if (data) setReviews(data) })
   }, [listing.id])
 
+  // Fires a GA event when a parent clicks one of the outbound CTAs on a listing.
+  // Feeds the booking-strategy decision (see docs/booking-strategy.md) — without
+  // this we have no read on which categories or listings actually convert.
+  const trackOutboundClick = (ctaType, destination) => {
+    try {
+      if (typeof window === 'undefined' || typeof window.gtag !== 'function') return
+      window.gtag('event', 'outbound_click', {
+        cta_type: ctaType,
+        destination: destination || null,
+        listing_id: listing.id,
+        listing_slug: listing.slug,
+        listing_category: listing.category || null,
+        listing_type: listing.type || null,
+        listing_verified: !!listing.verified,
+      })
+    } catch (e) {}
+  }
 
   const toggleVisited = () => {
     try {
@@ -305,6 +322,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         {/* Venue + map */}
         {listing.venue && (
           <a href={`https://maps.google.com/?q=${encodeURIComponent(listing.venue)}`} target="_blank" rel="noopener noreferrer"
+            onClick={() => trackOutboundClick('maps', listing.venue)}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'white', border: '1px solid #F3F4F6', borderRadius: 14, padding: '14px 16px', marginBottom: 14, textDecoration: 'none' }}>
             <div>
               <div style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 2 }}>{listing.venue}</div>
@@ -459,12 +477,14 @@ export default function ListingDetailClient({ listing, images, relatedListings }
                 {/* CTA buttons */}
         {!listing.cta_url && listing.website && (
           <a href={listing.website} target="_blank" rel="noopener noreferrer"
+            onClick={() => trackOutboundClick('website', listing.website)}
             style={{ display: 'block', background: '#5B2D6E', color: 'white', textAlign: 'center', padding: '16px 20px', borderRadius: 16, fontSize: 16, fontWeight: 800, marginBottom: 10, textDecoration: 'none' }}>
             🌐 Visit Website
           </a>
         )}
         {listing.cta_url && (
           <a href={listing.cta_url} target="_blank" rel="noopener noreferrer"
+            onClick={() => trackOutboundClick('book_now', listing.cta_url)}
             style={{ display: 'block', background: '#5B2D6E', color: 'white', textAlign: 'center', padding: '16px 20px', borderRadius: 16, fontSize: 16, fontWeight: 800, marginBottom: 10, textDecoration: 'none' }}>
             {listing.cta_label || '🎟 Book now'}
           </a>
@@ -472,6 +492,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
 
         {listing.trial_link && (
           <a href={listing.trial_link} target="_blank" rel="noopener noreferrer"
+            onClick={() => trackOutboundClick('book_trial', listing.trial_link)}
             style={{ display: 'block', background: '#D1FAE5', color: '#065F46', textAlign: 'center', padding: '12px 20px', borderRadius: 16, fontSize: 14, fontWeight: 700, border: '1px solid #6EE7B7', marginBottom: 10, textDecoration: 'none' }}>
             🎁 Book a free trial
           </a>
@@ -480,6 +501,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
 
         {/* Send to a parent */}
         <button onClick={() => {
+            trackOutboundClick('share', null)
             if (navigator.share) {
               navigator.share({ title: listing.name, text: 'Check out ' + listing.name + ' on LittleLocals!', url: window.location.href })
             } else {
@@ -493,6 +515,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         {/* WhatsApp */}
         {listing.whatsapp_group_url && (
           <a href={listing.whatsapp_group_url} target="_blank" rel="noopener noreferrer"
+            onClick={() => trackOutboundClick('whatsapp', listing.whatsapp_group_url)}
             style={{ display: 'block', background: '#F0FDF4', color: '#15803D', textAlign: 'center', padding: '12px 20px', borderRadius: 16, fontSize: 14, fontWeight: 700, border: '1px solid #BBF7D0', marginBottom: 10, textDecoration: 'none' }}>
             💬 Join WhatsApp Group
           </a>
@@ -501,6 +524,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         {/* Instagram */}
         {listing.instagram && (
           <a href={listing.instagram.startsWith('http') ? listing.instagram : `https://instagram.com/${listing.instagram.replace('@','')}`} target="_blank" rel="noopener noreferrer"
+            onClick={() => trackOutboundClick('instagram', listing.instagram)}
             style={{ display: 'block', background: '#FDF4FF', color: '#7E22CE', textAlign: 'center', padding: '12px 20px', borderRadius: 16, fontSize: 14, fontWeight: 700, border: '1px solid #E9D5FF', marginBottom: 10, textDecoration: 'none' }}>
             📸 View on Instagram
           </a>
