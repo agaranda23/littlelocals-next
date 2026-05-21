@@ -72,7 +72,7 @@ function getDayContextLine(dayFilter, count) {
   return null
 }
 
-export default function HomeClient({ listings, recentListings = [], localFav = null, viewCounts = {} }) {
+export default function HomeClient({ listings, recentListings = [], localFav = null, viewCounts = {}, exploringCount = 0 }) {
   const [savedIds, setSavedIds] = useState(new Set())
   const [mounted, setMounted] = useState(false)
   const [activeNav, setActiveNav] = useState('home')
@@ -122,18 +122,8 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
   const [isIOS, setIsIOS] = useState(false)
   const [showIOSInstructions, setShowIOSInstructions] = useState(false)
   const [weather, setWeather] = useState(null)
-  const [exploringCount, setExploringCount] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const PAGE_SIZE = 6
-  useEffect(() => {
-    const now = new Date()
-    const hour = now.getHours() + now.getMinutes() / 60
-    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000)
-    const jitter = (dayOfYear % 13) - 6
-    const curve = Math.round(7 + 23 * Math.pow(hour / 23, 1.4))
-    const count = Math.max(5, Math.min(36, curve + jitter))
-    setExploringCount(count)
-  }, [])
 
   const refreshSavedIds = () => {
     try {

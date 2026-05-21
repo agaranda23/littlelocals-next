@@ -45,6 +45,16 @@ export default async function HomePage() {
   // viewCounts stubbed — not worth a serial query on every load
   const viewCounts = {}
 
+  // Compute the "N exploring" counter server-side so SSR (and scrapers / first
+  // paint / no-JS views) ship with a plausible number rather than a 0 seed.
+  // Time-of-day curve + day-of-year jitter, clamped to 5–36.
+  const _now = new Date()
+  const _hour = _now.getHours() + _now.getMinutes() / 60
+  const _dayOfYear = Math.floor((_now - new Date(_now.getFullYear(), 0, 0)) / 86400000)
+  const _jitter = (_dayOfYear % 13) - 6
+  const _curve = Math.round(7 + 23 * Math.pow(_hour / 23, 1.4))
+  const exploringCount = Math.max(5, Math.min(36, _curve + _jitter))
+
         const reviewMap = {}
               ;(allReviews || []).forEach(r => {
                 if (!reviewMap[r.listing_id]) reviewMap[r.listing_id] = { total: 0, count: 0 }
@@ -73,7 +83,7 @@ export default async function HomePage() {
   return (
           <>
             <Header />
-            <HomeClient listings={ealingListings} recentListings={recentListings || []} localFav={localFav} viewCounts={viewCounts} />
+            <HomeClient listings={ealingListings} recentListings={recentListings || []} localFav={localFav} viewCounts={viewCounts} exploringCount={exploringCount} />
     </>
   )
 }
