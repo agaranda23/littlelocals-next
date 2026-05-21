@@ -593,13 +593,13 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {reviews.length > 0 ? (() => {
+            {reviews.length > 0 && (() => {
               const avg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
               return <>
                 <span style={{ fontSize: 22, fontWeight: 800, color: '#111827' }}>⭐ {avg}</span>
                 <span style={{ fontSize: 14, color: '#6B7280' }}>· {reviews.length} review{reviews.length !== 1 ? 's' : ''}</span>
               </>
-            })() : <span style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>Reviews</span>}
+            })()}
           </div>
           {!showForm && !reviewSubmitted && (
             <button onClick={() => setShowForm(true)} style={{ fontSize: 13, fontWeight: 700, color: '#5B2D6E', background: '#F3E8FF', border: 'none', borderRadius: 20, padding: '6px 14px', cursor: 'pointer' }}>
@@ -685,10 +685,6 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           </div>
         )}
 
-        {/* Empty state */}
-        {reviews.length === 0 && !showForm && (
-          <div style={{ fontSize: 13, color: '#9CA3AF', textAlign: 'center', padding: '12px 0' }}>No reviews yet — be the first!</div>
-        )}
       </div>
       {/* Lightbox */}
       {lightbox !== null && (
