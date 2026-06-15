@@ -440,6 +440,65 @@ export default function ListingDetailClient({ listing, images, relatedListings }
                 </div>
               )}
 
+              {/* Secondary nursery details — capacity, outdoor, languages, sibling discount, holiday closures */}
+              {(() => {
+                const caps = [
+                  listing.babies_capacity != null && { label: 'Babies 0–2', value: listing.babies_capacity },
+                  listing.toddlers_capacity != null && { label: 'Toddlers 2–3', value: listing.toddlers_capacity },
+                  listing.preschool_capacity != null && { label: 'Pre-school 3–4', value: listing.preschool_capacity },
+                ].filter(Boolean)
+                const langs = Array.isArray(listing.languages_spoken) ? listing.languages_spoken : []
+                const hasAny = caps.length > 0 || listing.outdoor_space || langs.length > 0 || listing.sibling_discount || listing.holiday_closures
+                if (!hasAny) return null
+                return (
+                  <div style={{ background: 'white', border: '1px solid #F3F4F6', borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: '#6B7280', marginBottom: 10, letterSpacing: 0.3, textTransform: 'uppercase' }}>More details</div>
+
+                    {caps.length > 0 && (
+                      <div style={{ marginBottom: 10 }}>
+                        <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 4 }}>Places by age group</div>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          {caps.map(c => (
+                            <span key={c.label} style={{ display: 'inline-block', background: '#F3F4F6', color: '#374151', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 12 }}>
+                              {c.label}: {c.value}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {listing.outdoor_space && (
+                      <div style={{ marginBottom: 8, fontSize: 13, color: '#374151' }}>
+                        🌳 <strong style={{ color: '#111827' }}>Outdoor space:</strong> {listing.outdoor_space}
+                      </div>
+                    )}
+
+                    {langs.length > 0 && (
+                      <div style={{ marginBottom: 8 }}>
+                        <span style={{ fontSize: 13, color: '#374151' }}>🌍 <strong style={{ color: '#111827' }}>Languages:</strong> </span>
+                        {langs.map((l, i) => (
+                          <span key={l} style={{ fontSize: 13, color: '#374151' }}>
+                            {i > 0 && ' · '}{l}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {listing.sibling_discount && (
+                      <div style={{ marginBottom: 8, fontSize: 13, color: '#374151' }}>
+                        💛 <strong style={{ color: '#111827' }}>Sibling discount:</strong> {listing.sibling_discount}
+                      </div>
+                    )}
+
+                    {listing.holiday_closures && (
+                      <div style={{ fontSize: 13, color: '#374151' }}>
+                        🌴 <strong style={{ color: '#111827' }}>Holiday closures:</strong> {listing.holiday_closures}
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
+
               {/* Funded hours */}
               <div style={{ background: 'white', border: '1px solid #E9D5FF', borderRadius: 12, padding: '14px 14px' }}>
                 <div style={{ fontSize: 12, fontWeight: 800, color: '#5B2D6E', marginBottom: 8, letterSpacing: 0.3 }}>💷 FREE & FUNDED CHILDCARE</div>
