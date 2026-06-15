@@ -52,6 +52,76 @@ export async function generateMetadata({ params }) {
   }
 }
 
+// Map our category to a Schema.org type. Default LocalBusiness when uncertain
+// — Google still understands the listing as a real business with reviews,
+// hours and location. Picking a specific sub-type just adds richer hints.
+function schemaTypeForCategory(category, type) {
+  const cat = (category || '').toLowerCase()
+  const typ = (type || '').toLowerCase()
+  if (cat === 'nursery') return 'PreSchool'
+  if (cat === 'soft play') return 'AmusementPark'
+  if (cat === 'attraction' || cat === 'days out' || typ.includes('attraction')) return 'TouristAttraction'
+  if (cat === 'park') return 'Park'
+  if (cat === 'event') return 'Event'
+  return 'LocalBusiness'
+}
+
+function buildOpeningHoursSpec(listing) {
+  // Best-effort: nurseries use opens_at/closes_at + days; classes use day + time strings.
+  // If both ends of a window are present we emit OpeningHoursSpecification entries.
+  if (!listing.opens_at || !listing.closes_at) return null
+  const DAY_MAP = { sun: 'Sunday', mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday' }
+  const days = Array.isArray(listing.days_of_week) && listing.days_of_week.length > 0
+    ? listing.days_of_week.map(d => DAY_MAP[d]).filter(Boolean)
+    : listing.is_daily
+      ? ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+      : ['Monday','Tuesday','Wednesday','Thursday','Friday']
+  return {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: days,
+    opens: listing.opens_at,
+    closes: listing.closes_at,
+  }
+}
+
+function buildListingJsonLd(listing, slug, primaryImage) {
+  const schemaType = schemaTypeForCategory(listing.category, listing.type)
+  const url = `https://littlelocals.uk/listing/${slug}`
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': schemaType,
+    name: listing.name,
+    url,
+  }
+  if (listing.description) jsonLd.description = listing.description.slice(0, 500)
+  if (primaryImage) jsonLd.image = primaryImage
+  if (listing.venue) {
+    jsonLd.address = {
+      '@type': 'PostalAddress',
+      streetAddress: listing.venue,
+      addressLocality: listing.location || 'Ealing',
+      addressRegion: 'London',
+      addressCountry: 'GB',
+    }
+  }
+  if (listing.lat && listing.lng) {
+    jsonLd.geo = { '@type': 'GeoCoordinates', latitude: listing.lat, longitude: listing.lng }
+  }
+  if (listing.price) jsonLd.priceRange = listing.price
+  const hours = buildOpeningHoursSpec(listing)
+  if (hours) jsonLd.openingHoursSpecification = hours
+  if (listing.google_rating && listing.google_review_count) {
+    jsonLd.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: Number(listing.google_rating).toFixed(1),
+      reviewCount: listing.google_review_count,
+      bestRating: 5,
+      worstRating: 1,
+    }
+  }
+  return jsonLd
+}
+
 export default async function ListingPage({ params }) {
   const { slug } = await params
 
@@ -68,6 +138,9 @@ export default async function ListingPage({ params }) {
     .select('url, sort_order')
     .eq('listing_id', listing.id)
     .order('sort_order', { ascending: true })
+
+  const primaryImage = listing.primary_image || images?.[0]?.url || null
+  const jsonLd = buildListingJsonLd(listing, slug, primaryImage)
 
   // Fetch cross links
   const { data: crossLinksA } = await supabase
@@ -96,6 +169,10 @@ export default async function ListingPage({ params }) {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Header />
       <ListingDetailClient listing={listing} images={images || []} relatedListings={relatedListings} />
     </>
