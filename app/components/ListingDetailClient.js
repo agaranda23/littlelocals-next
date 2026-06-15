@@ -701,6 +701,76 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           )
         })()}
 
+        {/* Days out info — for attractions / days out */}
+        {['attraction', 'days out', 'day out', 'theme park', 'farm', 'zoo', 'museum'].includes((listing.category || '').toLowerCase()) && (() => {
+          const SEASON_LABELS = {
+            year_round: 'Open year-round',
+            spring_summer: 'Open spring & summer',
+            summer_only: 'Summer only',
+            autumn_winter: 'Open autumn & winter',
+            school_holidays_only: 'School holidays only',
+          }
+          const features = []
+          if (listing.pram_friendly === true) features.push({ k: '🚼', label: 'Pram-friendly' })
+          if (listing.baby_changing === true) features.push({ k: '🍼', label: 'Baby changing' })
+          if (listing.accessible === true) features.push({ k: '♿', label: 'Accessible' })
+          if (listing.annual_pass_available === true) features.push({ k: '🎫', label: 'Annual pass' })
+
+          const hasFeatures = features.length > 0
+          const hasDetails = listing.free_under_age != null
+            || listing.family_ticket_price
+            || listing.season
+            || listing.duration_typical
+            || listing.food_options
+          if (!hasFeatures && !hasDetails) return null
+
+          return (
+            <div style={{ background: '#ECFEFF', border: '1px solid #A5F3FC', borderRadius: 16, padding: '16px 16px 14px', marginBottom: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: '#0E7490', marginBottom: 12, letterSpacing: 0.3 }}>🎢 DAY OUT INFO</div>
+
+              {hasFeatures && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: hasDetails ? 12 : 0 }}>
+                  {features.map(f => (
+                    <span key={f.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'white', color: '#0E7490', fontSize: 12, fontWeight: 700, padding: '5px 12px', borderRadius: 14, border: '1px solid #A5F3FC' }}>
+                      {f.k} {f.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {hasDetails && (
+                <div style={{ background: 'white', border: '1px solid #A5F3FC', borderRadius: 10, padding: '10px 12px' }}>
+                  {listing.season && SEASON_LABELS[listing.season] && (
+                    <div style={{ fontSize: 13, color: '#374151', marginBottom: 6 }}>
+                      📅 <strong style={{ color: '#111827' }}>Season:</strong> {SEASON_LABELS[listing.season]}
+                    </div>
+                  )}
+                  {listing.duration_typical && (
+                    <div style={{ fontSize: 13, color: '#374151', marginBottom: 6 }}>
+                      ⏱️ <strong style={{ color: '#111827' }}>Allow:</strong> {listing.duration_typical}
+                    </div>
+                  )}
+                  {listing.free_under_age != null && (
+                    <div style={{ fontSize: 13, color: '#374151', marginBottom: 6 }}>
+                      🆓 <strong style={{ color: '#111827' }}>Free under:</strong> {listing.free_under_age} year{listing.free_under_age === 1 ? '' : 's'}
+                    </div>
+                  )}
+                  {listing.family_ticket_price && (
+                    <div style={{ fontSize: 13, color: '#374151', marginBottom: 6 }}>
+                      💷 <strong style={{ color: '#111827' }}>Family ticket:</strong> {listing.family_ticket_price}
+                    </div>
+                  )}
+                  {listing.food_options && (
+                    <div style={{ fontSize: 13, color: '#374151' }}>
+                      🍴 <strong style={{ color: '#111827' }}>Food:</strong> {listing.food_options}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })()}
+
         {/* Social proof signal - verified only */}
         {detailSignal && (
           <div style={{ fontSize: 13, color: '#6B7280', fontWeight: 600, marginBottom: 12 }}>
