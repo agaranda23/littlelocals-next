@@ -22,6 +22,16 @@ export default function EditListing({ params }) {
     free_trial_info: '',
     whatsapp_group_url: '',
     instagram: '',
+    ofsted_rating: '',
+    ofsted_report_url: '',
+    ofsted_inspection_date: '',
+    funded_hours: [],
+    opens_at: '',
+    closes_at: '',
+    term_time_only: '',
+    meals_included: '',
+    nursery_fee: '',
+    waitlist_status: '',
   })
   const [listing, setListing] = useState(null)
   const [photos, setPhotos] = useState([])
@@ -63,7 +73,7 @@ export default function EditListing({ params }) {
 
       const { data: l } = await supabase
         .from('listings')
-        .select('id, name, slug, description, price, website, free_trial, whatsapp_group_url, instagram, is_paused, logo, age_min, age_max')
+        .select('id, name, slug, category, description, price, website, free_trial, whatsapp_group_url, instagram, is_paused, logo, age_min, age_max, ofsted_rating, ofsted_report_url, ofsted_inspection_date, funded_hours, opens_at, closes_at, term_time_only, meals_included, nursery_fee, waitlist_status')
         .eq('id', parseInt(listingId))
         .single()
 
@@ -88,6 +98,16 @@ export default function EditListing({ params }) {
           is_paused: l.is_paused || false,
           age_min: l.age_min ?? '',
           age_max: l.age_max ?? '',
+          ofsted_rating: l.ofsted_rating || '',
+          ofsted_report_url: l.ofsted_report_url || '',
+          ofsted_inspection_date: l.ofsted_inspection_date || '',
+          funded_hours: l.funded_hours || [],
+          opens_at: l.opens_at || '',
+          closes_at: l.closes_at || '',
+          term_time_only: l.term_time_only === true ? 'true' : l.term_time_only === false ? 'false' : '',
+          meals_included: l.meals_included === true ? 'true' : l.meals_included === false ? 'false' : '',
+          nursery_fee: l.nursery_fee || '',
+          waitlist_status: l.waitlist_status || '',
         })
       }
       setLoading(false)
@@ -145,13 +165,16 @@ export default function EditListing({ params }) {
     setSaved(false)
     setError('')
 
-    // Sanitise: empty strings -> null, coerce known types
-    const boolFields = ['is_paused']
+    // Sanitise: empty strings/arrays -> null, coerce known types
+    const boolFields = ['is_paused', 'term_time_only', 'meals_included']
     const intFields = ['age_min', 'age_max']
+    const arrayFields = ['funded_hours']
     const payload = {}
     for (const [k, v] of Object.entries(form)) {
-      if (v === '' || v === undefined) {
+      if (v === '' || v === undefined || v === null) {
         payload[k] = null
+      } else if (arrayFields.includes(k)) {
+        payload[k] = Array.isArray(v) && v.length > 0 ? v : null
       } else if (boolFields.includes(k)) {
         payload[k] = v === true || v === 'true'
       } else if (intFields.includes(k)) {
@@ -285,6 +308,101 @@ export default function EditListing({ params }) {
             <input value={form.whatsapp_group_url} onChange={set('whatsapp_group_url')} placeholder="https://chat.whatsapp.com/..." style={inputStyle} />
           </div>
         </div>
+
+        {/* Nursery info — only for nursery listings */}
+        {(listing?.category || '').toLowerCase() === 'nursery' && (
+          <div style={{ background: 'white', borderRadius: 14, padding: 20, border: '1px solid #E5E7EB', marginBottom: 12 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#5B2D6E', marginBottom: 6 }}>🧸 Nursery info</div>
+            <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 18, lineHeight: 1.5 }}>
+              Parents choose nurseries on Ofsted rating, fees, opening hours and which funded-hours schemes you accept. Filling these in significantly improves how your listing performs.
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Ofsted rating</label>
+              <select value={form.ofsted_rating} onChange={set('ofsted_rating')} style={inputStyle}>
+                <option value="">— Not set —</option>
+                <option value="outstanding">Outstanding</option>
+                <option value="good">Good</option>
+                <option value="requires_improvement">Requires improvement</option>
+                <option value="inadequate">Inadequate</option>
+                <option value="not_yet_inspected">Not yet inspected</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Ofsted report URL</label>
+              <input value={form.ofsted_report_url} onChange={set('ofsted_report_url')} placeholder="https://reports.ofsted.gov.uk/..." style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: 18 }}>
+              <label style={labelStyle}>Last inspection date</label>
+              <input type="date" value={form.ofsted_inspection_date} onChange={set('ofsted_inspection_date')} style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: 18 }}>
+              <label style={labelStyle}>Funded hours accepted</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, background: '#F9FAFB', padding: '12px 12px', borderRadius: 8, border: '1px solid #E5E7EB' }}>
+                {[
+                  ['15h_universal', '15 hours universal (all 3–4 year olds)'],
+                  ['30h_working', '30 hours, working parents (9 months to school age)'],
+                  ['15h_2yo', '15 hours, some 2-year-olds (low-income / disadvantaged)'],
+                  ['tax_free', 'Tax-Free Childcare (up to £2,000/yr per child)'],
+                ].map(([key, label]) => (
+                  <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={(form.funded_hours || []).includes(key)}
+                      onChange={e => setForm(prev => ({
+                        ...prev,
+                        funded_hours: e.target.checked
+                          ? [...(prev.funded_hours || []), key]
+                          : (prev.funded_hours || []).filter(k => k !== key),
+                      }))}
+                    />
+                    <span>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Opening hours</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <input type="time" value={form.opens_at} onChange={set('opens_at')} style={{ ...inputStyle, flex: 1 }} />
+                <span style={{ color: '#9CA3AF', fontSize: 13 }}>to</span>
+                <input type="time" value={form.closes_at} onChange={set('closes_at')} style={{ ...inputStyle, flex: 1 }} />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Term-time only?</label>
+              <select value={form.term_time_only} onChange={set('term_time_only')} style={inputStyle}>
+                <option value="">— Not specified —</option>
+                <option value="true">Yes, term-time only</option>
+                <option value="false">No, runs all year</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Meals included?</label>
+              <select value={form.meals_included} onChange={set('meals_included')} style={inputStyle}>
+                <option value="">— Not specified —</option>
+                <option value="true">Yes, included in fee</option>
+                <option value="false">No, extra charge or bring own</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Fee</label>
+              <input value={form.nursery_fee} onChange={set('nursery_fee')} placeholder="e.g. From £65/day or £14/hour" style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: 0 }}>
+              <label style={labelStyle}>Waitlist / availability status</label>
+              <input value={form.waitlist_status} onChange={set('waitlist_status')} placeholder="e.g. Spaces available for 2–3yo, waitlist for under-2s" style={inputStyle} />
+            </div>
+          </div>
+        )}
 
         {/* Photos */}
         <div style={{ background: 'white', borderRadius: 14, padding: 20, border: '1px solid #E5E7EB', marginBottom: 12 }}>

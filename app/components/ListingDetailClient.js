@@ -332,6 +332,132 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           </a>
         )}
 
+        {/* Nursery info — only for nursery category */}
+        {(listing.category || '').toLowerCase() === 'nursery' && (() => {
+          const ofstedConfig = {
+            outstanding: { label: 'Outstanding', bg: '#16A34A', emoji: '🏆' },
+            good: { label: 'Good', bg: '#2563EB', emoji: '✅' },
+            requires_improvement: { label: 'Requires improvement', bg: '#D97706', emoji: '⚠️' },
+            inadequate: { label: 'Inadequate', bg: '#DC2626', emoji: '🚨' },
+            not_yet_inspected: { label: 'Not yet inspected', bg: '#6B7280', emoji: '🕓' },
+          }
+          const fundedConfig = {
+            '15h_universal': '15h universal (3–4 yrs)',
+            '30h_working':   '30h working parents (9m–school)',
+            '15h_2yo':       '15h for some 2-year-olds',
+            'tax_free':      'Tax-Free Childcare',
+          }
+          const ofsted = ofstedConfig[listing.ofsted_rating]
+          const fundedList = Array.isArray(listing.funded_hours) ? listing.funded_hours : []
+          const inspectionDate = listing.ofsted_inspection_date
+            ? new Date(listing.ofsted_inspection_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+            : null
+          const hours = listing.opens_at && listing.closes_at
+            ? `${listing.opens_at} – ${listing.closes_at}`
+            : null
+          const anyContent = ofsted || hours || listing.nursery_fee || fundedList.length > 0
+            || listing.term_time_only === true || listing.term_time_only === false
+            || listing.meals_included === true || listing.meals_included === false
+            || listing.waitlist_status
+
+          if (!anyContent) return null
+
+          return (
+            <div style={{ background: '#FAF8FF', border: '1px solid #E9D5FF', borderRadius: 16, padding: '16px 16px 14px', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#5B2D6E', letterSpacing: 0.3 }}>🧸 NURSERY INFO</div>
+              </div>
+
+              {/* Ofsted */}
+              {ofsted && (
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: ofsted.bg, color: 'white', fontSize: 13, fontWeight: 800, padding: '6px 12px', borderRadius: 20 }}>
+                      {ofsted.emoji} Ofsted: {ofsted.label}
+                    </span>
+                    {inspectionDate && (
+                      <span style={{ fontSize: 12, color: '#6B7280' }}>Inspected {inspectionDate}</span>
+                    )}
+                  </div>
+                  {listing.ofsted_report_url && (
+                    <a href={listing.ofsted_report_url} target="_blank" rel="noopener noreferrer"
+                      onClick={() => trackOutboundClick('ofsted_report', listing.ofsted_report_url)}
+                      style={{ display: 'inline-block', marginTop: 8, fontSize: 12, color: '#5B2D6E', fontWeight: 700, textDecoration: 'underline' }}>
+                      Read the Ofsted report →
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {/* Hours + term-time + meals + fee + waitlist as info rows */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
+                {hours && (
+                  <div style={{ background: 'white', border: '1px solid #F3F4F6', borderRadius: 10, padding: '10px 12px' }}>
+                    <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 3 }}>Hours</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>🕐 {hours}</div>
+                  </div>
+                )}
+                {listing.term_time_only !== null && listing.term_time_only !== undefined && (
+                  <div style={{ background: 'white', border: '1px solid #F3F4F6', borderRadius: 10, padding: '10px 12px' }}>
+                    <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 3 }}>Calendar</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>📅 {listing.term_time_only ? 'Term-time only' : 'All year'}</div>
+                  </div>
+                )}
+                {listing.nursery_fee && (
+                  <div style={{ background: 'white', border: '1px solid #F3F4F6', borderRadius: 10, padding: '10px 12px' }}>
+                    <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 3 }}>Fee</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>💷 {listing.nursery_fee}</div>
+                  </div>
+                )}
+                {listing.meals_included !== null && listing.meals_included !== undefined && (
+                  <div style={{ background: 'white', border: '1px solid #F3F4F6', borderRadius: 10, padding: '10px 12px' }}>
+                    <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 3 }}>Meals</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>🍽️ {listing.meals_included ? 'Included' : 'Not included'}</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Waitlist */}
+              {listing.waitlist_status && (
+                <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '10px 12px', marginBottom: 14 }}>
+                  <div style={{ fontSize: 11, color: '#92400E', marginBottom: 3, fontWeight: 700 }}>AVAILABILITY</div>
+                  <div style={{ fontSize: 13, color: '#92400E' }}>{listing.waitlist_status}</div>
+                </div>
+              )}
+
+              {/* Funded hours */}
+              <div style={{ background: 'white', border: '1px solid #E9D5FF', borderRadius: 12, padding: '14px 14px' }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: '#5B2D6E', marginBottom: 8, letterSpacing: 0.3 }}>💷 FREE & FUNDED CHILDCARE</div>
+                {fundedList.length > 0 ? (
+                  <>
+                    <div style={{ fontSize: 12, color: '#4B5563', marginBottom: 10 }}>This nursery accepts:</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+                      {fundedList.map(key => fundedConfig[key] && (
+                        <span key={key} style={{ display: 'inline-block', background: '#F3E8FF', color: '#5B2D6E', fontSize: 12, fontWeight: 700, padding: '5px 10px', borderRadius: 14 }}>
+                          ✓ {fundedConfig[key]}
+                        </span>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 10 }}>This nursery hasn't yet listed which funded-hours schemes they accept.</div>
+                )}
+                <div style={{ fontSize: 12, color: '#4B5563', lineHeight: 1.55, marginBottom: 10 }}>
+                  UK parents may be entitled to <strong>15–30 free hours</strong> of childcare from 9 months old, plus <strong>Tax-Free Childcare</strong> worth up to £2,000/year per child.
+                </div>
+                <a
+                  href="https://www.childcarechoices.gov.uk/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackOutboundClick('childcare_choices', 'https://www.childcarechoices.gov.uk/')}
+                  style={{ display: 'inline-block', background: '#5B2D6E', color: 'white', fontSize: 12, fontWeight: 800, padding: '8px 14px', borderRadius: 18, textDecoration: 'none' }}>
+                  Check what you're entitled to →
+                </a>
+              </div>
+            </div>
+          )
+        })()}
+
         {/* Social proof signal - verified only */}
         {detailSignal && (
           <div style={{ fontSize: 13, color: '#6B7280', fontWeight: 600, marginBottom: 12 }}>
