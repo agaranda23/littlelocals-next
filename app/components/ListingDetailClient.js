@@ -334,6 +334,30 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           ))}
         </div>
 
+        {/* Google rating — universal trust signal until on-platform reviews land */}
+        {listing.google_rating && listing.google_rating > 0 && (() => {
+          const ratingPill = (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid #F3F4F6', borderRadius: 14, padding: '10px 14px', marginBottom: 14 }}>
+              <span style={{ fontSize: 18, fontWeight: 800, color: '#111827' }}>⭐ {Number(listing.google_rating).toFixed(1)}</span>
+              <span style={{ fontSize: 13, color: '#6B7280' }}>
+                on Google
+                {listing.google_review_count ? ` · ${listing.google_review_count.toLocaleString()} review${listing.google_review_count === 1 ? '' : 's'}` : ''}
+              </span>
+              {listing.google_maps_url && <span style={{ fontSize: 13, color: '#D4732A', fontWeight: 700, marginLeft: 4 }}>→</span>}
+            </div>
+          )
+          if (listing.google_maps_url) {
+            return (
+              <a href={listing.google_maps_url} target="_blank" rel="noopener noreferrer"
+                onClick={() => trackOutboundClick('google_reviews', listing.google_maps_url)}
+                style={{ display: 'block', textDecoration: 'none' }}>
+                {ratingPill}
+              </a>
+            )
+          }
+          return ratingPill
+        })()}
+
         {/* Venue + map */}
         {listing.venue && (
           <a href={`https://maps.google.com/?q=${encodeURIComponent(listing.venue)}`} target="_blank" rel="noopener noreferrer"
