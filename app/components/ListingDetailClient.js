@@ -26,6 +26,21 @@ export default function ListingDetailClient({ listing, images, relatedListings }
   const [claimSubmitting, setClaimSubmitting] = useState(false)
   const [claimSubmitted, setClaimSubmitted] = useState(false)
 
+  // Nursery tour form
+  const [showTourForm, setShowTourForm] = useState(false)
+  const [tourName, setTourName] = useState('')
+  const [tourEmail, setTourEmail] = useState('')
+  const [tourPhone, setTourPhone] = useState('')
+  const [tourChildAge, setTourChildAge] = useState('')
+  const [tourPreferredDate, setTourPreferredDate] = useState('')
+  const [tourAlternativeDate, setTourAlternativeDate] = useState('')
+  const [tourTimeWindow, setTourTimeWindow] = useState('either')
+  const [tourMessage, setTourMessage] = useState('')
+  const [tourSubmitting, setTourSubmitting] = useState(false)
+  const [tourSubmitted, setTourSubmitted] = useState(false)
+
+  const isNursery = (listing.category || '').toLowerCase() === 'nursery'
+
   const [visited, setVisited] = useState(false)
   const [plannedDates, setPlannedDates] = useState([])
   const [detailSignal, setDetailSignal] = useState(null)
@@ -601,14 +616,150 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         </div>
 
                 {/* CTA buttons */}
-        {!listing.cta_url && listing.website && (
+
+        {/* Nursery: tour request flow (replaces external "Book now" since nurseries don't sell online) */}
+        {isNursery && tourSubmitted && (
+          <div style={{ background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 16, padding: '16px', marginBottom: 10, textAlign: 'center' }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: '#065F46', marginBottom: 4 }}>✅ Tour request sent</div>
+            <div style={{ fontSize: 13, color: '#065F46', lineHeight: 1.5 }}>The team at {listing.name} will be in touch within 48 hours.</div>
+          </div>
+        )}
+
+        {isNursery && !tourSubmitted && !showTourForm && (
+          <button onClick={() => { setShowTourForm(true); trackOutboundClick('book_tour_open', null) }}
+            style={{ display: 'block', width: '100%', background: '#5B2D6E', color: 'white', textAlign: 'center', padding: '16px 20px', borderRadius: 16, fontSize: 16, fontWeight: 800, marginBottom: 10, border: 'none', cursor: 'pointer' }}>
+            📅 Book a tour
+          </button>
+        )}
+
+        {isNursery && showTourForm && !tourSubmitted && (
+          <div style={{ background: '#F5F3FF', border: '1px solid #DDD6FE', borderRadius: 16, padding: '16px', marginBottom: 10 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#5B2D6E', marginBottom: 4 }}>📅 Book a tour at {listing.name}</div>
+            <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 14, lineHeight: 1.5 }}>
+              Nurseries don't sell online — but visits do. Send your details and the team will be in touch within 48 hours to confirm a time.
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Your name *</div>
+              <input value={tourName} onChange={e => setTourName(e.target.value)} placeholder="e.g. Sarah Jones"
+                style={{ width: '100%', fontSize: 13, padding: '9px 11px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }} />
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Email *</div>
+              <input type="email" value={tourEmail} onChange={e => setTourEmail(e.target.value)} placeholder="you@example.com"
+                style={{ width: '100%', fontSize: 13, padding: '9px 11px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }} />
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Phone <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(optional)</span></div>
+              <input type="tel" value={tourPhone} onChange={e => setTourPhone(e.target.value)} placeholder="07700 900000"
+                style={{ width: '100%', fontSize: 13, padding: '9px 11px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }} />
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Child's age</div>
+              <select value={tourChildAge} onChange={e => setTourChildAge(e.target.value)}
+                style={{ width: '100%', fontSize: 13, padding: '9px 11px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none', background: 'white' }}>
+                <option value="">— Select —</option>
+                <option value="under_6mo">Under 6 months</option>
+                <option value="6_to_12mo">6–12 months</option>
+                <option value="1_to_2yr">1–2 years</option>
+                <option value="2_to_3yr">2–3 years</option>
+                <option value="3_to_4yr">3–4 years</option>
+                <option value="4_plus">4+ years</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Preferred date *</div>
+                <input type="date" value={tourPreferredDate} onChange={e => setTourPreferredDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  style={{ width: '100%', fontSize: 13, padding: '9px 11px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Alt. date <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(opt)</span></div>
+                <input type="date" value={tourAlternativeDate} onChange={e => setTourAlternativeDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  style={{ width: '100%', fontSize: 13, padding: '9px 11px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', outline: 'none' }} />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Time preference</div>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {[['morning', '🌅 Morning'], ['afternoon', '🌇 Afternoon'], ['either', '✨ Either']].map(([key, label]) => (
+                  <button key={key} onClick={() => setTourTimeWindow(key)}
+                    style={{
+                      flex: 1, fontSize: 12, fontWeight: 700, padding: '8px 0', borderRadius: 10,
+                      border: `1px solid ${tourTimeWindow === key ? '#5B2D6E' : '#D1D5DB'}`,
+                      background: tourTimeWindow === key ? '#5B2D6E' : 'white',
+                      color: tourTimeWindow === key ? 'white' : '#374151',
+                      cursor: 'pointer',
+                    }}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Anything to add? <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(optional)</span></div>
+              <textarea value={tourMessage} onChange={e => setTourMessage(e.target.value)} placeholder="e.g. Looking for 30h working parents, starting September..." rows={3}
+                style={{ width: '100%', fontSize: 13, padding: '9px 11px', borderRadius: 8, border: '1px solid #D1D5DB', boxSizing: 'border-box', resize: 'none', outline: 'none' }} />
+            </div>
+
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                disabled={tourSubmitting || !tourName.trim() || !tourEmail.trim() || !tourPreferredDate}
+                onClick={async () => {
+                  if (!tourName.trim() || !tourEmail.trim() || !tourPreferredDate) return
+                  setTourSubmitting(true)
+                  const { error } = await supabase.from('tour_requests').insert([{
+                    listing_id: listing.id,
+                    parent_name: tourName.trim(),
+                    parent_email: tourEmail.trim(),
+                    parent_phone: tourPhone.trim() || null,
+                    child_age: tourChildAge || null,
+                    preferred_date: tourPreferredDate,
+                    alternative_date: tourAlternativeDate || null,
+                    time_window: tourTimeWindow,
+                    message: tourMessage.trim() || null,
+                  }])
+                  trackOutboundClick('book_tour_submit', error ? 'error' : 'success')
+                  setTourSubmitted(true)
+                  setTourSubmitting(false)
+                }}
+                style={{ flex: 1, fontSize: 14, fontWeight: 700, color: 'white', background: tourSubmitting ? '#9CA3AF' : '#5B2D6E', border: 'none', borderRadius: 20, padding: '11px 0', cursor: tourSubmitting ? 'default' : 'pointer' }}>
+                {tourSubmitting ? 'Sending…' : 'Send tour request'}
+              </button>
+              <button onClick={() => setShowTourForm(false)}
+                style={{ fontSize: 13, color: '#6B7280', background: 'none', border: '1px solid #D1D5DB', borderRadius: 20, padding: '11px 16px', cursor: 'pointer' }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Nursery secondary website link (smaller, lower-emphasis than the tour CTA) */}
+        {isNursery && listing.website && !tourSubmitted && (
+          <a href={listing.website} target="_blank" rel="noopener noreferrer"
+            onClick={() => trackOutboundClick('website', listing.website)}
+            style={{ display: 'block', background: 'white', color: '#5B2D6E', textAlign: 'center', padding: '11px 20px', borderRadius: 16, fontSize: 13, fontWeight: 700, marginBottom: 10, textDecoration: 'none', border: '1px solid #DDD6FE' }}>
+            🌐 Visit nursery website
+          </a>
+        )}
+
+        {/* Non-nursery: existing CTA logic unchanged */}
+        {!isNursery && !listing.cta_url && listing.website && (
           <a href={listing.website} target="_blank" rel="noopener noreferrer"
             onClick={() => trackOutboundClick('website', listing.website)}
             style={{ display: 'block', background: '#5B2D6E', color: 'white', textAlign: 'center', padding: '16px 20px', borderRadius: 16, fontSize: 16, fontWeight: 800, marginBottom: 10, textDecoration: 'none' }}>
             🌐 Visit Website
           </a>
         )}
-        {listing.cta_url && (
+        {!isNursery && listing.cta_url && (
           <a href={listing.cta_url} target="_blank" rel="noopener noreferrer"
             onClick={() => trackOutboundClick('book_now', listing.cta_url)}
             style={{ display: 'block', background: '#5B2D6E', color: 'white', textAlign: 'center', padding: '16px 20px', borderRadius: 16, fontSize: 16, fontWeight: 800, marginBottom: 10, textDecoration: 'none' }}>
