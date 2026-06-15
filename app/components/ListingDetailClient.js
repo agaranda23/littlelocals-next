@@ -334,6 +334,30 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           ))}
         </div>
 
+        {/* Google rating — universal trust signal until on-platform reviews land */}
+        {listing.google_rating && listing.google_rating > 0 && (() => {
+          const ratingPill = (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid #F3F4F6', borderRadius: 14, padding: '10px 14px', marginBottom: 14 }}>
+              <span style={{ fontSize: 18, fontWeight: 800, color: '#111827' }}>⭐ {Number(listing.google_rating).toFixed(1)}</span>
+              <span style={{ fontSize: 13, color: '#6B7280' }}>
+                on Google
+                {listing.google_review_count ? ` · ${listing.google_review_count.toLocaleString()} review${listing.google_review_count === 1 ? '' : 's'}` : ''}
+              </span>
+              {listing.google_maps_url && <span style={{ fontSize: 13, color: '#D4732A', fontWeight: 700, marginLeft: 4 }}>→</span>}
+            </div>
+          )
+          if (listing.google_maps_url) {
+            return (
+              <a href={listing.google_maps_url} target="_blank" rel="noopener noreferrer"
+                onClick={() => trackOutboundClick('google_reviews', listing.google_maps_url)}
+                style={{ display: 'block', textDecoration: 'none' }}>
+                {ratingPill}
+              </a>
+            )
+          }
+          return ratingPill
+        })()}
+
         {/* Venue + map */}
         {listing.venue && (
           <a href={`https://maps.google.com/?q=${encodeURIComponent(listing.venue)}`} target="_blank" rel="noopener noreferrer"
@@ -528,6 +552,98 @@ export default function ListingDetailClient({ listing, images, relatedListings }
                   Check what you're entitled to →
                 </a>
               </div>
+            </div>
+          )
+        })()}
+
+        {/* Class info — for class-like listings (not nursery/soft play/event/park). Mutually exclusive with nursery section. */}
+        {(() => {
+          const cat = (listing.category || '').toLowerCase()
+          const type = (listing.type || '').toLowerCase()
+          if (cat === 'nursery' || cat === 'soft play' || cat === 'event' || cat === 'park' || cat === 'attraction') return null
+          const CLASS_KEYWORDS = ['class', 'club', 'sport', 'music', 'dance', 'art', 'language', 'martial', 'swim', 'football', 'gymnastic', 'yoga', 'ballet', 'tennis', 'fitness']
+          const isClass = CLASS_KEYWORDS.some(k => cat.includes(k) || type.includes(k))
+          if (!isClass) return null
+
+          const hasAny = listing.dbs_checked === true || listing.dbs_checked === false
+            || listing.governing_body
+            || listing.max_class_size
+            || listing.term_schedule
+            || listing.cancellation_policy
+            || listing.what_to_bring
+            || listing.sibling_discount
+            || listing.holiday_closures
+          if (!hasAny) return null
+
+          return (
+            <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 16, padding: '16px 16px 14px', marginBottom: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: '#0369A1', marginBottom: 12, letterSpacing: 0.3 }}>🎯 CLASS INFO</div>
+
+              {/* Trust signals — DBS + accreditation */}
+              {(listing.dbs_checked === true || listing.governing_body) && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+                  {listing.dbs_checked === true && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#16A34A', color: 'white', fontSize: 12, fontWeight: 800, padding: '5px 12px', borderRadius: 14 }}>
+                      ✓ DBS-checked instructors
+                    </span>
+                  )}
+                  {listing.governing_body && (
+                    listing.governing_body_url ? (
+                      <a href={listing.governing_body_url} target="_blank" rel="noopener noreferrer"
+                        onClick={() => trackOutboundClick('governing_body', listing.governing_body_url)}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#0369A1', color: 'white', fontSize: 12, fontWeight: 800, padding: '5px 12px', borderRadius: 14, textDecoration: 'none' }}>
+                        🏅 {listing.governing_body} →
+                      </a>
+                    ) : (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#0369A1', color: 'white', fontSize: 12, fontWeight: 800, padding: '5px 12px', borderRadius: 14 }}>
+                        🏅 {listing.governing_body}
+                      </span>
+                    )
+                  )}
+                </div>
+              )}
+
+              {/* Operational details grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: listing.cancellation_policy || listing.what_to_bring ? 12 : 0 }}>
+                {listing.max_class_size && (
+                  <div style={{ background: 'white', border: '1px solid #E0F2FE', borderRadius: 10, padding: '10px 12px' }}>
+                    <div style={{ fontSize: 11, color: '#0369A1', marginBottom: 3, fontWeight: 700 }}>MAX SIZE</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>👥 {listing.max_class_size} children</div>
+                  </div>
+                )}
+                {listing.term_schedule && (
+                  <div style={{ background: 'white', border: '1px solid #E0F2FE', borderRadius: 10, padding: '10px 12px' }}>
+                    <div style={{ fontSize: 11, color: '#0369A1', marginBottom: 3, fontWeight: 700 }}>TERMS</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>📅 {listing.term_schedule}</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Cancellation + what to bring as compact rows */}
+              {(listing.cancellation_policy || listing.what_to_bring || listing.sibling_discount || listing.holiday_closures) && (
+                <div style={{ background: 'white', border: '1px solid #E0F2FE', borderRadius: 10, padding: '10px 12px' }}>
+                  {listing.cancellation_policy && (
+                    <div style={{ fontSize: 13, color: '#374151', marginBottom: listing.what_to_bring || listing.sibling_discount || listing.holiday_closures ? 6 : 0 }}>
+                      🔁 <strong style={{ color: '#111827' }}>Cancellation:</strong> {listing.cancellation_policy}
+                    </div>
+                  )}
+                  {listing.what_to_bring && (
+                    <div style={{ fontSize: 13, color: '#374151', marginBottom: listing.sibling_discount || listing.holiday_closures ? 6 : 0 }}>
+                      🎒 <strong style={{ color: '#111827' }}>Bring:</strong> {listing.what_to_bring}
+                    </div>
+                  )}
+                  {listing.sibling_discount && (
+                    <div style={{ fontSize: 13, color: '#374151', marginBottom: listing.holiday_closures ? 6 : 0 }}>
+                      💛 <strong style={{ color: '#111827' }}>Sibling discount:</strong> {listing.sibling_discount}
+                    </div>
+                  )}
+                  {listing.holiday_closures && (
+                    <div style={{ fontSize: 13, color: '#374151' }}>
+                      🌴 <strong style={{ color: '#111827' }}>Holiday closures:</strong> {listing.holiday_closures}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )
         })()}
@@ -733,7 +849,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         {isNursery && tourSubmitted && (
           <div style={{ background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 16, padding: '16px', marginBottom: 10, textAlign: 'center' }}>
             <div style={{ fontSize: 16, fontWeight: 800, color: '#065F46', marginBottom: 4 }}>✅ Tour request sent</div>
-            <div style={{ fontSize: 13, color: '#065F46', lineHeight: 1.5 }}>The team at {listing.name} will be in touch within 48 hours.</div>
+            <div style={{ fontSize: 13, color: '#065F46', lineHeight: 1.5 }}>We've emailed you a copy. The team at {listing.name} will be in touch within 48 hours.</div>
           </div>
         )}
 
@@ -828,7 +944,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
                 onClick={async () => {
                   if (!tourName.trim() || !tourEmail.trim() || !tourPreferredDate) return
                   setTourSubmitting(true)
-                  const { error } = await supabase.from('tour_requests').insert([{
+                  const payload = {
                     listing_id: listing.id,
                     parent_name: tourName.trim(),
                     parent_email: tourEmail.trim(),
@@ -838,8 +954,22 @@ export default function ListingDetailClient({ listing, images, relatedListings }
                     alternative_date: tourAlternativeDate || null,
                     time_window: tourTimeWindow,
                     message: tourMessage.trim() || null,
-                  }])
+                  }
+                  const { error } = await supabase.from('tour_requests').insert([payload])
                   trackOutboundClick('book_tour_submit', error ? 'error' : 'success')
+                  // Fire-and-forget email notification. We don't block the success state on it —
+                  // the row is safely in the DB even if the email function is briefly down.
+                  if (!error) {
+                    fetch('/.netlify/functions/notify-tour-request', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        ...payload,
+                        listing_name: listing.name,
+                        listing_slug: listing.slug,
+                      }),
+                    }).catch(() => {})
+                  }
                   setTourSubmitted(true)
                   setTourSubmitting(false)
                 }}
