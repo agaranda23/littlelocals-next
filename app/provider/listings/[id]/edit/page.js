@@ -46,6 +46,13 @@ export default function EditListing({ params }) {
     term_schedule: '',
     cancellation_policy: '',
     what_to_bring: '',
+    under_2s_area: '',
+    sock_policy: '',
+    cafe_on_site: '',
+    free_parking: '',
+    max_session_minutes: '',
+    adult_price: '',
+    babies_free_under_months: '',
   })
   const [listing, setListing] = useState(null)
   const [photos, setPhotos] = useState([])
@@ -87,7 +94,7 @@ export default function EditListing({ params }) {
 
       const { data: l } = await supabase
         .from('listings')
-        .select('id, name, slug, category, type, description, price, website, free_trial, whatsapp_group_url, instagram, is_paused, logo, age_min, age_max, ofsted_rating, ofsted_report_url, ofsted_inspection_date, funded_hours, opens_at, closes_at, term_time_only, meals_included, nursery_fee, waitlist_status, babies_capacity, toddlers_capacity, preschool_capacity, outdoor_space, languages_spoken, sibling_discount, holiday_closures, dbs_checked, governing_body, governing_body_url, max_class_size, term_schedule, cancellation_policy, what_to_bring')
+        .select('id, name, slug, category, type, description, price, website, free_trial, whatsapp_group_url, instagram, is_paused, logo, age_min, age_max, ofsted_rating, ofsted_report_url, ofsted_inspection_date, funded_hours, opens_at, closes_at, term_time_only, meals_included, nursery_fee, waitlist_status, babies_capacity, toddlers_capacity, preschool_capacity, outdoor_space, languages_spoken, sibling_discount, holiday_closures, dbs_checked, governing_body, governing_body_url, max_class_size, term_schedule, cancellation_policy, what_to_bring, under_2s_area, sock_policy, cafe_on_site, free_parking, max_session_minutes, adult_price, babies_free_under_months')
         .eq('id', parseInt(listingId))
         .single()
 
@@ -136,6 +143,13 @@ export default function EditListing({ params }) {
           term_schedule: l.term_schedule || '',
           cancellation_policy: l.cancellation_policy || '',
           what_to_bring: l.what_to_bring || '',
+          under_2s_area: l.under_2s_area === true ? 'true' : l.under_2s_area === false ? 'false' : '',
+          sock_policy: l.sock_policy || '',
+          cafe_on_site: l.cafe_on_site === true ? 'true' : l.cafe_on_site === false ? 'false' : '',
+          free_parking: l.free_parking === true ? 'true' : l.free_parking === false ? 'false' : '',
+          max_session_minutes: l.max_session_minutes ?? '',
+          adult_price: l.adult_price || '',
+          babies_free_under_months: l.babies_free_under_months ?? '',
         })
       }
       setLoading(false)
@@ -194,8 +208,8 @@ export default function EditListing({ params }) {
     setError('')
 
     // Sanitise: empty strings/arrays -> null, coerce known types
-    const boolFields = ['is_paused', 'term_time_only', 'meals_included', 'dbs_checked']
-    const intFields = ['age_min', 'age_max', 'babies_capacity', 'toddlers_capacity', 'preschool_capacity', 'max_class_size']
+    const boolFields = ['is_paused', 'term_time_only', 'meals_included', 'dbs_checked', 'under_2s_area', 'cafe_on_site', 'free_parking']
+    const intFields = ['age_min', 'age_max', 'babies_capacity', 'toddlers_capacity', 'preschool_capacity', 'max_class_size', 'max_session_minutes', 'babies_free_under_months']
     const arrayFields = ['funded_hours']
     // Comma-separated text -> array of trimmed non-empty strings
     const csvArrayFields = ['languages_spoken']
@@ -547,6 +561,69 @@ export default function EditListing({ params }) {
             <div style={{ marginBottom: 0 }}>
               <label style={labelStyle}>Holiday closures</label>
               <input value={form.holiday_closures} onChange={set('holiday_closures')} placeholder="e.g. Closed bank holidays + Christmas" style={inputStyle} />
+            </div>
+          </div>
+        )}
+
+        {/* Soft play info — only for category=soft play */}
+        {(listing?.category || '').toLowerCase() === 'soft play' && (
+          <div style={{ background: 'white', borderRadius: 14, padding: 20, border: '1px solid #E5E7EB', marginBottom: 12 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#5B2D6E', marginBottom: 6 }}>🎈 Soft play info</div>
+            <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 18, lineHeight: 1.5 }}>
+              The deciders for soft play parents: is there a baby zone, what's the sock policy, is there a café, can they park, what do adults pay.
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Dedicated under-2s area?</label>
+              <select value={form.under_2s_area} onChange={set('under_2s_area')} style={inputStyle}>
+                <option value="">— Not specified —</option>
+                <option value="true">Yes — separate baby zone</option>
+                <option value="false">No</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Sock policy</label>
+              <input value={form.sock_policy} onChange={set('sock_policy')} placeholder="e.g. Grip socks required (£2 available on site)" style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Café on site?</label>
+              <select value={form.cafe_on_site} onChange={set('cafe_on_site')} style={inputStyle}>
+                <option value="">— Not specified —</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Free parking?</label>
+              <select value={form.free_parking} onChange={set('free_parking')} style={inputStyle}>
+                <option value="">— Not specified —</option>
+                <option value="true">Yes</option>
+                <option value="false">No / paid only</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>
+                Max session length
+                <span style={{ fontWeight: 400, color: '#9CA3AF', marginLeft: 6 }}>(minutes, blank = unlimited)</span>
+              </label>
+              <input type="number" min={1} value={form.max_session_minutes} onChange={set('max_session_minutes')} placeholder="e.g. 90" style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Adult price</label>
+              <input value={form.adult_price} onChange={set('adult_price')} placeholder="e.g. £2 per adult, or 'Free with paying child'" style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: 0 }}>
+              <label style={labelStyle}>
+                Babies free under
+                <span style={{ fontWeight: 400, color: '#9CA3AF', marginLeft: 6 }}>(months)</span>
+              </label>
+              <input type="number" min={0} value={form.babies_free_under_months} onChange={set('babies_free_under_months')} placeholder="e.g. 12" style={inputStyle} />
             </div>
           </div>
         )}

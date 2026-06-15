@@ -648,6 +648,59 @@ export default function ListingDetailClient({ listing, images, relatedListings }
           )
         })()}
 
+        {/* Soft play info — only for category=soft play */}
+        {(listing.category || '').toLowerCase() === 'soft play' && (() => {
+          const items = []
+          if (listing.under_2s_area === true) items.push({ k: '👶', label: 'Dedicated under-2s area' })
+          if (listing.cafe_on_site === true) items.push({ k: '☕', label: 'Café on site' })
+          if (listing.free_parking === true) items.push({ k: '🅿️', label: 'Free parking' })
+          const hasFeatures = items.length > 0
+          const hasDetails = listing.sock_policy || listing.max_session_minutes
+            || listing.adult_price || listing.babies_free_under_months
+          if (!hasFeatures && !hasDetails) return null
+
+          return (
+            <div style={{ background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: 16, padding: '16px 16px 14px', marginBottom: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: '#92400E', marginBottom: 12, letterSpacing: 0.3 }}>🎈 SOFT PLAY INFO</div>
+
+              {hasFeatures && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: hasDetails ? 12 : 0 }}>
+                  {items.map(it => (
+                    <span key={it.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'white', color: '#92400E', fontSize: 12, fontWeight: 700, padding: '5px 12px', borderRadius: 14, border: '1px solid #FDE68A' }}>
+                      {it.k} {it.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {hasDetails && (
+                <div style={{ background: 'white', border: '1px solid #FDE68A', borderRadius: 10, padding: '10px 12px' }}>
+                  {listing.sock_policy && (
+                    <div style={{ fontSize: 13, color: '#374151', marginBottom: 6 }}>
+                      🧦 <strong style={{ color: '#111827' }}>Sock policy:</strong> {listing.sock_policy}
+                    </div>
+                  )}
+                  {listing.max_session_minutes && (
+                    <div style={{ fontSize: 13, color: '#374151', marginBottom: 6 }}>
+                      ⏱️ <strong style={{ color: '#111827' }}>Max session:</strong> {listing.max_session_minutes} minutes
+                    </div>
+                  )}
+                  {listing.adult_price && (
+                    <div style={{ fontSize: 13, color: '#374151', marginBottom: listing.babies_free_under_months ? 6 : 0 }}>
+                      👤 <strong style={{ color: '#111827' }}>Adults:</strong> {listing.adult_price}
+                    </div>
+                  )}
+                  {listing.babies_free_under_months && (
+                    <div style={{ fontSize: 13, color: '#374151' }}>
+                      🍼 <strong style={{ color: '#111827' }}>Babies free under:</strong> {listing.babies_free_under_months} months
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })()}
+
         {/* Social proof signal - verified only */}
         {detailSignal && (
           <div style={{ fontSize: 13, color: '#6B7280', fontWeight: 600, marginBottom: 12 }}>
