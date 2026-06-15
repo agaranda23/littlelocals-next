@@ -796,7 +796,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
         {isNursery && tourSubmitted && (
           <div style={{ background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 16, padding: '16px', marginBottom: 10, textAlign: 'center' }}>
             <div style={{ fontSize: 16, fontWeight: 800, color: '#065F46', marginBottom: 4 }}>✅ Tour request sent</div>
-            <div style={{ fontSize: 13, color: '#065F46', lineHeight: 1.5 }}>The team at {listing.name} will be in touch within 48 hours.</div>
+            <div style={{ fontSize: 13, color: '#065F46', lineHeight: 1.5 }}>We've emailed you a copy. The team at {listing.name} will be in touch within 48 hours.</div>
           </div>
         )}
 
@@ -891,7 +891,7 @@ export default function ListingDetailClient({ listing, images, relatedListings }
                 onClick={async () => {
                   if (!tourName.trim() || !tourEmail.trim() || !tourPreferredDate) return
                   setTourSubmitting(true)
-                  const { error } = await supabase.from('tour_requests').insert([{
+                  const payload = {
                     listing_id: listing.id,
                     parent_name: tourName.trim(),
                     parent_email: tourEmail.trim(),
@@ -901,8 +901,22 @@ export default function ListingDetailClient({ listing, images, relatedListings }
                     alternative_date: tourAlternativeDate || null,
                     time_window: tourTimeWindow,
                     message: tourMessage.trim() || null,
-                  }])
+                  }
+                  const { error } = await supabase.from('tour_requests').insert([payload])
                   trackOutboundClick('book_tour_submit', error ? 'error' : 'success')
+                  // Fire-and-forget email notification. We don't block the success state on it —
+                  // the row is safely in the DB even if the email function is briefly down.
+                  if (!error) {
+                    fetch('/.netlify/functions/notify-tour-request', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        ...payload,
+                        listing_name: listing.name,
+                        listing_slug: listing.slug,
+                      }),
+                    }).catch(() => {})
+                  }
                   setTourSubmitted(true)
                   setTourSubmitting(false)
                 }}
