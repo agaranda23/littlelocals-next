@@ -113,10 +113,16 @@ export default function NurseriesClient({ nurseries }) {
           Filter by Ofsted rating, funded hours your child is entitled to, and age group.
           {totalCount > 0 && <> <strong style={{ color: '#374151' }}>{totalCount} settings listed.</strong></>}
         </p>
-        <a href="https://www.childcarechoices.gov.uk/" target="_blank" rel="noopener noreferrer"
-          style={{ display: 'inline-block', fontSize: 12, color: PURPLE, textDecoration: 'underline', fontWeight: 700 }}>
-          Not sure what funded hours you're entitled to? →
-        </a>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, alignItems: 'center' }}>
+          <a href="https://www.childcarechoices.gov.uk/" target="_blank" rel="noopener noreferrer"
+            style={{ fontSize: 12, color: PURPLE, textDecoration: 'underline', fontWeight: 700 }}>
+            What funded hours am I entitled to? →
+          </a>
+          <a href="/childcare-cost-calculator"
+            style={{ fontSize: 12, color: PURPLE, textDecoration: 'underline', fontWeight: 700 }}>
+            💷 Estimate my monthly cost →
+          </a>
+        </div>
       </div>
 
       {/* Search */}
