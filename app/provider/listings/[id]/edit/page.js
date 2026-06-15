@@ -32,6 +32,13 @@ export default function EditListing({ params }) {
     meals_included: '',
     nursery_fee: '',
     waitlist_status: '',
+    babies_capacity: '',
+    toddlers_capacity: '',
+    preschool_capacity: '',
+    outdoor_space: '',
+    languages_spoken: '',
+    sibling_discount: '',
+    holiday_closures: '',
   })
   const [listing, setListing] = useState(null)
   const [photos, setPhotos] = useState([])
@@ -73,7 +80,7 @@ export default function EditListing({ params }) {
 
       const { data: l } = await supabase
         .from('listings')
-        .select('id, name, slug, category, description, price, website, free_trial, whatsapp_group_url, instagram, is_paused, logo, age_min, age_max, ofsted_rating, ofsted_report_url, ofsted_inspection_date, funded_hours, opens_at, closes_at, term_time_only, meals_included, nursery_fee, waitlist_status')
+        .select('id, name, slug, category, description, price, website, free_trial, whatsapp_group_url, instagram, is_paused, logo, age_min, age_max, ofsted_rating, ofsted_report_url, ofsted_inspection_date, funded_hours, opens_at, closes_at, term_time_only, meals_included, nursery_fee, waitlist_status, babies_capacity, toddlers_capacity, preschool_capacity, outdoor_space, languages_spoken, sibling_discount, holiday_closures')
         .eq('id', parseInt(listingId))
         .single()
 
@@ -108,6 +115,13 @@ export default function EditListing({ params }) {
           meals_included: l.meals_included === true ? 'true' : l.meals_included === false ? 'false' : '',
           nursery_fee: l.nursery_fee || '',
           waitlist_status: l.waitlist_status || '',
+          babies_capacity: l.babies_capacity ?? '',
+          toddlers_capacity: l.toddlers_capacity ?? '',
+          preschool_capacity: l.preschool_capacity ?? '',
+          outdoor_space: l.outdoor_space || '',
+          languages_spoken: Array.isArray(l.languages_spoken) ? l.languages_spoken.join(', ') : '',
+          sibling_discount: l.sibling_discount || '',
+          holiday_closures: l.holiday_closures || '',
         })
       }
       setLoading(false)
@@ -167,14 +181,19 @@ export default function EditListing({ params }) {
 
     // Sanitise: empty strings/arrays -> null, coerce known types
     const boolFields = ['is_paused', 'term_time_only', 'meals_included']
-    const intFields = ['age_min', 'age_max']
+    const intFields = ['age_min', 'age_max', 'babies_capacity', 'toddlers_capacity', 'preschool_capacity']
     const arrayFields = ['funded_hours']
+    // Comma-separated text -> array of trimmed non-empty strings
+    const csvArrayFields = ['languages_spoken']
     const payload = {}
     for (const [k, v] of Object.entries(form)) {
       if (v === '' || v === undefined || v === null) {
         payload[k] = null
       } else if (arrayFields.includes(k)) {
         payload[k] = Array.isArray(v) && v.length > 0 ? v : null
+      } else if (csvArrayFields.includes(k)) {
+        const parts = String(v).split(',').map(s => s.trim()).filter(Boolean)
+        payload[k] = parts.length > 0 ? parts : null
       } else if (boolFields.includes(k)) {
         payload[k] = v === true || v === 'true'
       } else if (intFields.includes(k)) {
@@ -397,9 +416,51 @@ export default function EditListing({ params }) {
               <input value={form.nursery_fee} onChange={set('nursery_fee')} placeholder="e.g. From £65/day or £14/hour" style={inputStyle} />
             </div>
 
-            <div style={{ marginBottom: 0 }}>
+            <div style={{ marginBottom: 18 }}>
               <label style={labelStyle}>Waitlist / availability status</label>
               <input value={form.waitlist_status} onChange={set('waitlist_status')} placeholder="e.g. Spaces available for 2–3yo, waitlist for under-2s" style={inputStyle} />
+            </div>
+
+            <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 16, marginTop: 4, marginBottom: 12, fontSize: 12, fontWeight: 700, color: '#6B7280', letterSpacing: 0.3, textTransform: 'uppercase' }}>
+              Capacity & operations
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Capacity by age group (number of places)</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ flex: 1 }}>
+                  <input type="number" min={0} value={form.babies_capacity} onChange={set('babies_capacity')} placeholder="Babies 0–2" style={inputStyle} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <input type="number" min={0} value={form.toddlers_capacity} onChange={set('toddlers_capacity')} placeholder="Toddlers 2–3" style={inputStyle} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <input type="number" min={0} value={form.preschool_capacity} onChange={set('preschool_capacity')} placeholder="Pre-school 3–4" style={inputStyle} />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Outdoor space</label>
+              <input value={form.outdoor_space} onChange={set('outdoor_space')} placeholder="e.g. Large garden + shared rooftop, near Walpole Park" style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>
+                Languages spoken
+                <span style={{ fontWeight: 400, color: '#9CA3AF', marginLeft: 6 }}>(comma-separated)</span>
+              </label>
+              <input value={form.languages_spoken} onChange={set('languages_spoken')} placeholder="e.g. English, French, Polish" style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Sibling discount</label>
+              <input value={form.sibling_discount} onChange={set('sibling_discount')} placeholder="e.g. 10% off second child" style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: 0 }}>
+              <label style={labelStyle}>Holiday closures</label>
+              <input value={form.holiday_closures} onChange={set('holiday_closures')} placeholder="e.g. Closed Christmas, 2 weeks August, bank holidays" style={inputStyle} />
             </div>
           </div>
         )}
