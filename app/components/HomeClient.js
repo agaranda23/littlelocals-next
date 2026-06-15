@@ -981,7 +981,7 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
           </a>
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 12 }}>
-          {[['For providers','/for-providers'],['Privacy Policy','/privacy'],['Cookie Policy','/cookies'],['Terms of Service','/terms'],['Contact','mailto:hello@littlelocals.uk']].map(([label, href]) => (
+          {[['Nurseries','/nurseries'],['For providers','/for-providers'],['Privacy Policy','/privacy'],['Cookie Policy','/cookies'],['Terms of Service','/terms'],['Contact','mailto:hello@littlelocals.uk']].map(([label, href]) => (
             <a key={label} href={href} style={{ fontSize: 11, color: '#9CA3AF', textDecoration: 'underline' }}>{label}</a>
           ))}
         </div>
