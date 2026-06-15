@@ -39,6 +39,15 @@ export default function EditListing({ params }) {
     languages_spoken: '',
     sibling_discount: '',
     holiday_closures: '',
+    pram_friendly: '',
+    baby_changing: '',
+    accessible: '',
+    free_under_age: '',
+    family_ticket_price: '',
+    season: '',
+    duration_typical: '',
+    annual_pass_available: '',
+    food_options: '',
   })
   const [listing, setListing] = useState(null)
   const [photos, setPhotos] = useState([])
@@ -80,7 +89,7 @@ export default function EditListing({ params }) {
 
       const { data: l } = await supabase
         .from('listings')
-        .select('id, name, slug, category, description, price, website, free_trial, whatsapp_group_url, instagram, is_paused, logo, age_min, age_max, ofsted_rating, ofsted_report_url, ofsted_inspection_date, funded_hours, opens_at, closes_at, term_time_only, meals_included, nursery_fee, waitlist_status, babies_capacity, toddlers_capacity, preschool_capacity, outdoor_space, languages_spoken, sibling_discount, holiday_closures')
+        .select('id, name, slug, category, description, price, website, free_trial, whatsapp_group_url, instagram, is_paused, logo, age_min, age_max, ofsted_rating, ofsted_report_url, ofsted_inspection_date, funded_hours, opens_at, closes_at, term_time_only, meals_included, nursery_fee, waitlist_status, babies_capacity, toddlers_capacity, preschool_capacity, outdoor_space, languages_spoken, sibling_discount, holiday_closures, pram_friendly, baby_changing, accessible, free_under_age, family_ticket_price, season, duration_typical, annual_pass_available, food_options')
         .eq('id', parseInt(listingId))
         .single()
 
@@ -122,6 +131,15 @@ export default function EditListing({ params }) {
           languages_spoken: Array.isArray(l.languages_spoken) ? l.languages_spoken.join(', ') : '',
           sibling_discount: l.sibling_discount || '',
           holiday_closures: l.holiday_closures || '',
+          pram_friendly: l.pram_friendly === true ? 'true' : l.pram_friendly === false ? 'false' : '',
+          baby_changing: l.baby_changing === true ? 'true' : l.baby_changing === false ? 'false' : '',
+          accessible: l.accessible === true ? 'true' : l.accessible === false ? 'false' : '',
+          free_under_age: l.free_under_age ?? '',
+          family_ticket_price: l.family_ticket_price || '',
+          season: l.season || '',
+          duration_typical: l.duration_typical || '',
+          annual_pass_available: l.annual_pass_available === true ? 'true' : l.annual_pass_available === false ? 'false' : '',
+          food_options: l.food_options || '',
         })
       }
       setLoading(false)
@@ -180,8 +198,8 @@ export default function EditListing({ params }) {
     setError('')
 
     // Sanitise: empty strings/arrays -> null, coerce known types
-    const boolFields = ['is_paused', 'term_time_only', 'meals_included']
-    const intFields = ['age_min', 'age_max', 'babies_capacity', 'toddlers_capacity', 'preschool_capacity']
+    const boolFields = ['is_paused', 'term_time_only', 'meals_included', 'pram_friendly', 'baby_changing', 'accessible', 'annual_pass_available']
+    const intFields = ['age_min', 'age_max', 'babies_capacity', 'toddlers_capacity', 'preschool_capacity', 'free_under_age']
     const arrayFields = ['funded_hours']
     // Comma-separated text -> array of trimmed non-empty strings
     const csvArrayFields = ['languages_spoken']
@@ -461,6 +479,87 @@ export default function EditListing({ params }) {
             <div style={{ marginBottom: 0 }}>
               <label style={labelStyle}>Holiday closures</label>
               <input value={form.holiday_closures} onChange={set('holiday_closures')} placeholder="e.g. Closed Christmas, 2 weeks August, bank holidays" style={inputStyle} />
+            </div>
+          </div>
+        )}
+
+        {/* Days out info — for attractions / days out */}
+        {['attraction', 'days out', 'day out', 'theme park', 'farm', 'zoo', 'museum'].includes((listing?.category || '').toLowerCase()) && (
+          <div style={{ background: 'white', borderRadius: 14, padding: 20, border: '1px solid #E5E7EB', marginBottom: 12 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#5B2D6E', marginBottom: 6 }}>🎢 Days out info</div>
+            <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 18, lineHeight: 1.5 }}>
+              Parents planning a day out need to know: pram access, baby changing, when you're open, what a family ticket costs, how long to allow.
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Pram-friendly throughout?</label>
+              <select value={form.pram_friendly} onChange={set('pram_friendly')} style={inputStyle}>
+                <option value="">— Not specified —</option>
+                <option value="true">Yes</option>
+                <option value="false">No / partial access only</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Baby changing facilities?</label>
+              <select value={form.baby_changing} onChange={set('baby_changing')} style={inputStyle}>
+                <option value="">— Not specified —</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Wheelchair / step-free accessible?</label>
+              <select value={form.accessible} onChange={set('accessible')} style={inputStyle}>
+                <option value="">— Not specified —</option>
+                <option value="true">Yes</option>
+                <option value="false">Partially / limited</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>
+                Free entry under age
+                <span style={{ fontWeight: 400, color: '#9CA3AF', marginLeft: 6 }}>(years)</span>
+              </label>
+              <input type="number" min={0} value={form.free_under_age} onChange={set('free_under_age')} placeholder="e.g. 3" style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Family ticket price</label>
+              <input value={form.family_ticket_price} onChange={set('family_ticket_price')} placeholder="e.g. £45 for 2 adults + 2 kids" style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Season</label>
+              <select value={form.season} onChange={set('season')} style={inputStyle}>
+                <option value="">— Not specified —</option>
+                <option value="year_round">Year-round</option>
+                <option value="spring_summer">Spring & Summer</option>
+                <option value="summer_only">Summer only</option>
+                <option value="autumn_winter">Autumn & Winter</option>
+                <option value="school_holidays_only">School holidays only</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Typical visit duration</label>
+              <input value={form.duration_typical} onChange={set('duration_typical')} placeholder="e.g. Half day, full day, 2–3 hours" style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Annual pass available?</label>
+              <select value={form.annual_pass_available} onChange={set('annual_pass_available')} style={inputStyle}>
+                <option value="">— Not specified —</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 0 }}>
+              <label style={labelStyle}>Food options</label>
+              <input value={form.food_options} onChange={set('food_options')} placeholder="e.g. Café on site + picnic area, no food sold" style={inputStyle} />
             </div>
           </div>
         )}
