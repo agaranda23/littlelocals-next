@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import ListingCard from './ListingCard'
 import MapView from './MapView'
+import DigestSignup from './DigestSignup'
 
 const DAY_NAMES = ['sun','mon','tue','wed','thu','fri','sat']
 
@@ -885,6 +886,9 @@ export default function HomeClient({ listings, recentListings = [], localFav = n
         )
       })()}
 
+
+      {/* Weekly digest signup */}
+      <DigestSignup source="home" />
 
       {/* Suggest an activity CTA */}
       <div style={{ margin: '24px 16px 0', background: '#FFF7ED', border: '2px dashed #D4732A', borderRadius: 18, padding: '20px 16px' }}>
