@@ -70,6 +70,11 @@ export default function RootLayout({ children }) {
       <body style={{ margin: 0, background: '#F9FAFB', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
         <AuthRedirectHandler />
         {children}
+        <footer style={{ textAlign: 'center', padding: '28px 16px 96px', fontSize: 12, color: '#9CA3AF' }}>
+          <a href="https://arandalabs.com" target="_blank" rel="noreferrer" style={{ color: '#9CA3AF', textDecoration: 'none' }}>
+            An <span style={{ color: '#5C4B6B', fontWeight: 600 }}>Aranda Labs</span> product
+          </a>
+        </footer>
       </body>
     </html>
   )
